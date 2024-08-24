@@ -38,6 +38,12 @@ function efs_enqueue_admin_scripts()
     
     /* Enqueue admin JS */
     wp_enqueue_script('efs-admin-js', plugin_dir_url(__FILE__) . 'assets/js/admin.js', array('jquery'), '1.0.0', true);
+
+    /* Localize script with data */
+    wp_localize_script('efs-admin-js', 'efsAdminAjax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce'    => wp_create_nonce('efs_admin_nonce')
+    ));
 }
 
 /* Include the necessary files */
