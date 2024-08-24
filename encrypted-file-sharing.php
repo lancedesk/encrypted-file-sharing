@@ -18,6 +18,28 @@ if (!defined('ABSPATH'))
     exit; /* Exit if accessed directly */
 }
 
+/* Enqueue frontend styles and scripts */
+add_action('wp_enqueue_scripts', 'efs_enqueue_frontend_scripts');
+function efs_enqueue_frontend_scripts()
+{
+    /* Enqueue frontend CSS */
+    wp_enqueue_style('efs-frontend-css', plugin_dir_url(__FILE__) . 'assets/css/frontend.css', array(), '1.0.0');
+    
+    /* Enqueue frontend JS */
+    wp_enqueue_script('efs-frontend-js', plugin_dir_url(__FILE__) . 'assets/js/frontend.js', array('jquery'), '1.0.0', true);
+}
+
+/* Enqueue admin styles and scripts */
+add_action('admin_enqueue_scripts', 'efs_enqueue_admin_scripts');
+function efs_enqueue_admin_scripts()
+{
+    /* Enqueue admin CSS */
+    wp_enqueue_style('efs-admin-css', plugin_dir_url(__FILE__) . 'assets/css/admin.css', array(), '1.0.0');
+    
+    /* Enqueue admin JS */
+    wp_enqueue_script('efs-admin-js', plugin_dir_url(__FILE__) . 'assets/js/admin.js', array('jquery'), '1.0.0', true);
+}
+
 /* Include the necessary files */
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-handler.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-encryption.php';
