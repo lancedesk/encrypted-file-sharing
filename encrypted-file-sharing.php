@@ -47,3 +47,10 @@ require_once plugin_dir_path(__FILE__) . 'includes/classes/class-notification.ph
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-user-dashboard.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-2fa-auth.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-protection.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-users.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-cpt.php';
+
+
+/* Instantiate the necessary classes */
+new EFS_Admin_Users();
+new EFS_File_CPT();
