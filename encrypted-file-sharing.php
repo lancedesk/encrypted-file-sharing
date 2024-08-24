@@ -50,9 +50,11 @@ require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-protectio
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-users.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-cpt.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/user-permissions.php';
+require_once plugin_dir_path(__FILE__) . 'includes/functions/class-admin-columns.php';
 
 /* Hook for plugin activation to create the table */
 register_activation_hook(__FILE__, 'create_admin_table');
 
 /* Instantiate the necessary classes */
 new EFS_File_CPT();
+$efs_admin_columns = new EFS_Admin_Columns();
