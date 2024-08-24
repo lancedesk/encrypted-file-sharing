@@ -1,5 +1,7 @@
 <?php
 
+require_once 'class-file-handler.php'; /* Include the file handler class */
+
 class EFS_File_CPT
 {
     /**
@@ -7,6 +9,8 @@ class EFS_File_CPT
      */
     public function __construct()
     {
+        $this->file_handler = new EFS_File_Handler(); /* Instantiate the file handler */
+
         /* Hook for initializing the custom post type */
         add_action('init', array($this, 'register_file_cpt'));
 
@@ -67,7 +71,7 @@ class EFS_File_CPT
         add_submenu_page(
             'edit.php?post_type=efs_file', /* Parent slug (the slug of the CPT menu) */
             __('EFS Settings', 'encrypted-file-sharing'), // Page title */
-            __('Settings', 'encrypted-file-sharing'), // Menu title */
+            __('Settings', 'encrypted-file-sharing'), /* Menu title */
             'manage_options', /* Capability */
             'efs-settings', /* Menu slug */
             array($this, 'settings_page_content') /* Callback function */
@@ -192,7 +196,14 @@ class EFS_File_CPT
         /* Sanitize user input. */
         $file_url = sanitize_text_field($_POST['efs_file_url']);
 
-        /* Update the meta field in the database. */
-        update_post_meta($post_id, '_efs_file_url', $file_url);
+        /* Handle the file upload if a file is provided */
+        if (isset($_FILES['file']) && !empty($_FILES['file']['name'])) {
+            $upload_result = $this->file_handler->handle_file_upload($_FILES['file']);
+
+            if ($upload_result) {
+                /* Update the meta field with the new file URL if upload was successful */
+                update_post_meta($post_id, '_efs_file_url', $upload_result);
+            }
+        }
     }
 }
