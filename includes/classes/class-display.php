@@ -110,7 +110,7 @@ public function render_user_files_shortcode($atts) {
 private function get_file_type_icon($file_type) 
 {
     /* Use dynamic base path to the icons folder */
-    $base_path = plugins_url('assets/images/', dirname(__FILE__));
+    $base_path = plugin_dir_url(__FILE__) . '../../assets/images/';
 
     switch (strtolower($file_type)) 
     {
