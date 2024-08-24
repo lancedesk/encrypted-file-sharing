@@ -50,6 +50,7 @@ encrypted-file-sharing/
 ├── assets/
 │   ├── css/
 │   └── js/
+│   └── images/
 │
 ├── includes/
 │   ├── classes/
