@@ -80,12 +80,23 @@ class EFS_File_CPT
 
     public function settings_page_content()
     {
+        if (isset($_POST['efs_storage_option'])) {
+            update_option('efs_storage_option', sanitize_text_field($_POST['efs_storage_option']));
+        }
+
+        $selected_storage = get_option('efs_storage_option', 'local');
+
         echo '<div class="wrap">';
         echo '<h1>' . __('EFS Settings', 'encrypted-file-sharing') . '</h1>';
-        echo '<form method="post" action="options.php">';
-        settings_fields('efs_settings_group');
-        do_settings_sections('efs-settings');
-        submit_button();
+        echo '<form method="post" action="">';
+        echo '<h2>' . __('Select Storage Option', 'encrypted-file-sharing') . '</h2>';
+        echo '<select name="efs_storage_option">';
+        echo '<option value="local"' . selected($selected_storage, 'local', false) . '>' . __('Local Media', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="amazon"' . selected($selected_storage, 'amazon', false) . '>' . __('Amazon S3', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="google"' . selected($selected_storage, 'google', false) . '>' . __('Google Drive', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="dropbox"' . selected($selected_storage, 'dropbox', false) . '>' . __('Dropbox', 'encrypted-file-sharing') . '</option>';
+        echo '</select>';
+        submit_button(__('Save Settings', 'encrypted-file-sharing'));
         echo '</form>';
         echo '</div>';
     }
