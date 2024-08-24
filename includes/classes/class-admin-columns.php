@@ -38,11 +38,14 @@ class EFS_Admin_Columns
             case 'recipient':
                 $recipients = get_post_meta($post_id, '_efs_user_selection', true);
                 if ($recipients) {
-                    $user_names = array_map(function($user_id) {
+                    $user_links = array_map(function($user_id) {
                         $user = get_user_by('ID', $user_id);
-                        return $user ? $user->display_name : '';
+                        if ($user) {
+                            return '<a href="' . esc_url(get_edit_user_link($user_id)) . '">' . esc_html($user->display_name) . '</a>';
+                        }
+                        return '';
                     }, $recipients);
-                    echo implode(', ', $user_names);
+                    echo implode(', ', $user_links);
                 } else {
                     echo __('None', 'encrypted-file-sharing');
                 }
