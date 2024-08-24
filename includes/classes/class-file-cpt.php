@@ -41,6 +41,7 @@ class EFS_File_CPT
             'has_archive'        => false,
             'hierarchical'       => false,
             'supports'           => array('title', 'editor', 'author', 'thumbnail', 'excerpt'),
+            'taxonomies'         => array('category'), /* Support for categories */
             'menu_icon'          => 'dashicons-media-document', /* Icon for the post type */
         );
 
