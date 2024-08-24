@@ -168,7 +168,8 @@ class EFS_File_CPT
 
     /**
      * Save the file URL meta box data.
-     */
+    */
+
     public function save_file_meta_box_data($post_id)
     {
         /* Check if our nonce is set. */
@@ -206,6 +207,9 @@ class EFS_File_CPT
                 /* Update the meta field with the new file URL if upload was successful */
                 update_post_meta($post_id, '_efs_file_url', $upload_result);
             }
+        } else {
+            /* Update file URL if it's provided in the form */
+            update_post_meta($post_id, '_efs_file_url', $file_url);
         }
     }
 }
