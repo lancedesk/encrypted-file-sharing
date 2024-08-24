@@ -62,6 +62,9 @@ public function render_user_files_shortcode($atts) {
                         $excerpt = get_the_excerpt();
                         $description = get_the_content();
 
+                        /* Get upload date and format it to show time */
+                        $upload_date = get_the_date('F j, Y \a\t g:i A');
+
                         echo '<li>';
                         
                         /* Display file type icon */
@@ -69,6 +72,9 @@ public function render_user_files_shortcode($atts) {
                         
                         /* Display title */
                         echo '<a href="' . esc_url($file_url) . '">' . get_the_title() . '</a>';
+
+                        /* Display upload/creation date */
+                        echo '<p class="file-date">' . __('Uploaded on: ', 'encrypted-file-sharing') . esc_html($upload_date) . '</p>';
                         
                         /* Show excerpt or description */
                         if (!empty($excerpt)) {
