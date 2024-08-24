@@ -111,35 +111,36 @@ private function get_file_type_icon($file_type)
 {
     /* Use dynamic base path to the icons folder */
     $base_path = plugin_dir_url(__FILE__) . '../../assets/images/';
+    $icon_dimension = 'width="32px" height="32px"'; /* Add width and height dimensions */
 
     switch (strtolower($file_type)) 
     {
         case 'pdf':
-            return '<img src="' . esc_url($base_path . 'pdf.png') . '" alt="PDF Icon" />';
+            return '<img src="' . esc_url($base_path . 'pdf.png') . '" alt="PDF Icon" ' . $icon_dimension . ' />';
         case 'doc':
         case 'docx':
-            return '<img src="' . esc_url($base_path . 'doc.png') . '" alt="Word Icon" />';
+            return '<img src="' . esc_url($base_path . 'doc.png') . '" alt="Word Icon" ' . $icon_dimension . ' />';
         case 'mp3':
         case 'wav':
-            return '<img src="' . esc_url($base_path . 'mp3.png') . '" alt="Audio Icon" />';
+            return '<img src="' . esc_url($base_path . 'mp3.png') . '" alt="Audio Icon" ' . $icon_dimension . ' />';
         case 'avi':
-            return '<img src="' . esc_url($base_path . 'avi.png') . '" alt="AVI Icon" />';
+            return '<img src="' . esc_url($base_path . 'avi.png') . '" alt="AVI Icon" ' . $icon_dimension . ' />';
         case 'csv':
-            return '<img src="' . esc_url($base_path . 'csv.png') . '" alt="CSV Icon" />';
+            return '<img src="' . esc_url($base_path . 'csv.png') . '" alt="CSV Icon" ' . $icon_dimension . ' />';
         case 'jpg':
         case 'jpeg':
-            return '<img src="' . esc_url($base_path . 'jpg.png') . '" alt="JPG Icon" />';
+            return '<img src="' . esc_url($base_path . 'jpg.png') . '" alt="JPG Icon" ' . $icon_dimension . ' />';
         case 'mp4':
-            return '<img src="' . esc_url($base_path . 'mp4.png') . '" alt="MP4 Icon" />';
+            return '<img src="' . esc_url($base_path . 'mp4.png') . '" alt="MP4 Icon" ' . $icon_dimension . ' />';
         case 'ppt':
         case 'pptx':
-            return '<img src="' . esc_url($base_path . 'ppt.png') . '" alt="PowerPoint Icon" />';
+            return '<img src="' . esc_url($base_path . 'ppt.png') . '" alt="PowerPoint Icon" ' . $icon_dimension . ' />';
         case 'rtf':
-            return '<img src="' . esc_url($base_path . 'rtf.png') . '" alt="RTF Icon" />';
+            return '<img src="' . esc_url($base_path . 'rtf.png') . '" alt="RTF Icon" ' . $icon_dimension . ' />';
         case 'zip':
-            return '<img src="' . esc_url($base_path . 'zip.png') . '" alt="ZIP Icon" />';
+            return '<img src="' . esc_url($base_path . 'zip.png') . '" alt="ZIP Icon" ' . $icon_dimension . ' />';
         default:
-            return '<img src="' . esc_url($base_path . 'default.png') . '" alt="File Icon" />';
+            return '<img src="' . esc_url($base_path . 'default.png') . '" alt="File Icon" ' . $icon_dimension . ' />';
     }
 }
 
