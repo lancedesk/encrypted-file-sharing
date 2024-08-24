@@ -17,3 +17,11 @@ if (!defined('ABSPATH'))
 {
     exit; /* Exit if accessed directly */
 }
+
+/* Include the necessary files */
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-handler.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-encryption.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-notification.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-user-dashboard.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-2fa-auth.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-protection.php';
