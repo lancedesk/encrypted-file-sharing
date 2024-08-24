@@ -1,6 +1,7 @@
 <?php
 
 require_once 'class-file-handler.php'; /* Include the file handler class */
+require_once 'class-user-selection.php'; /* Include the user selection class */
 
 class EFS_File_CPT
 {
@@ -10,6 +11,7 @@ class EFS_File_CPT
     public function __construct()
     {
         $this->file_handler = new EFS_File_Handler(); /* Instantiate the file handler */
+        $this->user_selection = new EFS_User_Selection(); /* Instantiate user selection */
 
         /* Hook for initializing the custom post type */
         add_action('init', array($this, 'register_file_cpt'));
