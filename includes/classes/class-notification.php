@@ -49,9 +49,11 @@ class EFS_Notification_Handler
                 wp_mail($user_email, $subject, $message, $headers);
 
                 /* Log debug info */
+                /*
                 $this->log_debug_info(
                     "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
                 );
+                */
             }
         }
     }
@@ -86,8 +88,10 @@ class EFS_Notification_Handler
         wp_mail($admin_email, $subject, $message, $headers);
 
         /* Log debug info */
+        /*
         $this->log_debug_info(
             "Admin notification sent: Admin email: {$admin_email}, File: {$file_name}, Time: {$download_time}, Downloaded by: {$user->user_email}, IP: {$user_ip}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
         );
+        */
     }
 }
