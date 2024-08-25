@@ -7,6 +7,7 @@ class EFS_Notification_Handler
      *
      * @param int $post_id Post ID of the uploaded file.
     */
+
     public function send_upload_notifications($post_id)
     {
         $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
@@ -33,5 +34,32 @@ class EFS_Notification_Handler
                 wp_mail($user_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
             }
         }
+    }
+
+    /**
+     * Send notification to admin after file download.
+     *
+     * @param int $file_id Post ID of the downloaded file.
+     * @param WP_User $user The user who downloaded the file.
+    */
+
+    public function send_download_notification_to_admin($file_id, $user)
+    {
+        $admin_email = get_option('admin_email');
+        $file_name = get_the_title($file_id);
+        $download_time = current_time('mysql');
+        $user_ip = $_SERVER['REMOTE_ADDR'];
+
+        /* Email subject and message */
+        $subject = "File Downloaded: " . $file_name;
+        $message = "
+            <h1>File Download Notification</h1>
+            <p>The file <strong>" . esc_html($file_name) . "</strong> was downloaded on <strong>" . esc_html($download_time) . "</strong>.</p>
+            <p>Downloaded by: " . esc_html($user->display_name) . " (" . esc_html($user->user_email) . ")</p>
+            <p>IP Address: " . esc_html($user_ip) . "</p>
+        ";
+
+        /* Send the email to the admin */
+        wp_mail($admin_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
     }
 }
