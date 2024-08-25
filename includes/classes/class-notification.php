@@ -32,6 +32,8 @@ class EFS_Notification_Handler
             $download_link = wp_login_url() . '?redirect_to=' . urlencode(get_permalink($post_id));
             $headers = ['Content-Type: text/html; charset=UTF-8'];
 
+            $this->log_debug_info("Starting notification process for post ID: {$post_id}");
+
             foreach ($selected_users as $user_id) {
                 $user_info = get_userdata($user_id);
                 $user_email = $user_info->user_email;
