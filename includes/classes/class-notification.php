@@ -30,46 +30,52 @@ class EFS_Notification_Handler
 
     public function send_upload_notifications($post_id)
     {
-    $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+        $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
 
-    if (!empty($selected_users) && is_array($selected_users)) {
-        $file_name = get_the_title($post_id);
-        $upload_time = current_time('mysql');
-        $download_link = wp_login_url() . '?redirect_to=' . urlencode(get_permalink($post_id));
-        $headers = ['Content-Type: text/html; charset=UTF-8'];
+        if (!empty($selected_users) && is_array($selected_users)) {
+            $file_name = get_the_title($post_id);
+            $upload_time = current_time('mysql');
+            $download_link = wp_login_url() . '?redirect_to=' . urlencode(get_permalink($post_id));
+            $headers = ['Content-Type: text/html; charset=UTF-8'];
 
-        $this->log_debug_info("Starting notification process for post ID: {$post_id}");
+            $this->log_debug_info("Starting notification process for post ID: {$post_id}");
 
-        foreach ($selected_users as $user_id) {
-            $user_info = get_userdata($user_id);
-            if ($user_info) {
-                $user_email = $user_info->user_email;
+            foreach ($selected_users as $user_id) {
+                $user_info = get_userdata($user_id);
+                if ($user_info) {
+                    $user_email = $user_info->user_email;
 
-                /* Email subject and message */
-                $subject = "New File Available for Download: " . $file_name;
-                $message = "
-                <h1>File Upload Notification</h1>
-                <p>Hello " . esc_html($user_info->display_name) . ",</p>
-                <p>A new file titled <strong>" . esc_html($file_name) . "</strong> was uploaded for you on <strong>" . esc_html($upload_time) . "</strong>.</p>
-                <p>Please <a href='" . esc_url($download_link) . "'>log in</a> to download your file.</p>
-                ";
+                    /* Email subject and message */
+                    $subject = "New File Available for Download: " . $file_name;
+                    $message = "
+                    <h1>File Upload Notification</h1>
+                    <p>Hello " . esc_html($user_info->display_name) . ",</p>
+                    <p>A new file titled <strong>" . esc_html($file_name) . "</strong> was uploaded for you on <strong>" . esc_html($upload_time) . "</strong>.</p>
+                    <p>Please <a href='" . esc_url($download_link) . "'>log in</a> to download your file.</p>
+                    ";
 
-                /* Send the email to the user */
-                $mail_status = wp_mail($user_email, $subject, $message, $headers);
+                    /* Send the email to the user */
+                    $mail_status = wp_mail($user_email, $subject, $message, $headers);
 
-                /* Log debug info */
-                $this->log_debug_info(
-                "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
-                );
+                    /* Log debug info */
+                    /*
+                    $this->log_debug_info(
+                    "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
+                    );
+                    */
+                }
             }
-        }
 
-        if (empty($selected_users)) {
-        $this->log_debug_info("No valid users found for notifications.");
+            if (empty($selected_users)) {
+                /*
+                $this->log_debug_info("No valid users found for notifications.");
+                */
+            }
+        } else {
+            /*
+            $this->log_debug_info("No users selected for notifications.");
+            */
         }
-    } else {
-        $this->log_debug_info("No users selected for notifications.");
-    }
     }
 
     /**
