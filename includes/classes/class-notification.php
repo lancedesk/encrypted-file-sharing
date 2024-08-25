@@ -83,6 +83,9 @@ class EFS_Notification_Handler
         /* Send the email to the admin */
         wp_mail($admin_email, $subject, $message, $headers);
 
-
+        /* Log debug info */
+        $this->log_debug_info(
+            "Admin notification sent: Admin email: {$admin_email}, File: {$file_name}, Time: {$download_time}, Downloaded by: {$user->user_email}, IP: {$user_ip}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
+        );
     }
 }
