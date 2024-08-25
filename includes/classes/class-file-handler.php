@@ -2,15 +2,22 @@
 
 class EFS_File_Handler
 {
+    private $notification_handler;
+
     /**
      * Constructor to initialize actions and filters.
     */
 
     public function __construct()
     {
+        $this->notification_handler = new EFS_Notification_Handler();
+
         /* Register AJAX actions */
         add_action('wp_ajax_efs_handle_download', array($this, 'handle_download_request'));
         add_action('wp_ajax_nopriv_efs_handle_download', array($this, 'handle_download_request')); /* Allow non-logged-in users */
+
+        /* Hook after file is uploaded */
+        add_action('save_post_efs_file', array($this, 'handle_file_upload_notifications'));
     }
 
     /**
@@ -56,6 +63,10 @@ class EFS_File_Handler
         $file_path = parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
     
+        /* Send notification to admin */
+        $current_user = wp_get_current_user();
+        $this->notification_handler->send_download_notification_to_admin($file_id, $current_user);
+
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="' . $file_name . '"');
@@ -69,6 +80,17 @@ class EFS_File_Handler
         /* Terminate script execution */
         exit;
     }    
+
+    /**
+     * Handle the file upload notifications to selected users.
+     *
+     * @param int $post_id Post ID of the uploaded file.
+    */
+
+    public function handle_file_upload_notifications($post_id)
+    {
+        $this->notification_handler->send_upload_notifications($post_id);
+    }
 
     /**
      * Handle the file upload based on the selected storage option.
