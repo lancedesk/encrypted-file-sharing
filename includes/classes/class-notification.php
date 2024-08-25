@@ -22,6 +22,12 @@ class EFS_Notification_Handler
      * @param int $post_id Post ID of the uploaded file.
     */
 
+    /**
+     * Send notifications based on file upload.
+     *
+     * @param int $post_id Post ID of the uploaded file.
+    */
+
     public function send_upload_notifications($post_id)
     {
         $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
@@ -34,27 +40,37 @@ class EFS_Notification_Handler
 
             $this->log_debug_info("Starting notification process for post ID: {$post_id}");
 
+            $recipients = [];
             foreach ($selected_users as $user_id) {
                 $user_info = get_userdata($user_id);
-                $user_email = $user_info->user_email;
+                if ($user_info) {
+                    $user_email = $user_info->user_email;
+                    $recipients[] = $user_email;
 
-                /* Email subject and message */
-                $subject = "New File Available for Download: " . $file_name;
-                $message = "
-                    <h1>File Upload Notification</h1>
-                    <p>Hello " . esc_html($user_info->display_name) . ",</p>
-                    <p>A new file titled <strong>" . esc_html($file_name) . "</strong> was uploaded for you on <strong>" . esc_html($upload_time) . "</strong>.</p>
-                    <p>Please <a href='" . esc_url($download_link) . "'>log in</a> to download your file.</p>
-                ";
+                    /* Email subject and message */
+                    $subject = "New File Available for Download: " . $file_name;
+                    $message = "
+                        <h1>File Upload Notification</h1>
+                        <p>Hello " . esc_html($user_info->display_name) . ",</p>
+                        <p>A new file titled <strong>" . esc_html($file_name) . "</strong> was uploaded for you on <strong>" . esc_html($upload_time) . "</strong>.</p>
+                        <p>Please <a href='" . esc_url($download_link) . "'>log in</a> to download your file.</p>
+                    ";
 
-                /* Send the email to the user */
-                wp_mail($user_email, $subject, $message, $headers);
+                    /* Send the email to the user */
+                    $mail_status = wp_mail($recipients, $subject, $message, $headers);
 
-                /* Log debug info */
-                $this->log_debug_info(
-                    "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
-                );
+                    /* Log debug info */
+                    $this->log_debug_info(
+                        "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
+                    );
+                }
             }
+
+            if (empty($recipients)) {
+                $this->log_debug_info("No valid users found for notifications.");
+            }
+        } else {
+            $this->log_debug_info("No users selected for notifications.");
         }
     }
 
