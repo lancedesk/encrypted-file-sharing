@@ -48,7 +48,10 @@ class EFS_Notification_Handler
                 /* Send the email to the user */
                 wp_mail($user_email, $subject, $message, $headers);
 
-
+                /* Log debug info */
+                $this->log_debug_info(
+                    "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
+                );
             }
         }
     }
