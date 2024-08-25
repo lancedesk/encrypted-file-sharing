@@ -65,7 +65,9 @@ class EFS_Notification_Handler
 
     public function send_download_notification_to_admin($file_id, $user)
     {
-        $admin_email = get_option('admin_email');
+        /* Get admin email from EFS settings page */
+        $admin_email = get_option('efs_admin_email', get_option('admin_email'));
+
         $file_name = get_the_title($file_id);
         $download_time = current_time('mysql');
         $user_ip = $_SERVER['REMOTE_ADDR'];
