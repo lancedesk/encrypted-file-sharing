@@ -16,6 +16,7 @@ class EFS_Notification_Handler
             $file_name = get_the_title($post_id);
             $upload_time = current_time('mysql');
             $download_link = wp_login_url() . '?redirect_to=' . urlencode(get_permalink($post_id));
+            $headers = ['Content-Type: text/html; charset=UTF-8'];
 
             foreach ($selected_users as $user_id) {
                 $user_info = get_userdata($user_id);
@@ -31,7 +32,7 @@ class EFS_Notification_Handler
                 ";
 
                 /* Send the email to the user */
-                wp_mail($user_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
+                wp_mail($user_email, $subject, $message, $headers);
             }
         }
     }
@@ -49,6 +50,7 @@ class EFS_Notification_Handler
         $file_name = get_the_title($file_id);
         $download_time = current_time('mysql');
         $user_ip = $_SERVER['REMOTE_ADDR'];
+        $headers = ['Content-Type: text/html; charset=UTF-8'];
 
         /* Email subject and message */
         $subject = "File Downloaded: " . $file_name;
@@ -60,6 +62,6 @@ class EFS_Notification_Handler
         ";
 
         /* Send the email to the admin */
-        wp_mail($admin_email, $subject, $message, array('Content-Type: text/html; charset=UTF-8'));
+        wp_mail($admin_email, $subject, $message, $headers);
     }
 }
