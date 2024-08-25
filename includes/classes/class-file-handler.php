@@ -17,7 +17,7 @@ class EFS_File_Handler
         add_action('wp_ajax_nopriv_efs_handle_download', array($this, 'handle_download_request')); /* Allow non-logged-in users */
 
         /* Hook after file is uploaded */
-        add_action('save_post_efs_file', array($this, 'handle_file_upload_notifications'));
+        add_action('save_post', array($this, 'handle_file_upload_notifications'));
     }
 
     /**
