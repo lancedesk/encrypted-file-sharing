@@ -87,11 +87,14 @@ class EFS_File_Handler
      * @param int $post_id Post ID of the uploaded file.
     */
 
-    public function handle_file_upload_notifications($post_id)
+    public function handle_file_upload_notifications($post_id, $post_after, $post_before)
     {
         /* Ensure this only runs for the `efs_file` post type */
         if (get_post_type($post_id) === 'efs_file') {
-            $this->notification_handler->send_upload_notifications($post_id);
+            /* Check if the post status has transitioned from draft to publish */
+            if ($post_before->post_status === 'draft' && $post_after->post_status === 'publish') {
+                $this->notification_handler->send_upload_notifications($post_id);
+            }
         }
     }
 
