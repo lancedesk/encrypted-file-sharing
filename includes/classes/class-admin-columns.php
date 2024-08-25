@@ -2,12 +2,16 @@
 
 class EFS_Admin_Columns
 {
+    protected $file_display;
     /**
      * Constructor to initialize hooks.
     */
 
     public function __construct()
     {
+        /* Instantiate the EFS_File_Display class to access its methods */
+        $this->file_display = new EFS_File_Display();
+
         /* Hook to add custom columns */
         add_filter('manage_efs_file_posts_columns', array($this, 'add_custom_columns'));
 
@@ -21,6 +25,7 @@ class EFS_Admin_Columns
 
     public function add_custom_columns($columns)
     {
+        $columns['file_size'] = __('File Size', 'encrypted-file-sharing');
         $columns['recipient'] = __('Recipient', 'encrypted-file-sharing');
         $columns['downloaded'] = __('Downloaded', 'encrypted-file-sharing');
         $columns['download_date'] = __('Download Date', 'encrypted-file-sharing');
@@ -64,6 +69,26 @@ class EFS_Admin_Columns
                     echo esc_html($formatted_date);
                 } else {
                     echo __('N/A', 'encrypted-file-sharing');
+                }
+                break;
+            
+            case 'file_size':
+                $file_url = get_post_meta($post_id, '_efs_file_url', true);
+                if ($file_url) {
+                    /* Convert file URL to file path */
+                    $upload_dir = wp_upload_dir();
+                    $relative_path = str_replace($upload_dir['baseurl'], '', $file_url);
+                    $file_path = $upload_dir['basedir'] . $relative_path;
+    
+                    /* Check if the file exists and get its size */
+                    if (file_exists($file_path)) {
+                        $file_size = filesize($file_path);
+                        echo esc_html($this->file_display->format_file_size($file_size));
+                    } else {
+                        echo __('File not found', 'encrypted-file-sharing');
+                    }
+                } else {
+                    echo __('No file available', 'encrypted-file-sharing');
                 }
                 break;
         }
