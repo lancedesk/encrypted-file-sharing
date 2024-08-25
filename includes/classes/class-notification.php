@@ -3,6 +3,20 @@
 class EFS_Notification_Handler
 {
     /**
+     * Log debug info to a file in the wp-content folder.
+     *
+     * @param string $message The message to log.
+    */
+
+    private function log_debug_info($message)
+    {
+        $log_file = WP_CONTENT_DIR . '/efs_notification_log.txt';  /* Define log file path */
+        $current_time = current_time('mysql');
+        $log_message = '[' . $current_time . '] ' . $message . PHP_EOL;
+        file_put_contents($log_file, $log_message, FILE_APPEND);  /* Append message to the log file */
+    }
+
+    /**
      * Send notifications based on file upload.
      *
      * @param int $post_id Post ID of the uploaded file.
@@ -33,6 +47,8 @@ class EFS_Notification_Handler
 
                 /* Send the email to the user */
                 wp_mail($user_email, $subject, $message, $headers);
+
+
             }
         }
     }
@@ -63,5 +79,7 @@ class EFS_Notification_Handler
 
         /* Send the email to the admin */
         wp_mail($admin_email, $subject, $message, $headers);
+
+
     }
 }
