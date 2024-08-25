@@ -93,7 +93,12 @@ class EFS_File_Handler
         if (get_post_type($post_id) === 'efs_file') {
             /* Check if the post status has transitioned from draft to publish */
             if ($post_before->post_status === 'draft' && $post_after->post_status === 'publish') {
-                $this->notification_handler->send_upload_notifications($post_id);
+                $file_url = get_post_meta($post_id, '_efs_file_url', true);
+
+                /* Check if file URL is set or file is uploaded */
+                if (!empty($file_url)) {
+                    $this->notification_handler->send_upload_notifications($post_id);
+                }
             }
         }
     }
