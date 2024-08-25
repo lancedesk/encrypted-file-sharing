@@ -89,7 +89,10 @@ class EFS_File_Handler
 
     public function handle_file_upload_notifications($post_id)
     {
-        $this->notification_handler->send_upload_notifications($post_id);
+        /* Ensure this only runs for the `efs_file` post type */
+        if (get_post_type($post_id) === 'efs_file') {
+            $this->notification_handler->send_upload_notifications($post_id);
+        }
     }
 
     /**
