@@ -29,6 +29,8 @@ class EFS_Admin_Columns
         $columns['recipient'] = __('Recipient', 'encrypted-file-sharing');
         $columns['downloaded'] = __('Downloaded', 'encrypted-file-sharing');
         $columns['download_date'] = __('Download Date', 'encrypted-file-sharing');
+        $columns['expiry_date'] = __('Expiry Date', 'encrypted-file-sharing');
+        $columns['status'] = __('Status', 'encrypted-file-sharing');
 
         return $columns;
     }
@@ -89,6 +91,29 @@ class EFS_Admin_Columns
                     }
                 } else {
                     echo __('No file available', 'encrypted-file-sharing');
+                }
+                break;
+
+            case 'expiry_date':
+                $expiry_date = get_post_meta($post_id, '_efs_file_expiry_date', true);
+                if ($expiry_date) {
+                    echo esc_html(date('Y/m/d', strtotime($expiry_date)));
+                } else {
+                    echo __('No expiry set', 'encrypted-file-sharing');
+                }
+                break;
+        
+            case 'status':
+                $expiry_date = get_post_meta($post_id, '_efs_file_expiry_date', true);
+                if ($expiry_date) {
+                    $current_date = date('Y-m-d');
+                    if ($expiry_date < $current_date) {
+                        echo __('Expired', 'encrypted-file-sharing');
+                    } else {
+                        echo __('Active', 'encrypted-file-sharing');
+                    }
+                } else {
+                    echo __('No expiry set', 'encrypted-file-sharing');
                 }
                 break;
         }
