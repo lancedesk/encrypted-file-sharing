@@ -9,7 +9,8 @@ class EFS_File_Expiry_Handler
 
     /**
      * Constructor to set up hooks and actions.
-     */
+    */
+
     public function __construct()
     {
         $this->file_handler = new EFS_File_Handler(); /* Initialize the file handler. */
@@ -22,11 +23,15 @@ class EFS_File_Expiry_Handler
 
         /* Unschedule the event when the plugin is deactivated. */
         register_deactivation_hook(__FILE__, array($this, 'unschedule_file_expiry_cron'));
+
+        /* Hook into save_post to save expiry information */
+        add_action('save_post', array($this, 'save_file_expiry'));
     }
 
     /**
      * Schedule cron event if not already scheduled.
-     */
+    */
+
     public function schedule_file_expiry_cron()
     {
         if (!wp_next_scheduled('efs_check_file_expiry_event')) 
@@ -37,7 +42,8 @@ class EFS_File_Expiry_Handler
 
     /**
      * Unschedule the cron event when the plugin is deactivated.
-     */
+    */
+
     public function unschedule_file_expiry_cron()
     {
         $timestamp = wp_next_scheduled('efs_check_file_expiry_event');
@@ -49,7 +55,8 @@ class EFS_File_Expiry_Handler
 
     /**
      * Function to check for expired files and handle them.
-     */
+    */
+
     public function check_file_expiry()
     {
         /* Check if file expiry is enabled */
@@ -87,4 +94,52 @@ class EFS_File_Expiry_Handler
             }
         }
     }
+
+    public function save_file_expiry($post_id)
+    {
+        /* Check if this is an auto-save routine. */
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        /* Check if this is a valid post type. */
+        if (get_post_type($post_id) !== 'efs_file') {
+            return;
+        }
+
+        /* Get the file expiry settings. */
+        $enable_expiry = get_option('efs_enable_expiry', 0);
+
+        if ($enable_expiry)
+        {
+            $expiry_period = intval(get_option('efs_expiry_period', 7));
+            $expiry_unit = get_option('efs_expiry_unit', 'days');
+            
+            /* Calculate the expiry date based on the current date and the settings. */
+            $current_date = new DateTime();
+            $expiry_date = clone $current_date;
+            
+            if ($expiry_unit === 'minutes')
+            {
+                $expiry_date->add(new DateInterval('PT' . $expiry_period . 'M'));
+            }
+            elseif ($expiry_unit === 'hours')
+            {
+                $expiry_date->add(new DateInterval('PT' . $expiry_period . 'H'));
+            }
+            else
+            {
+                $expiry_date->add(new DateInterval('P' . $expiry_period . 'D'));
+            }
+            
+            /* Update the post meta with the expiry date. */
+            update_post_meta($post_id, '_efs_file_expiry_date', $expiry_date->format('Y-m-d H:i:s'));
+        }
+        else
+        {
+            /* Remove the expiry date if expiry is disabled. */
+            delete_post_meta($post_id, '_efs_file_expiry_date');
+        }
+    }
+
 }
