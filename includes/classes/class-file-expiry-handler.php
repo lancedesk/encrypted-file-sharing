@@ -1,16 +1,14 @@
 <?php
 /**
  * Class to handle file expiry via cron jobs in WordPress.
-*/
-
+ */
 class EFS_File_Expiry_Handler
 {
     private $file_handler;
 
     /**
      * Constructor to set up hooks and actions.
-    */
-
+     */
     public function __construct($file_handler)
     {
         $this->file_handler = $file_handler;
@@ -27,8 +25,7 @@ class EFS_File_Expiry_Handler
 
     /**
      * Schedule cron event if not already scheduled.
-    */
-
+     */
     public function schedule_file_expiry_cron()
     {
         if (!wp_next_scheduled('efs_check_file_expiry_event')) 
@@ -39,8 +36,7 @@ class EFS_File_Expiry_Handler
 
     /**
      * Unschedule the cron event when the plugin is deactivated.
-    */
-
+     */
     public function unschedule_file_expiry_cron()
     {
         $timestamp = wp_next_scheduled('efs_check_file_expiry_event');
@@ -52,37 +48,42 @@ class EFS_File_Expiry_Handler
 
     /**
      * Function to check for expired files and handle them.
-    */
-
+     */
     public function check_file_expiry()
     {
-        /* Get expired files based on meta_key `_efs_file_expiry_date` */
-        $args = array(
-            'post_type'    => 'efs_file',
-            'meta_key'     => '_efs_file_expiry_date',
-            'meta_value'   => date('Y-m-d'),
-            'meta_compare' => '<=',
-            'post_status'  => 'publish',
-            'fields'       => 'ids',
-        );
+        /* Check if file expiry is enabled */
+        $enable_expiry = get_option('efs_enable_expiry', 0);
 
-        $expired_posts = get_posts($args);
-
-        foreach ($expired_posts as $post_id) 
+        if ($enable_expiry) 
         {
-            /* Delete the local file if stored locally */
-            $storage_option = get_option('efs_storage_option', 'local');
-            if ($storage_option === 'local') 
-            {
-                $file_url = get_post_meta($post_id, '_efs_file_url', true);
-                $this->file_handler->delete_local_file($file_url);
-            }
+            /* Get expired files based on meta_key `_efs_file_expiry_date` */
+            $args = array(
+                'post_type'    => 'efs_file',
+                'meta_key'     => '_efs_file_expiry_date',
+                'meta_value'   => date('Y-m-d'),
+                'meta_compare' => '<=',
+                'post_status'  => 'publish',
+                'fields'       => 'ids',
+            );
 
-            /* Change post status to 'expired' */
-            wp_update_post(array(
-                'ID'          => $post_id,
-                'post_status' => 'expired', /* Set to 'expired' */
-            ));
+            $expired_posts = get_posts($args);
+
+            foreach ($expired_posts as $post_id) 
+            {
+                /* Delete the local file if stored locally */
+                $storage_option = get_option('efs_storage_option', 'local');
+                if ($storage_option === 'local') 
+                {
+                    $file_url = get_post_meta($post_id, '_efs_file_url', true);
+                    $this->file_handler->delete_local_file($file_url);
+                }
+
+                /* Change post status to 'expired' */
+                wp_update_post(array(
+                    'ID'          => $post_id,
+                    'post_status' => 'expired', /* Set to 'expired' */
+                ));
+            }
         }
     }
 }
