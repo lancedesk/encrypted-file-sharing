@@ -3,7 +3,7 @@
  * Class to handle file expiry via cron jobs in WordPress.
 */
 
-class File_Expiry_Handler
+class EFS_File_Expiry_Handler
 {
     private $file_handler;
 
