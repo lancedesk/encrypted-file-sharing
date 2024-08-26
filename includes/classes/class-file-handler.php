@@ -63,9 +63,14 @@ class EFS_File_Handler
         $file_path = parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
     
-        /* Send notification to admin */
-        $current_user = wp_get_current_user();
-        $this->notification_handler->send_download_notification_to_admin($file_id, $current_user);
+        /* Retrieve the admin notification setting */
+        $send_notifications = get_option('efs_send_notifications', 0); /* Default to 0 (disabled) */
+
+        /* Send notification to admin if notifications are enabled */
+        if ($send_notifications) {
+            $current_user = wp_get_current_user();
+            $this->notification_handler->send_download_notification_to_admin($file_id, $current_user);
+        }
 
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
