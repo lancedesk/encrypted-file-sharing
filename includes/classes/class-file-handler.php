@@ -90,18 +90,26 @@ class EFS_File_Handler
     public function handle_file_upload_notifications($post_id)
     {
         /* Ensure this only runs for the `efs_file` post type */
-        if (get_post_type($post_id) === 'efs_file') {
-            /* Retrieve the post data before and after the update */
-            $post_before = get_post($post_id);
-            $post_after = get_post($post_id);
+        if (get_post_type($post_id) === 'efs_file') 
+        {
+            /* Retrieve the current post data */
+            $post = get_post($post_id);
 
-            /* Check if the post status has transitioned from draft to publish */
-            if ($post_before->post_status === 'draft' && $post_after->post_status === 'publish') {
+            /* Check if the post status is 'publish' and if the post hasn't been marked as first published */
+            $first_published = get_post_meta($post_id, '_efs_first_published', true);
+
+            if ($post->post_status === 'publish' && empty($first_published)) 
+            {
                 $file_url = get_post_meta($post_id, '_efs_file_url', true);
 
                 /* Check if file URL is set or file is uploaded */
-                if (!empty($file_url)) {
+                if (!empty($file_url)) 
+                {
+                    /* Send the notification */
                     $this->notification_handler->send_upload_notifications($post_id);
+
+                    /* Mark this post as published for the first time */
+                    update_post_meta($post_id, '_efs_first_published', 1);
                 }
             }
         }
