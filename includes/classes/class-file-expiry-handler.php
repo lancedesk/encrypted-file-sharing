@@ -1,17 +1,18 @@
 <?php
 /**
  * Class to handle file expiry via cron jobs in WordPress.
- */
+*/
+
 class EFS_File_Expiry_Handler
 {
-    private $file_handler;
+    private $file_handler; /* Class property. */
 
     /**
      * Constructor to set up hooks and actions.
      */
-    public function __construct($file_handler)
+    public function __construct()
     {
-        $this->file_handler = $file_handler;
+        $this->file_handler = new EFS_File_Handler(); /* Initialize the file handler. */
 
         /* Schedule cron event on init. */
         add_action('init', array($this, 'schedule_file_expiry_cron'));
