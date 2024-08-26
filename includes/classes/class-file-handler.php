@@ -196,4 +196,19 @@ class EFS_File_Handler
         
         return $attachment_id;
     }
+
+    /**
+     * Delete local file based on the file URL.
+     * 
+     * @param string $file_url The URL of the file to delete.
+    */
+
+    public function delete_local_file($file_url)
+    {
+        $attachment_id = attachment_url_to_postid($file_url);
+        if ($attachment_id) 
+        {
+            wp_delete_attachment($attachment_id, true); /* Delete permanently */
+        }
+    }
 }
