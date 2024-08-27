@@ -23,6 +23,9 @@ class EFS_File_Handler
 
         /* Hook after file is uploaded */
         add_action('save_post', array($this, 'handle_file_upload_notifications'));
+
+        /* Initialize S3 Client */
+        $this->initialize_s3_client();
     }
 
     /**
