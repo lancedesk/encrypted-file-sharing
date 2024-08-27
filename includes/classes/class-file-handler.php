@@ -201,6 +201,38 @@ class EFS_File_Handler
     }
 
     /**
+     * Generate a pre-signed URL for downloading a private S3 file.
+     *
+     * @param string $file_key The S3 key of the file.
+     * @param int $expiry_time The time in seconds the URL will remain valid.
+     * @return string Pre-signed URL for the file.
+    */
+
+    private function get_presigned_url($file_key, $expiry_time = 3600)
+    {
+        /* Define your bucket */
+        $bucket = 'your-s3-bucket';
+
+        try {
+            /* Generate the pre-signed URL */
+            $cmd = $this->s3_client->getCommand('GetObject', [
+                'Bucket' => $bucket,
+                'Key'    => $file_key,
+            ]);
+
+            /* Create a pre-signed request with an expiration time */
+            $request = $this->s3_client->createPresignedRequest($cmd, '+' . $expiry_time . ' seconds');
+
+            /* Get the actual pre-signed URL */
+            return (string) $request->getUri();
+
+        } catch (AwsException $e) {
+            error_log('Failed to generate pre-signed URL: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Upload file to Google Drive.
      *
      * @param array $file The file to upload.
