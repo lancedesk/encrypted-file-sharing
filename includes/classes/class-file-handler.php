@@ -246,6 +246,20 @@ class EFS_File_Handler
         }
     }
 
+    private function get_unit_multiplier($unit)
+    {
+        switch ($unit) {
+            case 'minutes':
+                return 60;
+            case 'hours':
+                return 3600;
+            case 'days':
+                return 86400;
+            default:
+                return 86400; /* Default to days */
+        }
+    }
+
     /**
      * Generate a pre-signed URL for downloading a private S3 file.
      *
