@@ -1,7 +1,5 @@
 <?php
 
-require 'https://sdk.amazonaws.com/php/aws.phar'; /* Load AWS SDK */
-
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
 
