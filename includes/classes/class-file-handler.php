@@ -31,7 +31,8 @@ class EFS_File_Handler
      * Initialize the S3 client with credentials and settings.
     */
 
-    private function initialize_s3_client()
+    /* private function initialize_s3_client() */
+    public function initialize_s3_client()
     {
         /* Include the AWS SDK */
         require_once plugin_dir_path(__FILE__) . '../aws-sdk/aws.phar';
