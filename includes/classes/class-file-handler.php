@@ -201,6 +201,35 @@ class EFS_File_Handler
     }
 
     /**
+     * Handle the S3 file upload via AJAX.
+    */
+
+    public function handle_s3_upload_ajax() 
+    {
+        if (!isset($_FILES['file']) || empty($_FILES['file']['name'])) {
+            wp_send_json_error(['message' => 'No file uploaded.']);
+        }
+
+        $file = $_FILES['file'];
+
+        /* Call the method to upload the file to S3 */
+        $file_key = $this->upload_to_amazon_s3($file);
+
+        if ($file_key) {
+            /* Generate a pre-signed URL for the uploaded file */
+            $presigned_url = $this->get_presigned_url($file_key, 3600);  /* 1 hour expiry */
+
+            if ($presigned_url) {
+                wp_send_json_success(['presigned_url' => $presigned_url]);
+            } else {
+                wp_send_json_error(['message' => 'Failed to generate presigned URL.']);
+            }
+        } else {
+            wp_send_json_error(['message' => 'S3 upload failed.']);
+        }
+    }
+
+    /**
      * Generate a pre-signed URL for downloading a private S3 file.
      *
      * @param string $file_key The S3 key of the file.
