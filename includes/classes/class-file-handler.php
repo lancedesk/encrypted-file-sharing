@@ -25,6 +25,9 @@ class EFS_File_Handler
         $this->initialize_s3_client();
 
         add_action('wp_ajax_upload_to_s3', [$this, 'handle_s3_upload_ajax']);
+
+        /* Register the AJAX action for logged-in users */
+        add_action('wp_ajax_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
     }
 
     /**
@@ -58,7 +61,41 @@ class EFS_File_Handler
             error_log('S3 Connection Failed: ' . $e->getMessage());
             return false;
         }
-    }  
+    } 
+
+    /* AJAX handler to fetch S3 buckets */
+    public function efs_fetch_s3_buckets()
+    {
+        $region = sanitize_text_field($_POST['region']);
+        $access_key = sanitize_text_field($_POST['access_key']);
+        $secret_key = sanitize_text_field($_POST['secret_key']);
+
+        try {
+            /* Initialize S3 Client */
+            $s3 = new S3Client([
+                'region'  => $region,
+                'version' => 'latest',
+                'credentials' => [
+                    'key'    => $access_key,
+                    'secret' => $secret_key,
+                ],
+            ]);
+
+            /* List Buckets */
+            $result = $s3->listBuckets();
+
+            /* Return bucket names */
+            $buckets = array_map(function($bucket) {
+                return $bucket['Name'];
+            }, $result['Buckets']);
+
+            /* Send bucket names as JSON response */
+            wp_send_json_success($buckets);
+        } catch (Exception $e) {
+            /* Handle errors */
+            wp_send_json_error($e->getMessage());
+        }
+    }
 
     /**
      * Handle the file upload notifications to selected users.
