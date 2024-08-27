@@ -1,0 +1,14 @@
+{
+    "name": "lancedesk/encrypted-file-sharing",
+    "description": "A WordPress plugin for secure file sharing.",
+    "require": {
+        "aws/aws-sdk-php": "^3.200",
+        "dropbox/dropbox-sdk": "^1.0",
+        "google/apiclient": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "encrypted-file-sharing\\": "includes/classes/"
+        }
+    }
+}
