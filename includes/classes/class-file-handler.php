@@ -18,14 +18,16 @@ class EFS_File_Handler
         $this->notification_handler = new EFS_Notification_Handler();
 
         /* Register AJAX actions */
-        add_action('wp_ajax_efs_handle_download', array($this, 'handle_download_request'));
-        add_action('wp_ajax_nopriv_efs_handle_download', array($this, 'handle_download_request')); /* Allow non-logged-in users */
+        add_action('wp_ajax_efs_handle_download', [$this, 'handle_download_request']);
+        add_action('wp_ajax_nopriv_efs_handle_download', [$this, 'handle_download_request']); /* Allow non-logged-in users */
 
         /* Hook after file is uploaded */
-        add_action('save_post', array($this, 'handle_file_upload_notifications'));
+        add_action('save_post', [$this, 'handle_file_upload_notifications']);
 
         /* Initialize S3 Client */
         $this->initialize_s3_client();
+
+        add_action('wp_ajax_upload_to_s3', [$this, 'handle_s3_upload_ajax']);
     }
 
     /**
@@ -181,13 +183,16 @@ class EFS_File_Handler
         $bucket = 'your-s3-bucket';
         $file_key = basename($file['file']); /* Use the file's name as its S3 key */
 
+        /* Retrieve the privacy setting */
+        $file_privacy = get_option('efs_file_privacy', 0); /* Default to public */
+
         try {
             /* Upload the file to S3 */
             $result = $this->s3_client->putObject([
                 'Bucket'     => $bucket,
                 'Key'        => $file_key,
                 'SourceFile' => $file['file'],  /* Path to the file on the local filesystem */
-                'ACL'        => 'private',      /* File is private */
+                'ACL'        => $file_privacy ? 'private' : 'public-read', /* Set ACL based on privacy setting */
             ]);
 
             /* Return the S3 URL */
