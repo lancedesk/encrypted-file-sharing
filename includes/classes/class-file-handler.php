@@ -177,7 +177,31 @@ class EFS_File_Handler
 
     private function upload_to_amazon_s3($file)
     {
-        /* Implement Amazon S3 upload logic */
+        /* Define your bucket and file path on S3 */
+        $bucket = 'your-s3-bucket';
+        $file_key = basename($file['file']); /* Use the file's name as its S3 key */
+
+        try {
+            /* Upload the file to S3 */
+            $result = $this->s3_client->putObject([
+                'Bucket'     => $bucket,
+                'Key'        => $file_key,
+                'SourceFile' => $file['file'],  /* Path to the file on the local filesystem */
+                'ACL'        => 'public-read',  /* File will be publicly accessible */
+            ]);
+
+            /* Return the S3 URL & save the file URL to post meta */
+            $file_url = $result['ObjectURL'];
+
+            /* Save file URL to post meta */
+            /* update_post_meta($post_id, '_efs_file_url', $file_url); */
+
+            return $file_url;
+
+        } catch (AwsException $e) {
+            error_log('Amazon S3 Upload Failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
