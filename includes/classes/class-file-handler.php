@@ -76,6 +76,9 @@ class EFS_File_Handler
     /* AJAX handler to fetch S3 buckets */
     public function efs_fetch_s3_buckets()
     {
+        /* Check nonce for security */
+        check_ajax_referer('efs_s3_nonce', '_ajax_nonce');
+
         $region = sanitize_text_field($_POST['region']);
         $access_key = sanitize_text_field($_POST['access_key']);
         $secret_key = sanitize_text_field($_POST['secret_key']);
