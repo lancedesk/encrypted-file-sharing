@@ -29,6 +29,22 @@ class EFS_File_Handler
     }
 
     /**
+     * Initialize the S3 client with credentials and settings.
+    */
+
+    private function initialize_s3_client()
+    {
+        $this->s3_client = new S3Client([
+            'region'  => 'your-region', /* e.g., 'us-east-1' */
+            'version' => 'latest',
+            'credentials' => [
+                'key'    => 'your-aws-access-key',
+                'secret' => 'your-aws-secret-key',
+            ],
+        ]);
+    }
+
+    /**
      * Handle the file download request via AJAX.
     */
 
