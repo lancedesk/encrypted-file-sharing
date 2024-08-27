@@ -39,9 +39,16 @@ class EFS_File_Handler
     {
         /* Include the AWS SDK */
         require_once plugin_dir_path(__FILE__) . '../aws-sdk/aws.phar';
-        $region = sanitize_text_field($_POST['region']);
-        $access_key = sanitize_text_field($_POST['access_key']);
-        $secret_key = sanitize_text_field($_POST['secret_key']);
+
+         /* Fetch settings from the stored options */
+        $region = get_option('efs_aws_region', '');
+        $access_key = get_option('efs_aws_access_key', '');
+        $secret_key = get_option('efs_aws_secret_key', '');
+
+        if (!$region || !$access_key || !$secret_key) {
+            error_log('AWS credentials or region not configured properly.');
+            return false;
+        }
 
         $this->s3_client = new S3Client([
             'region'  => $region, /* e.g., 'us-east-1' */
