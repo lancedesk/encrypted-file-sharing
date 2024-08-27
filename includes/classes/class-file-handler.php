@@ -44,73 +44,20 @@ class EFS_File_Handler
                 'secret' => 'your-aws-secret-key',
             ],
         ]);
-    }
 
-    /**
-     * Handle the file download request via AJAX.
-    */
-
-    public function handle_download_request()
-    {
-        /* Check nonce for security */
-        check_ajax_referer('efs_download_nonce', 'security');
-    
-        /* Validate user */
-        if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'User not logged in.'));
+        /* Test if the connection to S3 is successful */
+        try {
+            /* A simple request to list S3 buckets */
+            $result = $this->s3_client->listBuckets();
+            
+            /* If the request is successful, return true */
+            return true;
+        } catch (AwsException $e) {
+            /* Log the error message */
+            error_log('S3 Connection Failed: ' . $e->getMessage());
+            return false;
         }
-    
-        /* Check if file ID is set */
-        if (!isset($_POST['file_id'])) {
-            wp_send_json_error(array('message' => 'File ID missing.'));
-        }
-    
-        $file_id = intval($_POST['file_id']);
-    
-        /* Validate file ID */
-        if (get_post_type($file_id) !== 'efs_file') {
-            wp_send_json_error(array('message' => 'Invalid file ID.'));
-        }
-    
-        /* Retrieve the file URL */
-        $file_url = get_post_meta($file_id, '_efs_file_url', true);
-    
-        if (empty($file_url)) {
-            wp_send_json_error(array('message' => 'File URL not found.'));
-        }
-    
-        /* Update download status and date */
-        $current_time = current_time('mysql');
-        update_post_meta($file_id, '_efs_download_status', '1'); /* Mark as downloaded */
-        /* Set download date as MySQL timestamp */
-        update_post_meta($file_id, '_efs_download_date', $current_time);
-
-        /* Serve the file for download */
-        $file_path = parse_url($file_url, PHP_URL_PATH);
-        $file_name = basename($file_path);
-    
-        /* Retrieve the admin notification setting */
-        $send_notifications = get_option('efs_send_notifications', 0); /* Default to 0 (disabled) */
-
-        /* Send notification to admin if notifications are enabled */
-        if ($send_notifications) {
-            $current_user = wp_get_current_user();
-            $this->notification_handler->send_download_notification_to_admin($file_id, $current_user);
-        }
-
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $file_name . '"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($file_path));
-        flush(); /* Flush system output buffer */
-        readfile($file_path);
-    
-        /* Terminate script execution */
-        exit;
-    }    
+    }  
 
     /**
      * Handle the file upload notifications to selected users.
@@ -342,6 +289,72 @@ class EFS_File_Handler
         wp_update_attachment_metadata($attachment_id, $attachment_data);
         
         return $attachment_id;
+    }
+
+    /**
+     * Handle the file download request via AJAX.
+    */
+
+    public function handle_download_request()
+    {
+        /* Check nonce for security */
+        check_ajax_referer('efs_download_nonce', 'security');
+    
+        /* Validate user */
+        if (!is_user_logged_in()) {
+            wp_send_json_error(array('message' => 'User not logged in.'));
+        }
+    
+        /* Check if file ID is set */
+        if (!isset($_POST['file_id'])) {
+            wp_send_json_error(array('message' => 'File ID missing.'));
+        }
+    
+        $file_id = intval($_POST['file_id']);
+    
+        /* Validate file ID */
+        if (get_post_type($file_id) !== 'efs_file') {
+            wp_send_json_error(array('message' => 'Invalid file ID.'));
+        }
+    
+        /* Retrieve the file URL */
+        $file_url = get_post_meta($file_id, '_efs_file_url', true);
+    
+        if (empty($file_url)) {
+            wp_send_json_error(array('message' => 'File URL not found.'));
+        }
+    
+        /* Update download status and date */
+        $current_time = current_time('mysql');
+        update_post_meta($file_id, '_efs_download_status', '1'); /* Mark as downloaded */
+        /* Set download date as MySQL timestamp */
+        update_post_meta($file_id, '_efs_download_date', $current_time);
+
+        /* Serve the file for download */
+        $file_path = parse_url($file_url, PHP_URL_PATH);
+        $file_name = basename($file_path);
+    
+        /* Retrieve the admin notification setting */
+        $send_notifications = get_option('efs_send_notifications', 0); /* Default to 0 (disabled) */
+
+        /* Send notification to admin if notifications are enabled */
+        if ($send_notifications) {
+            $current_user = wp_get_current_user();
+            $this->notification_handler->send_download_notification_to_admin($file_id, $current_user);
+        }
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . $file_name . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file_path));
+        flush(); /* Flush system output buffer */
+        readfile($file_path);
+    
+        /* Terminate script execution */
+        exit;
     }
 
     /**
