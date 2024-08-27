@@ -94,7 +94,7 @@ class EFS_File_Handler
 
             /* Send bucket names as JSON response */
             wp_send_json_success($buckets);
-        } catch (Exception $e) {
+        } catch (AwsException $e) {
             /* Handle errors */
             wp_send_json_error($e->getMessage());
         }
