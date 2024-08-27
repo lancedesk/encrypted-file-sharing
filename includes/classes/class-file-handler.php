@@ -221,8 +221,20 @@ class EFS_File_Handler
         $file_key = $this->upload_to_amazon_s3($file);
 
         if ($file_key) {
+            /* Retrieve expiry settings */
+            $enable_expiry = get_option('efs_enable_expiry', 0);
+            $expiry_period = get_option('efs_expiry_period', 7); /* Default to 7 */
+            $expiry_unit = get_option('efs_expiry_unit', 'days'); /* Default to days */
+
+            /* Convert expiry period to seconds */
+            $expiry_in_seconds = $expiry_period * $this->get_unit_multiplier($expiry_unit);
+
+            if (!$enable_expiry) {
+                $expiry_in_seconds = 0; /* No expiry */
+            }
+
             /* Generate a pre-signed URL for the uploaded file */
-            $presigned_url = $this->get_presigned_url($file_key, 3600);  /* 1 hour expiry */
+            $presigned_url = $this->get_presigned_url($file_key, $expiry_in_seconds);
 
             if ($presigned_url) {
                 wp_send_json_success(['presigned_url' => $presigned_url]);
