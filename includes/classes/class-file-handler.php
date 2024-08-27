@@ -187,7 +187,7 @@ class EFS_File_Handler
                 'Bucket'     => $bucket,
                 'Key'        => $file_key,
                 'SourceFile' => $file['file'],  /* Path to the file on the local filesystem */
-                'ACL'        => 'public-read',  /* File will be publicly accessible */
+                'ACL'        => 'private',      /* File is private */
             ]);
 
             /* Return the S3 URL */
