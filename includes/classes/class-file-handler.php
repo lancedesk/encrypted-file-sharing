@@ -190,12 +190,8 @@ class EFS_File_Handler
                 'ACL'        => 'public-read',  /* File will be publicly accessible */
             ]);
 
-            /* Return the S3 URL & save the file URL to post meta */
+            /* Return the S3 URL */
             $file_url = $result['ObjectURL'];
-
-            /* Save file URL to post meta */
-            /* update_post_meta($post_id, '_efs_file_url', $file_url); */
-
             return $file_url;
 
         } catch (AwsException $e) {
