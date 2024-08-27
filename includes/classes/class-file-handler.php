@@ -246,6 +246,17 @@ class EFS_File_Handler
         }
     }
 
+    /**
+     * Returns the multiplier for a given time unit.
+     *
+     * This method converts time units (minutes, hours, days) into their equivalent 
+     * number of seconds. It defaults to days if an unrecognized unit is provided.
+     *
+     * @param string $unit The time unit to convert. Valid values are 'minutes', 'hours', 'days'.
+     * 
+     * @return int The number of seconds corresponding to the specified time unit.
+    */
+
     private function get_unit_multiplier($unit)
     {
         switch ($unit) {
