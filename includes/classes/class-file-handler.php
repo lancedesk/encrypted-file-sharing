@@ -34,7 +34,7 @@ class EFS_File_Handler
     private function initialize_s3_client()
     {
         /* Include the AWS SDK */
-        require_once plugin_dir_path(__FILE__) . 'includes/aws-sdk/aws.phar';
+        require_once plugin_dir_path(__FILE__) . '../aws-sdk/aws.phar';
 
         $this->s3_client = new S3Client([
             'region'  => 'your-region', /* e.g., 'us-east-1' */
