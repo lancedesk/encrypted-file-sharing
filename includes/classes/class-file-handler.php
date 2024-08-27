@@ -268,7 +268,7 @@ class EFS_File_Handler
      * @return string Pre-signed URL for the file.
     */
 
-    private function get_presigned_url($file_key, $expiry_time = 3600)
+    private function get_presigned_url($file_key, $expiry_in_seconds)
     {
         /* Define your bucket */
         $bucket = 'your-s3-bucket';
@@ -281,7 +281,7 @@ class EFS_File_Handler
             ]);
 
             /* Create a pre-signed request with an expiration time */
-            $request = $this->s3_client->createPresignedRequest($cmd, '+' . $expiry_time . ' seconds');
+            $request = $this->s3_client->createPresignedRequest($cmd, '+' . $expiry_in_seconds . ' seconds');
 
             /* Get the actual pre-signed URL */
             return (string) $request->getUri();
