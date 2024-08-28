@@ -1,11 +1,10 @@
 jQuery(document).ready(function ($) {
+    console.log("File loaded!");
     /* Handle bucket creation */
     $('#efs_create_bucket').on('click', function() {
         console.log('Button clicked');  /* Check if the button click is detected */
         var newBucket = $('#efs_new_bucket').val();
         var region = $('#efs_aws_region').val();
-        var accessKey = $('#efs_aws_access_key').val();
-        var secretKey = $('#efs_aws_secret_key').val();
 
         if (newBucket === '') {
             console.log('No bucket name provided');
@@ -14,8 +13,8 @@ jQuery(document).ready(function ($) {
         }
 
         /* Ensure AWS credentials are provided */
-        if (!region || !accessKey || !secretKey) {
-            alert('Please provide AWS region, access key, and secret key.');
+        if (!region) {
+            alert('Please provide AWS region.');
             return;
         }
 
@@ -27,8 +26,6 @@ jQuery(document).ready(function ($) {
                 action: 'efs_create_s3_bucket',
                 bucket_name: newBucket,
                 region: region,
-                access_key: accessKey,
-                secret_key: secretKey,
                 _ajax_nonce: efs_s3_params.efs_s3_nonce  /* Include nonce for security */
             },
             success: function(response) {
@@ -55,12 +52,10 @@ jQuery(document).ready(function ($) {
 
     function fetchBuckets() {
         var region = $('#efs_aws_region').val();
-        var accessKey = $('#efs_aws_access_key').val();
-        var secretKey = $('#efs_aws_secret_key').val();
 
         /* Ensure AWS credentials are provided */
-        if (!region || !accessKey || !secretKey) {
-            alert('Please provide AWS region, access key, and secret key.');
+        if (!region) {
+            alert('Please provide AWS region.');
             return;
         }
 
@@ -70,8 +65,6 @@ jQuery(document).ready(function ($) {
             data: {
                 action: 'efs_fetch_s3_buckets',
                 region: region,
-                access_key: accessKey,
-                secret_key: secretKey,
                 _ajax_nonce: efs_s3_params.efs_s3_nonce  /* Include nonce for security */
             },
             success: function(response) {
