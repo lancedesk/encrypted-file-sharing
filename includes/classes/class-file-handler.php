@@ -107,6 +107,8 @@ class EFS_File_Handler
     /* Function to create S3 bucket */
     public function efs_create_s3_bucket()
     {
+        $this->log_error('efs_create_s3_bucket called.');
+
         if (!current_user_can('manage_options')) {
             $this->log_error('Unauthorized access attempt.');
             wp_send_json_error(array('message' => 'Unauthorized user'));
@@ -119,6 +121,8 @@ class EFS_File_Handler
             $this->log_error('Bucket name cannot be empty.');
             wp_send_json_error(array('message' => 'Bucket name cannot be empty'));
         }
+
+        $this->log_success('Attempting to create bucket: ' . $bucket_name);
 
         /* Use AWS SDK to create the bucket */
         try {
@@ -138,6 +142,7 @@ class EFS_File_Handler
             $this->log_success('Bucket created: ' . $bucket_name);
             wp_send_json_success();
         } catch (Exception $e) {
+            $this->log_error('Exception occurred: ' . $e->getMessage());
             wp_send_json_error(array('message' => $e->getMessage()));
         }
     }
