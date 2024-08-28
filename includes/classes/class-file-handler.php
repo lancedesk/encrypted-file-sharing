@@ -28,6 +28,7 @@ class EFS_File_Handler
 
         /* Register the AJAX action for logged-in users */
         add_action('wp_ajax_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
+        add_action('wp_ajax_nopriv_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
 
         add_action('wp_ajax_efs_create_s3_bucket', [$this, 'efs_create_s3_bucket']);
         add_action('wp_ajax_nopriv_efs_create_s3_bucket', [$this, 'efs_create_s3_bucket']);
@@ -126,20 +127,20 @@ class EFS_File_Handler
             wp_send_json_error(array('message' => 'Bucket name cannot be empty'));
         }
 
+        /* Ensure S3 client is initialized */
+        if (!$this->s3_client) {
+            $initialized = $this->initialize_s3_client();
+            if (!$initialized) {
+                wp_send_json_error(array('message' => 'S3 client initialization failed.'));
+            }
+        }
+
         $this->log_success('Attempting to create bucket: ' . $bucket_name);
 
         /* Use AWS SDK to create the bucket */
-        try {
-            $s3 = new Aws\S3\S3Client([
-                'region'  => $region,
-                'version' => 'latest',
-                'credentials' => [
-                    'key'    => get_option('efs_aws_access_key'),
-                    'secret' => get_option('efs_aws_secret_key'),
-                ]
-            ]);
-
-            $result = $s3->createBucket([
+        try
+        {
+            $result = $this->s3_client->createBucket([
                 'Bucket' => $bucket_name,
             ]);
 
@@ -189,23 +190,15 @@ class EFS_File_Handler
         /* Check nonce for security */
         check_ajax_referer('efs_s3_nonce', '_ajax_nonce');
 
-        $region = get_option('efs_aws_region');;
-        $access_key = get_option('efs_aws_access_key');
-        $secret_key = get_option('efs_aws_secret_key');
+        /* Ensure the S3 client is initialized */
+        if (!$this->s3_client) {
+            wp_send_json_error(array('message' => 'S3 client is not initialized.'));
+            return;
+        }
 
         try {
-            /* Initialize S3 Client */
-            $s3 = new S3Client([
-                'region'  => $region,
-                'version' => 'latest',
-                'credentials' => [
-                    'key'    => $access_key,
-                    'secret' => $secret_key,
-                ],
-            ]);
-
             /* List Buckets */
-            $result = $s3->listBuckets();
+            $result = $this->s3_client->listBuckets();
 
             /* Return bucket names */
             $buckets = array_map(function($bucket) {
