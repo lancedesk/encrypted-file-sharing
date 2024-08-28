@@ -107,6 +107,9 @@ class EFS_File_Handler
     /* Function to create S3 bucket */
     public function efs_create_s3_bucket()
     {
+        /* Check nonce for security */
+        check_ajax_referer('efs_s3_nonce', '_ajax_nonce');
+
         $this->log_error('efs_create_s3_bucket called.');
 
         if (!current_user_can('manage_options')) {
