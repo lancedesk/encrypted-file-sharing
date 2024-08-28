@@ -71,7 +71,36 @@ class EFS_File_Handler
             error_log('S3 Connection Failed: ' . $e->getMessage());
             return false;
         }
-    } 
+    }
+
+    /**
+     * Debug method to fetch S3 buckets without using AJAX or POST requests.
+     * @return array|bool List of S3 bucket names or false on failure.
+    */
+
+    public function fetch_s3_buckets_debug()
+    {
+        if (!$this->s3_client) {
+            error_log('S3 client is not initialized.');
+            return false;
+        }
+
+        try {
+            /* List Buckets */
+            $result = $this->s3_client->listBuckets();
+
+            /* Extract and return bucket names */
+            $buckets = array_map(function($bucket) {
+                return $bucket['Name'];
+            }, $result['Buckets']);
+
+            return $buckets;
+        } catch (AwsException $e) {
+            /* Log any errors */
+            error_log('Error fetching S3 buckets: ' . $e->getMessage());
+            return false;
+        }
+    }
 
     /* AJAX handler to fetch S3 buckets */
     public function efs_fetch_s3_buckets()
