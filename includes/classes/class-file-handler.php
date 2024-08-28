@@ -30,6 +30,9 @@ class EFS_File_Handler
         add_action('wp_ajax_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
 
         add_action('wp_ajax_create_s3_bucket', [$this, 'efs_create_s3_bucket']);
+
+        /* Log to verify constructor is called */
+        error_log('Constructor called');
     }
 
     /**
