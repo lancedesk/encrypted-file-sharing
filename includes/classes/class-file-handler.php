@@ -145,7 +145,22 @@ class EFS_File_Handler
 
             $this->log_success('Bucket created: ' . $bucket_name);
             wp_send_json_success();
-        } catch (Exception $e) {
+        }
+        catch (Aws\S3\Exception\S3Exception $e) 
+        {
+            if ($e->getAwsErrorCode() === 'BucketAlreadyExists')
+            {
+                $this->log_error('Bucket already exists: ' . $bucket_name);
+                wp_send_json_error(array('message' => 'Bucket name already taken. Please choose a different name.'));
+            }
+            else
+            {
+                $this->log_error('Exception occurred: ' . $e->getMessage());
+                wp_send_json_error(array('message' => $e->getMessage()));
+            }
+        }
+        catch (Exception $e)
+        {
             $this->log_error('Exception occurred: ' . $e->getMessage());
             wp_send_json_error(array('message' => $e->getMessage()));
         }
@@ -169,9 +184,9 @@ class EFS_File_Handler
         /* Check nonce for security */
         check_ajax_referer('efs_s3_nonce', '_ajax_nonce');
 
-        $region = sanitize_text_field($_POST['region']);
-        $access_key = sanitize_text_field($_POST['access_key']);
-        $secret_key = sanitize_text_field($_POST['secret_key']);
+        $region = get_option('efs_aws_region');;
+        $access_key = get_option('efs_aws_access_key');
+        $secret_key = get_option('efs_aws_secret_key');
 
         try {
             /* Initialize S3 Client */
