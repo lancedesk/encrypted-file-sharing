@@ -28,6 +28,8 @@ class EFS_File_Handler
 
         /* Register the AJAX action for logged-in users */
         add_action('wp_ajax_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
+
+        add_action('wp_ajax_create_s3_bucket', [$this, 'efs_create_s3_bucket']);
     }
 
     /**
@@ -99,6 +101,40 @@ class EFS_File_Handler
             /* Log any errors */
             error_log('Error fetching S3 buckets: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    /* Function to create S3 bucket */
+    public function efs_create_s3_bucket()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized user'));
+        }
+
+        $bucket_name = sanitize_text_field($_POST['bucket_name']);
+        
+        if (empty($bucket_name)) {
+            wp_send_json_error(array('message' => 'Bucket name cannot be empty'));
+        }
+
+        /* Use AWS SDK to create the bucket */
+        try {
+            $s3 = new Aws\S3\S3Client([
+                'region'  => get_option('efs_aws_region'),
+                'version' => 'latest',
+                'credentials' => [
+                    'key'    => get_option('efs_aws_access_key'),
+                    'secret' => get_option('efs_aws_secret_key'),
+                ]
+            ]);
+
+            $result = $s3->createBucket([
+                'Bucket' => $bucket_name,
+            ]);
+
+            wp_send_json_success();
+        } catch (Exception $e) {
+            wp_send_json_error(array('message' => $e->getMessage()));
         }
     }
 
