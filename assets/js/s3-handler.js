@@ -1,12 +1,14 @@
 jQuery(document).ready(function ($) {
     /* Handle bucket creation */
     $('#efs_create_bucket').on('click', function() {
+        console.log('Button clicked');  /* Check if the button click is detected */
         var newBucket = $('#efs_new_bucket').val();
         var region = $('#efs_aws_region').val();
         var accessKey = $('#efs_aws_access_key').val();
         var secretKey = $('#efs_aws_secret_key').val();
 
         if (newBucket === '') {
+            console.log('No bucket name provided');
             $('#efs_create_bucket_message').html('<span style="color: red;">Please enter a bucket name.</span>');
             return;
         }
@@ -17,6 +19,7 @@ jQuery(document).ready(function ($) {
             return;
         }
 
+        console.log('Starting AJAX request');  /* Ensure this logs before the AJAX request */
         $.ajax({
             url: efsAdminAjax.ajax_url, /* WordPress admin AJAX URL */
             type: 'POST',
@@ -29,6 +32,7 @@ jQuery(document).ready(function ($) {
                 _ajax_nonce: efs_s3_params.efs_s3_nonce  /* Include nonce for security */
             },
             success: function(response) {
+                console.log('Response received:', response);  /* Log the response */
                 if (response.success) {
                     $('#efs_create_bucket_message').html('<span style="color: green;">Bucket created successfully!</span>');
                     $('#efs_new_bucket').val(''); /* Clear input field */
