@@ -153,6 +153,11 @@ class EFS_File_Handler
                 $this->log_error('Bucket already exists: ' . $bucket_name);
                 wp_send_json_error(array('message' => 'Bucket name already taken. Please choose a different name.'));
             }
+            elseif ($e->getAwsErrorCode() === 'BucketAlreadyOwnedByYou')
+            {
+                $this->log_error('Bucket already owned by you: ' . $bucket_name);
+                wp_send_json_error(array('message' => 'You already own a bucket with this name.'));
+            }
             else
             {
                 $this->log_error('Exception occurred: ' . $e->getMessage());
