@@ -43,12 +43,18 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    /* Handle fetching of buckets */
+    $('#efs_fetch_buckets').on('click', function() {
+        fetchBuckets();
+    });
 
-    $('#efs_fetch_buckets').on('click', function () {
+
+    function fetchBuckets() {
         var region = $('#efs_aws_region').val();
         var accessKey = $('#efs_aws_access_key').val();
         var secretKey = $('#efs_aws_secret_key').val();
 
+        /* Ensure AWS credentials are provided */
         if (!region || !accessKey || !secretKey) {
             alert('Please provide AWS region, access key, and secret key.');
             return;
@@ -56,29 +62,30 @@ jQuery(document).ready(function ($) {
 
         $.ajax({
             url: efsAdminAjax.ajax_url, /* WordPress admin AJAX URL */
-            method: 'POST',
+            type: 'POST',
             data: {
                 action: 'efs_fetch_s3_buckets',
                 region: region,
                 access_key: accessKey,
                 secret_key: secretKey,
-                _ajax_nonce: efs_s3_params.efs_s3_nonce  /* Include the localized nonce */
+                _ajax_nonce: efs_s3_params.efs_s3_nonce  /* Include nonce for security */
             },
-            success: function (response) {
+            success: function(response) {
                 if (response.success) {
-                    var bucketDropdown = $('#efs_aws_bucket');
-                    bucketDropdown.empty(); /* Clear existing options */
-
-                    $.each(response.data, function (index, bucketName) {
-                        bucketDropdown.append(new Option(bucketName, bucketName));
+                    var bucketList = response.data.buckets;
+                    var $select = $('#efs_aws_bucket');
+                    $select.empty();
+                    $.each(bucketList, function(index, bucket) {
+                        $select.append('<option value="' + bucket + '">' + bucket + '</option>');
                     });
+                    $('#efs_fetch_buckets_message').html('<span style="color: green;">Buckets fetched successfully.</span>');
                 } else {
-                    alert('Error: ' + response.data);
+                    $('#efs_fetch_buckets_message').html('<span style="color: red;">Failed to fetch buckets.</span>');
                 }
             },
-            error: function () {
-                alert('AJAX request failed.');
+            error: function() {
+                $('#efs_fetch_buckets_message').html('<span style="color: red;">Failed to fetch buckets. Please try again.</span>');
             }
         });
-    });
+    }
 });
