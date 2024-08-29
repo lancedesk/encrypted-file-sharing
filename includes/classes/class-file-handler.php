@@ -24,14 +24,13 @@ class EFS_File_Handler
         /* Initialize S3 Client */
         $this->initialize_s3_client();
 
+        /* Register AJAX actions for managing S3 buckets */
         add_action('wp_ajax_upload_to_s3', [$this, 'handle_s3_upload_ajax']);
-
-        /* Register the AJAX action for logged-in users */
         add_action('wp_ajax_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
         add_action('wp_ajax_nopriv_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
-
         add_action('wp_ajax_efs_create_s3_bucket', [$this, 'efs_create_s3_bucket']);
         add_action('wp_ajax_nopriv_efs_create_s3_bucket', [$this, 'efs_create_s3_bucket']);
+        add_action('wp_ajax_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets_callback']);
     }
 
     /**
@@ -106,6 +105,28 @@ class EFS_File_Handler
             /* Log any errors */
             error_log('Error fetching S3 buckets: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Callback function for fetching S3 buckets via AJAX.
+     * 
+     * Retrieves the list of S3 buckets using the fetch_and_store_s3_buckets method
+     * and returns the result as a JSON response. Logs errors if the operation fails.
+    */
+
+    public function efs_fetch_s3_buckets_callback() {
+        if (!$this->s3_client) {
+            error_log('S3 client is not initialized.');
+            return false;
+        }
+
+        $buckets = $this->fetch_and_store_s3_buckets();
+
+        if ($buckets) {
+            wp_send_json_success($buckets);
+        } else {
+            wp_send_json_error(array('message' => 'Failed to fetch buckets.'));
         }
     }
 
