@@ -78,6 +78,49 @@ class EFS_File_Handler
     }
 
     /**
+     * Fetches and stores the list of S3 buckets in the WordPress options table.
+     * 
+     * @return array|false Returns an array of bucket names on success, or false on failure.
+    */
+
+    public function fetch_and_store_s3_buckets() {
+        if (!$this->s3_client) {
+            error_log('S3 client is not initialized.');
+            return false;
+        }
+
+        try {
+            /* List Buckets */
+            $result = $this->s3_client->listBuckets();
+
+            /* Extract and store bucket names */
+            $buckets = array_map(function($bucket) {
+                return $bucket['Name'];
+            }, $result['Buckets']);
+
+            /* Save buckets to WordPress options table */
+            update_option('efs_s3_buckets', $buckets);
+
+            return $buckets;
+        } catch (AwsException $e) {
+            /* Log any errors */
+            error_log('Error fetching S3 buckets: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Retrieves the list of stored S3 buckets from the WordPress options table.
+     * 
+     * @return array Returns an array of stored bucket names. If no buckets are stored, returns an empty array.
+    */
+
+    public function get_stored_s3_buckets() {
+        /* Retrieve stored buckets from WordPress options table */
+        return get_option('efs_s3_buckets', array());
+    }
+
+    /**
      * Debug method to fetch S3 buckets without using AJAX or POST requests.
      * @return array|bool List of S3 bucket names or false on failure.
     */
