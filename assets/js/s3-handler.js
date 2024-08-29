@@ -51,17 +51,16 @@ jQuery(document).ready(function ($) {
         fetchBuckets();
     });
 
-
     function fetchBuckets() {
         var region = $('#efs_aws_region').val();
-
+    
         /* Ensure AWS credentials are provided */
         if (!region) {
             console.log('No AWS region provided for fetching buckets');  /* Log if no region is provided */
             alert('Please provide AWS region.');
             return;
         }
-
+    
         console.log('Starting fetch buckets AJAX request');  /* Log before AJAX request for fetching buckets */
         $.ajax({
             url: efsAdminAjax.ajax_url, /* WordPress admin AJAX URL */
@@ -75,13 +74,16 @@ jQuery(document).ready(function ($) {
                 console.log('Fetch buckets response received:', response); /* Log the response */
                 if (response.success) {
                     console.log('Buckets fetched successfully'); /* Log success message */
-                    var bucketList = response.data.buckets;
-                    var $select = $('#efs_aws_bucket');
-                    $select.empty();
+                    var bucketList = response.data;
+                    var $checklist = $('#efs_bucket_checklist'); /* The div where checkboxes are displayed */
+                    $checklist.empty(); /* Clear any existing content */
+    
                     $.each(bucketList, function(index, bucket) {
                         console.log('Bucket found:', bucket);  /* Log each bucket */
-                        $select.append('<option value="' + bucket + '">' + bucket + '</option>');
+                        var checkbox = '<label><input type="checkbox" name="efs_aws_buckets[]" value="' + bucket + '">' + bucket + '</label><br>';
+                        $checklist.append(checkbox); /* Append each checkbox to the checklist div */
                     });
+    
                     $('#efs_fetch_buckets_message').html('<span style="color: green;">Buckets fetched successfully.</span>');
                 } else {
                     console.log('Failed to fetch buckets: ' + response.data.message); /* Log failure message */
@@ -93,5 +95,5 @@ jQuery(document).ready(function ($) {
                 $('#efs_fetch_buckets_message').html('<span style="color: red;">Failed to fetch buckets. Please try again.</span>');
             }
         });
-    }
+    }    
 });
