@@ -7,10 +7,7 @@ class EFS_Admin_Users
      */
     public function __construct()
     {
-        /* Hook for plugin activation to create the table */
-        /* register_activation_hook(__FILE__, array($this, 'create_admin_table')); */
-        register_activation_hook(plugin_dir_path(__FILE__) . '../encrypted-file-sharing.php', array($this, 'create_admin_table'));
-        /* register_deactivation_hook( __FILE__, "deactivate_myplugin" ); */
+        /* To impement any relevant hooks later */
     }
 
     /**
