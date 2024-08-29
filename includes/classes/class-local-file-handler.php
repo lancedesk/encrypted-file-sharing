@@ -7,9 +7,7 @@ class EFS_Local_File_Handler
      */
     public function __construct()
     {
-        /* Hook for plugin activation to create a secure private uploads folder */
-        /* register_activation_hook(plugin_dir_path(__FILE__) . '../encrypted-file-sharing.php', [$this, 'efs_create_private_folder']); */
-        register_activation_hook(__FILE__, [$this, 'efs_create_private_folder']);
+        /* Hooks to be implemented later */
     }
 
     /**
