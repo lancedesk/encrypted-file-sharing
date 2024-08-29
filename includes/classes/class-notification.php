@@ -22,12 +22,6 @@ class EFS_Notification_Handler
      * @param int $post_id Post ID of the uploaded file.
     */
 
-    /**
-     * Send notifications based on file upload.
-     *
-     * @param int $post_id Post ID of the uploaded file.
-    */
-
     public function send_upload_notifications($post_id)
     {
         $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
