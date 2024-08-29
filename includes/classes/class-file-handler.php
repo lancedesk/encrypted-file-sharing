@@ -25,12 +25,38 @@ class EFS_File_Handler
     }
 
     /**
+     * Initialize the S3 client.
+     *
+     * Calls the S3 file handler's method to initialize the S3 client.
+     *
+     * @return \Aws\S3\S3Client Initialized S3 client instance.
+    */
+
+    public function initialize_s3_client()
+    {
+        return $this->s3_file_handler->initialize_s3_client();
+    }
+
+    /**
      * Fetch stored S3 buckets via S3 file handler.
     */
 
     public function get_stored_s3_buckets()
     {
         return $this->s3_file_handler->get_stored_s3_buckets();
+    }
+
+    /**
+     * Fetch S3 buckets for debugging purposes.
+     *
+     * Calls the S3 file handler's method to fetch S3 buckets.
+     *
+     * @return array List of S3 buckets for debugging.
+    */
+
+    public function fetch_s3_buckets_debug()
+    {
+        return $this->s3_file_handler->fetch_s3_buckets_debug();
     }
 
     /**
