@@ -341,8 +341,8 @@ class EFS_File_Handler
 
     private function upload_to_amazon_s3($file)
     {
-        /* Define your bucket and file path on S3 */
-        $bucket = 'your-s3-bucket';
+        /* Get AWS bucket from EFS settings */
+        $bucket = get_option('efs_aws_bucket', '');
         $file_key = basename($file['file']); /* Use the file's name as its S3 key */
 
         /* Retrieve the privacy setting */
@@ -443,8 +443,8 @@ class EFS_File_Handler
 
     private function get_presigned_url($file_key, $expiry_in_seconds)
     {
-        /* Define your bucket */
-        $bucket = 'your-s3-bucket';
+        /* Get AWS bucket from EFS settings */
+        $bucket = get_option('efs_aws_bucket', '');
 
         try {
             /* Generate the pre-signed URL */
