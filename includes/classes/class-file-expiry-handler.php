@@ -16,16 +16,16 @@ class EFS_File_Expiry_Handler
         $this->file_handler = new EFS_File_Handler(); /* Initialize the file handler. */
 
         /* Schedule cron event on init. */
-        add_action('init', array($this, 'schedule_file_expiry_cron'));
+        add_action('init', [$this, 'schedule_file_expiry_cron']);
 
         /* Hook into the cron event to check for expired files. */
-        add_action('efs_check_file_expiry_event', array($this, 'check_file_expiry'));
+        add_action('efs_check_file_expiry_event', [$this, 'check_file_expiry']);
 
         /* Unschedule the event when the plugin is deactivated. */
-        register_deactivation_hook(__FILE__, array($this, 'unschedule_file_expiry_cron'));
+        register_deactivation_hook(__FILE__, [$this, 'unschedule_file_expiry_cron']);
 
         /* Hook into save_post to save expiry information */
-        add_action('save_post', array($this, 'save_file_expiry'));
+        add_action('save_post', [$this, 'save_file_expiry']);
     }
 
     /**
@@ -65,14 +65,14 @@ class EFS_File_Expiry_Handler
         if ($enable_expiry) 
         {
             /* Get expired files based on meta_key `_efs_file_expiry_date` */
-            $args = array(
+            $args = [
                 'post_type'    => 'efs_file',
                 'meta_key'     => '_efs_file_expiry_date',
                 'meta_value'   => date('Y-m-d'),
                 'meta_compare' => '<=',
                 'post_status'  => 'publish',
                 'fields'       => 'ids',
-            );
+            ];
 
             $expired_posts = get_posts($args);
 
@@ -80,6 +80,7 @@ class EFS_File_Expiry_Handler
             {
                 /* Delete the local file if stored locally */
                 $storage_option = get_option('efs_storage_option', 'local');
+
                 if ($storage_option === 'local') 
                 {
                     $file_url = get_post_meta($post_id, '_efs_file_url', true);
@@ -87,10 +88,10 @@ class EFS_File_Expiry_Handler
                 }
 
                 /* Change post status to 'expired' */
-                wp_update_post(array(
+                wp_update_post([
                     'ID'          => $post_id,
                     'post_status' => 'expired', /* Set to 'expired' */
-                ));
+                ]);
             }
         }
     }
