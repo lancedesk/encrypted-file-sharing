@@ -82,7 +82,8 @@ class EFS_File_Handler
      * @return array|false Returns an array of bucket names on success, or false on failure.
     */
 
-    public function fetch_and_store_s3_buckets() {
+    public function fetch_and_store_s3_buckets()
+    {
         if (!$this->s3_client) {
             error_log('S3 client is not initialized.');
             return false;
@@ -115,12 +116,8 @@ class EFS_File_Handler
      * and returns the result as a JSON response. Logs errors if the operation fails.
     */
 
-    public function efs_fetch_s3_buckets_callback() {
-        if (!$this->s3_client) {
-            error_log('S3 client is not initialized.');
-            return false;
-        }
-
+    public function efs_fetch_s3_buckets_callback()
+    {
         $buckets = $this->fetch_and_store_s3_buckets();
 
         if ($buckets) {
