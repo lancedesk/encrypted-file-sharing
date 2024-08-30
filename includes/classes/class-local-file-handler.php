@@ -45,6 +45,38 @@ class EFS_Local_File_Handler
         }
     }
 
+    private function upload_to_local($file)
+    {
+        /* Define the secure directory */
+        $upload_dir = ABSPATH . '../private_uploads/';
+
+        /* Ensure the directory exists */
+        if (!file_exists($upload_dir)) 
+        {
+            mkdir($upload_dir, 0755, true);
+        }
+
+        /* Get the file name and ensure it's sanitized */
+        $file_name = sanitize_file_name($file['name']);
+        $target_file = $upload_dir . $file_name;
+
+        /* Move the uploaded file to the secure directory */
+        if (move_uploaded_file($file['tmp_name'], $target_file)) 
+        {
+            /* Log the upload success */
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File uploaded successfully: ' . $target_file);
+            
+            /* Return the file path or URL (for secure downloads, you might return a URL later) */
+            return $target_file;
+        } 
+        else 
+        {
+            /* Log failure */
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to upload file: ' . $file_name);
+            return false;
+        }
+    }
+
     /**
      * Log messages to a file
      *
