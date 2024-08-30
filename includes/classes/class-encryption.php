@@ -42,6 +42,36 @@ class EFS_Encryption
     }
 
     /**
+     * Decrypt an encrypted file using OpenSSL.
+     *
+     * @param string $encrypted_file_path The path to the encrypted file.
+     * @param string $encryption_key The encryption key to decrypt the file.
+     * @return string|false The decrypted file contents on success, false on failure.
+    */
+
+    private function decrypt_file($encrypted_file_path, $encryption_key)
+    {
+        /* Read the encrypted file data */
+        $encrypted_data = file_get_contents($encrypted_file_path);
+        if ($encrypted_data === false) {
+            return false;
+        }
+
+        /* Separate IV (first 16 bytes) from the encrypted data */
+        $iv = substr($encrypted_data, 0, 16);
+        $ciphertext = substr($encrypted_data, 16);
+
+        /* Decrypt the file content */
+        $decrypted_data = openssl_decrypt($ciphertext, 'AES-256-CBC', $encryption_key, 0, $iv);
+
+        if ($decrypted_data === false) {
+            return false;
+        }
+
+        return $decrypted_data;
+    }
+
+    /**
      * Create the `efs_encryption_keys` table in the database.
      * This method is called during plugin activation.
     */
