@@ -98,6 +98,28 @@ class EFS_Local_File_Handler
         }
     }
 
+    /**
+     * Save file metadata such as expiration date.
+     *
+     * @param string $file_name The name of the file.
+     * @param string $expiration_date The expiration date for the file.
+    */
+
+    private function save_file_metadata($file_name, $expiration_date)
+    {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'efs_file_metadata';
+
+        $wpdb->insert(
+            $table_name,
+            [
+                'file_name' => $file_name,
+                'expiration_date' => $expiration_date,
+                'created_at' => current_time('mysql')
+            ]
+        );
+    }
 
     /**
      * Log messages to a file
