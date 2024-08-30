@@ -142,20 +142,42 @@ class EFS_File_Handler
     }
 
     /**
-     * Upload file to the local media library.
+     * Upload file to a secure location outside the web root.
      *
-     * @param array $file The file to upload.
-     * @return mixed Result of the upload operation, or false on failure.
+     * @param array $file File array from the upload form ($_FILES['file'])
+     * @return string|false The file path on success, false on failure.
     */
 
     private function upload_to_local($file)
     {
-        $attachment_id = wp_insert_attachment($file, $file['file']);
-        require_once(ABSPATH . 'wp-admin/includes/image.php');
-        $attachment_data = wp_generate_attachment_metadata($attachment_id, $file['file']);
-        wp_update_attachment_metadata($attachment_id, $attachment_data);
-        
-        return $attachment_id;
+        /* Define the secure directory */
+        $upload_dir = ABSPATH . '../private_uploads/';
+
+        /* Ensure the directory exists */
+        if (!file_exists($upload_dir)) 
+        {
+            mkdir($upload_dir, 0755, true);
+        }
+
+        /* Get the file name and ensure it's sanitized */
+        $file_name = sanitize_file_name($file['name']);
+        $target_file = $upload_dir . $file_name;
+
+        /* Move the uploaded file to the secure directory */
+        if (move_uploaded_file($file['tmp_name'], $target_file)) 
+        {
+            /* Log the upload success */
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File uploaded successfully: ' . $target_file);
+            
+            /* Return the file path or URL (for secure downloads, you might return a URL later) */
+            return $target_file;
+        } 
+        else 
+        {
+            /* Log failure */
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to upload file: ' . $file_name);
+            return false;
+        }
     }
 
     /**
