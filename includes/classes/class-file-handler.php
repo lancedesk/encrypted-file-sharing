@@ -28,11 +28,7 @@ class EFS_File_Handler
     }
 
     /**
-     * Initialize the S3 client.
-     *
-     * Calls the S3 file handler's method to initialize the S3 client.
-     *
-     * @return \Aws\S3\S3Client Initialized S3 client instance.
+     * Initialize the S3 client via the S3 file handler.
     */
 
     public function initialize_s3_client()
@@ -51,7 +47,6 @@ class EFS_File_Handler
 
     /**
      * Upload file to a secure location via the local file handler.
-     *
     */
 
     private function upload_to_local($file)
@@ -60,11 +55,7 @@ class EFS_File_Handler
     }
 
     /**
-     * Fetch S3 buckets for debugging purposes.
-     *
-     * Calls the S3 file handler's method to fetch S3 buckets.
-     *
-     * @return array List of S3 buckets for debugging.
+     * Fetch S3 buckets for debugging purposes via S3 file handler.
     */
 
     public function fetch_s3_buckets_debug()
