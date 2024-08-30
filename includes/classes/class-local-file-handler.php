@@ -69,8 +69,10 @@ class EFS_Local_File_Handler
         /* Move the uploaded file to the secure directory */
         if (move_uploaded_file($file['tmp_name'], $target_file)) 
         {
+            /* Generate a random encryption key (256-bit) */
+            $encryption_key = openssl_random_pseudo_bytes(32);
+
             /* Encrypt the file */
-            $encryption_key = 'your-secret-encryption-key';
             $encrypted_file = $this->efs_encryption->encrypt_file($target_file, $encryption_key);
 
             if ($encrypted_file)
