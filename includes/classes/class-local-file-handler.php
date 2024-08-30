@@ -69,11 +69,16 @@ class EFS_Local_File_Handler
         /* Move the uploaded file to the secure directory */
         if (move_uploaded_file($file['tmp_name'], $target_file)) 
         {
-            /* Log the upload success */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File uploaded successfully: ' . $target_file);
-            
-            /* Return the file path or URL (for secure downloads, you might return a URL later) */
-            return $target_file;
+            /* Encrypt the file */
+            $encryption_key = 'your-secret-encryption-key';
+            $encrypted_file = $this->efs_encryption->encrypt_file($target_file, $encryption_key);
+
+            if ($encrypted_file)
+            {
+                /* Log the upload success */
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded successfully: ' . $encrypted_file);
+                return $encrypted_file;  /* Return the encrypted file path */
+            }
         } 
         else 
         {
