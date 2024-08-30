@@ -64,5 +64,44 @@ class EFS_Encryption
         dbDelta($sql); /* Ensures the table is created or updated if it already exists */
     }
     
+    /**
+     * Save the encrypted symmetric key in the database
+    */
+
+    private function save_encrypted_key($file_name, $encryption_key)
+    {
+        global $wpdb;
+
+        $wpdb->insert(
+            $wpdb->prefix . 'efs_encryption_keys',
+            [
+                'file_name' => $file_name,
+                'encryption_key' => $encryption_key, /* Binary data */
+                'created_at' => current_time('mysql')
+            ]
+        );
+    }
+
+    /**
+     * Retrieve the encryption key for a file
+    */
+
+    private function get_encryption_key($file_name)
+    {
+        global $wpdb;
+
+        $row = $wpdb->get_row(
+            $wpdb->prepare("SELECT encryption_key FROM {$wpdb->prefix}efs_encryption_keys WHERE file_name = %s", $file_name),
+            ARRAY_A
+        );
+
+        if ($row) 
+        {
+            return $row['encryption_key'];
+        }
+
+        return false;
+    }
+
 
 }
