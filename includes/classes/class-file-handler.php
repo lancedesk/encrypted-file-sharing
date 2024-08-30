@@ -1,10 +1,12 @@
 <?php
 require_once 'class-s3-file-handler.php'; /* Include the S3 file handler class */
+require_once 'class-local-file-handler.php'; /* Include the local file handler class */
 
 class EFS_File_Handler
 {
     private $notification_handler;
     private $s3_file_handler;
+    private $local_file_handler;
 
     /**
      * Constructor to initialize actions and filters.
@@ -14,6 +16,7 @@ class EFS_File_Handler
     {
         $this->notification_handler = new EFS_Notification_Handler();
         $this->s3_file_handler = new EFS_S3_File_Handler();
+        $this->local_file_handler = new EFS_Local_File_Handler();
 
         /* Register AJAX actions */
         add_action('wp_ajax_efs_handle_download', [$this, 'handle_download_request']);
@@ -150,34 +153,7 @@ class EFS_File_Handler
 
     private function upload_to_local($file)
     {
-        /* Define the secure directory */
-        $upload_dir = ABSPATH . '../private_uploads/';
-
-        /* Ensure the directory exists */
-        if (!file_exists($upload_dir)) 
-        {
-            mkdir($upload_dir, 0755, true);
-        }
-
-        /* Get the file name and ensure it's sanitized */
-        $file_name = sanitize_file_name($file['name']);
-        $target_file = $upload_dir . $file_name;
-
-        /* Move the uploaded file to the secure directory */
-        if (move_uploaded_file($file['tmp_name'], $target_file)) 
-        {
-            /* Log the upload success */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File uploaded successfully: ' . $target_file);
-            
-            /* Return the file path or URL (for secure downloads, you might return a URL later) */
-            return $target_file;
-        } 
-        else 
-        {
-            /* Log failure */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to upload file: ' . $file_name);
-            return false;
-        }
+        return $this->s3_file_handler->upload_to_local($file);
     }
 
     /**
