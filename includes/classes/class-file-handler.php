@@ -225,4 +225,29 @@ class EFS_File_Handler
             wp_delete_attachment($attachment_id, true); /* Delete permanently */
         }
     }
+
+    /**
+     * Create the `efs_file_metadata` table in the database.
+    */
+
+    public function efs_create_file_metadata_table()
+    {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'efs_file_metadata';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id INT NOT NULL AUTO_INCREMENT,
+            file_name VARCHAR(255) NOT NULL,
+            expiration_date DATETIME NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY file_name (file_name)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql); /* Ensure table creation or update */
+    }
+
 }
