@@ -44,7 +44,7 @@ class EFS_Encryption
      * This method is called during plugin activation.
     */
 
-    public function create_encryption_keys_table()
+    public function efs_create_encryption_keys_table()
     {
         global $wpdb;
 
