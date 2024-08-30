@@ -18,19 +18,21 @@ class EFS_Encryption
     private function encrypt_file($file_path, $encryption_key)
     {
         $output_file = $file_path . '.enc';
-        $iv = openssl_random_pseudo_bytes(16);
+        $iv = openssl_random_pseudo_bytes(16); /* Initialization vector for AES-256-CBC */
 
+        /* Read the file content */
         $file_data = file_get_contents($file_path);
         if ($file_data === false) {
             return false;
         }
 
+        /* Encrypt the file content */
         $encrypted_data = openssl_encrypt($file_data, 'AES-256-CBC', $encryption_key, 0, $iv);
         if ($encrypted_data === false) {
             return false;
         }
 
-        /* Store the encrypted file and IV */
+        /* Write the IV and encrypted data to a new file */
         file_put_contents($output_file, $iv . $encrypted_data);
 
         /* Remove the original file for security */
@@ -76,7 +78,7 @@ class EFS_Encryption
             $wpdb->prefix . 'efs_encryption_keys',
             [
                 'file_name' => $file_name,
-                'encryption_key' => $encryption_key, /* Binary data */
+                'encryption_key' => $encryption_key, /* Store the key as binary data */
                 'created_at' => current_time('mysql')
             ]
         );
