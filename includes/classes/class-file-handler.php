@@ -50,6 +50,16 @@ class EFS_File_Handler
     }
 
     /**
+     * Upload file to a secure location via the local file handler.
+     *
+    */
+
+    private function upload_to_local($file)
+    {
+        return $this->local_file_handler->upload_to_local($file);
+    }
+
+    /**
      * Fetch S3 buckets for debugging purposes.
      *
      * Calls the S3 file handler's method to fetch S3 buckets.
@@ -142,18 +152,6 @@ class EFS_File_Handler
     private function upload_to_dropbox($file)
     {
         /* Implement Dropbox upload logic */
-    }
-
-    /**
-     * Upload file to a secure location outside the web root.
-     *
-     * @param array $file File array from the upload form ($_FILES['file'])
-     * @return string|false The file path on success, false on failure.
-    */
-
-    private function upload_to_local($file)
-    {
-        return $this->s3_file_handler->upload_to_local($file);
     }
 
     /**
