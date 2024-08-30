@@ -1,13 +1,19 @@
 <?php
 
+require_once 'class-encryption.php'; /* Include the EFS encryption class */
+
 class EFS_Local_File_Handler
 {
+    private $efs_encryption;
+
     /**
      * Constructor to initialize actions and hooks.
-     */
+    */
+
     public function __construct()
     {
-        /* Hooks to be implemented later */
+        /* Initialize the EFS encryption class. */
+        $this->efs_encryption = new EFS_Encryption();
     }
 
     /**
