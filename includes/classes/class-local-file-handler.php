@@ -101,6 +101,33 @@ class EFS_Local_File_Handler
     }
 
     /**
+     * Handle the local file upload via AJAX.
+    */
+
+    public function handle_local_upload_ajax()
+    {
+        if (!isset($_FILES['file']) || empty($_FILES['file']['name'])) {
+            wp_send_json_error(['message' => 'No file uploaded.']);
+        }
+
+        if (!isset($_POST['expiration_date'])) {
+            wp_send_json_error(['message' => 'No expiration date provided.']);
+        }
+
+        $file = $_FILES['file'];
+        $expiration_date = sanitize_text_field($_POST['expiration_date']);
+
+        /* Call the method to upload and encrypt the file locally */
+        $encrypted_file = $this->upload_to_local($file, $expiration_date);
+
+        if ($encrypted_file) {
+            wp_send_json_success(['file_url' => $encrypted_file]);
+        } else {
+            wp_send_json_error(['message' => 'File upload failed.']);
+        }
+    }
+
+    /**
      * Save file metadata such as expiration date.
      *
      * @param string $file_name The name of the file.
