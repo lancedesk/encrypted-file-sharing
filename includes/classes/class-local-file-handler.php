@@ -14,8 +14,8 @@ class EFS_Local_File_Handler
     {
         /* Initialize the EFS encryption class. */
         $this->efs_encryption = new EFS_Encryption();
-        add_action('wp_ajax_upload_to_local', [$this, 'handle_local_upload_ajax']);
-        add_action('wp_ajax_nopriv_upload_to_local', [$this, 'handle_local_upload_ajax']);
+        add_action('wp_ajax_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
+        add_action('wp_ajax_nopriv_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
     }
 
     /**
