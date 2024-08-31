@@ -128,23 +128,33 @@ class EFS_Local_File_Handler
 
     public function handle_local_upload_ajax()
     {
+        $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
+
         if (!isset($_FILES['file']) || empty($_FILES['file']['name'])) {
+            $this->log_message($log_file, 'No file uploaded.');
             wp_send_json_error(['message' => 'No file uploaded.']);
         }
 
         if (!isset($_POST['expiration_date'])) {
+            $this->log_message($log_file, 'No expiration date provided.');
             wp_send_json_error(['message' => 'No expiration date provided.']);
         }
 
         $file = $_FILES['file'];
         $expiration_date = sanitize_text_field($_POST['expiration_date']);
 
+        /* Log the received file and expiration date */
+        $this->log_message($log_file, 'Handling file upload - File: ' . print_r($file, true));
+        $this->log_message($log_file, 'Expiration date: ' . $expiration_date);
+
         /* Call the method to upload and encrypt the file locally */
         $encrypted_file = $this->upload_to_local($file, $expiration_date);
 
         if ($encrypted_file) {
+            $this->log_message($log_file, 'File upload and encryption successful. Encrypted file: ' . $encrypted_file);
             wp_send_json_success(['file_url' => $encrypted_file]);
         } else {
+            $this->log_message($log_file, 'File upload or encryption failed.');
             wp_send_json_error(['message' => 'File upload failed.']);
         }
     }
