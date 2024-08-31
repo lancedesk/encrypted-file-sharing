@@ -61,18 +61,35 @@ class EFS_Local_File_Handler
     {
         $upload_dir = ABSPATH . '../private_uploads/';
 
+        /* Log the received file and expiration date */
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Received file: ' . print_r($file, true));
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Expiration date: ' . $expiration_date);
+
         /* Check if upload directory exists, create it if not */
         if (!file_exists($upload_dir)) 
         {
-            mkdir($upload_dir, 0755, true);
+            if (mkdir($upload_dir, 0755, true)) 
+            {
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Created directory: ' . $upload_dir);
+            } 
+            else 
+            {
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to create directory: ' . $upload_dir);
+                return false;
+            }
         }
 
         $file_name = sanitize_file_name($file['name']);
         $target_file = $upload_dir . $file_name;
 
+        /* Log the target file path */
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Target file path: ' . $target_file);
+
         /* Move the uploaded file to the secure directory */
         if (move_uploaded_file($file['tmp_name'], $target_file)) 
         {
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File moved to: ' . $target_file);
+            
             $encryption_key = openssl_random_pseudo_bytes(32); /* Generate a random encryption key (256-bit) */
 
             /* Encrypt the file using the EFS_Encryption class */
@@ -90,12 +107,17 @@ class EFS_Local_File_Handler
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
 
                 return $encrypted_file;
+            } 
+            else 
+            {
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
+                return false;
             }
         } 
         else 
         {
             /* Log an error if file upload fails */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to upload file: ' . $file_name);
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to move uploaded file to: ' . $target_file);
             return false;
         }
     }
