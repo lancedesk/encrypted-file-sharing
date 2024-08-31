@@ -181,9 +181,18 @@ class EFS_Local_File_Handler
 
     private function log_message($file, $message)
     {
-        $timestamp = date('Y-m-d H:i:s');
-        $log_message = $timestamp . ' - ' . $message . PHP_EOL;
-        file_put_contents($file, $log_message, FILE_APPEND);
+        if (file_exists($file)) 
+        {
+            $current = file_get_contents($file);
+            $current .= "[" . date('Y-m-d H:i:s') . "] " . $message . "\n";
+            file_put_contents($file, $current);
+        } 
+        else 
+        {
+            $timestamp = date('Y-m-d H:i:s');
+            $log_message = $timestamp . ' - ' . $message . PHP_EOL;
+            file_put_contents($file, $log_message, FILE_APPEND);
+        }
     }
 
 }
