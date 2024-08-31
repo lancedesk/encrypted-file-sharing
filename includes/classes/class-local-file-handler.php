@@ -136,11 +136,13 @@ class EFS_Local_File_Handler
             wp_send_json_error(['message' => 'Invalid nonce.']);
         }
 
+        /* Check if a file was uploaded */
         if (!isset($_FILES['file']) || empty($_FILES['file']['name'])) {
             $this->log_message($log_file, 'No file uploaded.');
             wp_send_json_error(['message' => 'No file uploaded.']);
         }
 
+        /* Check if an expiration date was provided */
         if (!isset($_POST['expiration_date'])) {
             $this->log_message($log_file, 'No expiration date provided.');
             wp_send_json_error(['message' => 'No expiration date provided.']);
