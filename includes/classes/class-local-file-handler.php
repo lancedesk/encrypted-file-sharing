@@ -130,6 +130,12 @@ class EFS_Local_File_Handler
     {
         $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
 
+        /* Verify the nonce */
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'efs_upload_nonce')) {
+            $this->log_message($log_file, 'Invalid nonce.');
+            wp_send_json_error(['message' => 'Invalid nonce.']);
+        }
+
         if (!isset($_FILES['file']) || empty($_FILES['file']['name'])) {
             $this->log_message($log_file, 'No file uploaded.');
             wp_send_json_error(['message' => 'No file uploaded.']);
