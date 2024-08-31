@@ -158,6 +158,7 @@ class EFS_Local_File_Handler
         /* Call the method to upload and encrypt the file locally */
         $encrypted_file = $this->upload_to_local($file, $expiration_date);
 
+        /* Check if the file was uploaded and encrypted successfully */
         if ($encrypted_file) {
             $this->log_message($log_file, 'File upload and encryption successful. Encrypted file: ' . $encrypted_file);
             wp_send_json_success(['file_url' => $encrypted_file]);
