@@ -13,9 +13,9 @@ jQuery(document).ready(function($) {
         }
 
         mediaUploader = wp.media.frames.file_frame = wp.media({
-            title: efsSelectFileTitle,
+            title: efsAdminAjax.efsSelectFileTitle, /* Localized variable */
             button: {
-                text: efsSelectFileButtonText
+                text: efsAdminAjax.efsSelectFileButtonText /* Localized variable */
             },
             multiple: false
         });
@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
             /* Append file details and relevant info */
             formData.append("file_url", fileUrl); /* Append file URL */
             formData.append("file_id", fileId); /* Append file ID */          
-            formData.append("nonce", efsNonce); /* Nonce for security */
+            formData.append("nonce", efsAdminAjax.nonce); /* Nonce for security from localized variable */
 
             /* Append the expiration date */
             var expirationDate = $("#expiration_date_field").val();
@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
 
             var uploadAction = "efs_upload_to_local";
 
-            switch (efsStorageOption) {
+            switch (efsAdminAjax.efsStorageOption) {
                 case "amazon":
                     uploadAction = "upload_to_s3";
                     break;
@@ -81,7 +81,7 @@ jQuery(document).ready(function($) {
                         }
                     } else {
                         console.error("File upload failed:", response.data.message);
-                        alert(efsUploadFailedMessage);
+                        alert(efsAdminAjax.efsUploadFailedMessage); /* Localized variable */
                     }
                 },
                 error: function(xhr, status, error) {
@@ -91,7 +91,7 @@ jQuery(document).ready(function($) {
                     console.log("XHR response JSON:", xhr.responseJSON);
                     console.log("Status:", status);
                     console.log("Error:", error);
-                    alert(efsErrorMessage);
+                    alert(efsAdminAjax.efsErrorMessage); /* Localized variable */
                 }
             });
         });
