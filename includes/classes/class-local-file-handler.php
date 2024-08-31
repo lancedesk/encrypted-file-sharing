@@ -128,7 +128,13 @@ class EFS_Local_File_Handler
 
     public function handle_local_upload_ajax()
     {
+        /* Log a message to the error log to confirm the hook was fired */
+        error_log('The handle_local_upload_ajax hook was fired!');
+
+        /* Log file path */
         $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
+
+        $this->log_message($log_file, 'Ajax method called.');
 
         /* Verify the nonce */
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'efs_upload_nonce')) {
