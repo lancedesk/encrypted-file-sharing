@@ -16,6 +16,18 @@ class EFS_Local_File_Handler
         $this->efs_encryption = new EFS_Encryption();
         add_action('wp_ajax_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
         add_action('wp_ajax_nopriv_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
+        add_action('wp_ajax_efs_write_log', [$this, 'write_log']);
+        add_action('wp_ajax_nopriv_efs_write_log', [$this, 'write_log']);
+    }
+
+    /**
+     * Write a log message to a file.
+    */
+
+    public function write_log()
+    {
+        $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
+        $this->log_message($log_file, 'Ajax method called.');
     }
 
     /**
@@ -143,9 +155,8 @@ class EFS_Local_File_Handler
         }
 
         /* Check if a file was uploaded */
-        if (!isset($_FILES['file']) || empty($_FILES['file']['name'])) {
-            $this->log_message($log_file, 'No file uploaded.');
-            wp_send_json_error(['message' => 'No file uploaded.']);
+        if (!isset($_POST['file_data']) || empty($_POST['file_data'])) {
+            wp_send_json_error(['message' => 'No file data provided.']);
         }
 
         /* Check if an expiration date was provided */
