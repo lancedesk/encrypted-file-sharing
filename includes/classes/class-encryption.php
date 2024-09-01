@@ -100,7 +100,7 @@ class EFS_Encryption
      * Save the encrypted symmetric key in the database
     */
 
-    private function save_encrypted_key($file_name, $encryption_key)
+    public function save_encrypted_key($file_name, $encryption_key)
     {
         global $wpdb;
 
