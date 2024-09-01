@@ -1,12 +1,14 @@
 <?php
 require_once 'class-s3-file-handler.php'; /* Include the S3 file handler class */
 require_once 'class-local-file-handler.php'; /* Include the local file handler class */
+require_once 'class-encryption.php'; /* Include the encryption handler class */
 
 class EFS_File_Handler
 {
     private $notification_handler;
     private $s3_file_handler;
     private $local_file_handler;
+    private $encryption_handler;
 
     /**
      * Constructor to initialize actions and filters.
@@ -17,6 +19,7 @@ class EFS_File_Handler
         $this->notification_handler = new EFS_Notification_Handler();
         $this->s3_file_handler = new EFS_S3_File_Handler();
         $this->local_file_handler = new EFS_Local_File_Handler();
+        $this->encryption_handler = new EFS_Encryption();
 
         /* Register AJAX actions */
         add_action('wp_ajax_efs_handle_download', [$this, 'handle_download_request']);
@@ -62,6 +65,16 @@ class EFS_File_Handler
     {
         return $this->s3_file_handler->fetch_s3_buckets_debug();
     }
+
+    /**
+     * Retrieve the encryption key for a file via the encryption class.
+    */
+
+    private function get_encryption_key($file_name)
+    {
+        return EFS_Encryption::get_encryption_key($file_name);
+    }
+
 
     /**
      * Handle the file upload notifications to selected users.
