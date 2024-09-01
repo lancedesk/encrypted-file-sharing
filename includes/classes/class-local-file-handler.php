@@ -165,7 +165,8 @@ class EFS_Local_File_Handler
             wp_send_json_error(['message' => 'No expiration date provided.']);
         }
 
-        $file = $_FILES['file'];
+        $file_data = json_decode(stripslashes($_POST['file_data']), true);
+        
         $expiration_date = sanitize_text_field($_POST['expiration_date']);
 
         /* Log the received file and expiration date */
