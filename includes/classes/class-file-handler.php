@@ -187,6 +187,12 @@ class EFS_File_Handler
         if ($encryption_key === false) {
             wp_send_json_error(array('message' => 'Encryption key not found.'));
         }
+
+        /* Decrypt the file */
+        $decrypted_data = $this->decrypt_file($file_path, $encryption_key);
+        if ($decrypted_data === false) {
+            wp_send_json_error(array('message' => 'File decryption failed.'));
+        }
     
         /* Update download status and date */
         $current_time = current_time('mysql');
