@@ -217,7 +217,7 @@ class EFS_File_Handler
         header('Pragma: public');
         header('Content-Length: ' . filesize($file_path));
         flush(); /* Flush system output buffer */
-        readfile($file_path);
+        echo $decrypted_data;  /* Output the decrypted data */
     
         /* Terminate script execution */
         exit;
