@@ -66,16 +66,50 @@ class EFS_Local_File_Handler
     }
 
     /**
+     * Calculate the expiration date based on admin settings.
+     *
+     * @return string Expiration date in 'Y-m-d H:i:s' format.
+    */
+
+    private function calculate_expiration_date()
+    {
+        /* Get the expiration period and unit from the admin settings */
+        $expiry_period = get_option('efs_expiry_period', 1); /* Default to 1 if not set */
+        $expiry_unit = get_option('efs_expiry_unit', 'days'); /* Default to 'days' if not set */
+
+        /* Get the current date and time */
+        $current_time = current_time('timestamp');
+
+        /* Calculate the expiration date based on the unit */
+        switch ($expiry_unit) 
+        {
+            case 'minutes':
+                $expiration_time = strtotime("+{$expiry_period} minutes", $current_time);
+                break;
+            case 'hours':
+                $expiration_time = strtotime("+{$expiry_period} hours", $current_time);
+                break;
+            case 'days':
+            default:
+                $expiration_time = strtotime("+{$expiry_period} days", $current_time);
+                break;
+        }
+
+        /* Return the expiration date in 'Y-m-d H:i:s' format */
+        return date('Y-m-d H:i:s', $expiration_time);
+    }
+
+    /**
      * Upload the file to a secure location and encrypt it.
     */
 
-    private function upload_to_local($file, $expiration_date)
+    private function upload_to_local($file)
     {
+        $expiration_date = ;
         $upload_dir = ABSPATH . '../private_uploads/';
 
         /* Log the received file and expiration date */
         $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Received file: ' . print_r($file, true));
-        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Expiration date: ' . $expiration_date);
 
         /* Check if upload directory exists, create it if not */
         if (!file_exists($upload_dir)) 
@@ -140,6 +174,8 @@ class EFS_Local_File_Handler
 
     public function handle_local_upload_ajax()
     {
+        $expiration_date = ;
+
         /* Log a message to the error log to confirm the hook was fired */
         error_log('The handle_local_upload_ajax hook was fired!');
 
@@ -159,15 +195,14 @@ class EFS_Local_File_Handler
             wp_send_json_error(['message' => 'No file data provided.']);
         }
 
-        /* Check if an expiration date was provided */
+        /* Check if an expiration date was provided 
         if (!isset($_POST['expiration_date'])) {
             $this->log_message($log_file, 'No expiration date provided.');
             wp_send_json_error(['message' => 'No expiration date provided.']);
         }
+        */
 
         $file_data = json_decode(stripslashes($_POST['file_data']), true);
-
-        $expiration_date = sanitize_text_field($_POST['expiration_date']);
 
         /* Log the received file and expiration date */
         $this->log_message($log_file, 'Received file data: ' . print_r($file_data, true));
