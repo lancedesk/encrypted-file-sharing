@@ -45,10 +45,6 @@ jQuery(document).ready(function($) {
             formData.append("file_data", JSON.stringify(attachment));
             formData.append("nonce", efsAdminAjax.nonce); /* Nonce for security from localized variable */
 
-            /* Append the expiration date */
-            var expirationDate = $("#expiration_date_field").val();
-            formData.append("expiration_date", expirationDate);
-
             /* Set the upload action based on storage option */
             var uploadAction = "efs_upload_to_local";
             switch (efsAdminAjax.efsStorageOption) {
