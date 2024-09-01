@@ -200,12 +200,21 @@ class EFS_Local_File_Handler
 
         $file_id = intval($_POST['file_id']);
 
+        /* Retrieve file information */
+        $file_url = wp_get_attachment_url($file_id);
+        $file_name = get_the_title($file_id);
+        $file_metadata = wp_get_attachment_metadata($file_id);
+
+        if (!$file_url) {
+            wp_send_json_error(['message' => 'File information could not be retrieved.']);
+        }
+
         /* Log the received file and expiration date */
-        $this->log_message($log_file, 'Received file data: ' . print_r($file_data, true));
+        $this->log_message($log_file, 'Received file data: ' . print_r($file_url, true));
         $this->log_message($log_file, 'Expiration date: ' . $expiration_date);
 
         /* Call the method to upload and encrypt the file locally */
-        $encrypted_file = $this->upload_to_local($file, $expiration_date);
+        $encrypted_file = $this->upload_to_local($file_url, $expiration_date);
 
         /* Check if the file was uploaded and encrypted successfully */
         if ($encrypted_file) {
