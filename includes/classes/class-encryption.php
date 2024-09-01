@@ -49,7 +49,7 @@ class EFS_Encryption
      * @return string|false The decrypted file contents on success, false on failure.
     */
 
-    private function decrypt_file($encrypted_file_path, $encryption_key)
+    public function decrypt_file($encrypted_file_path, $encryption_key)
     {
         /* Read the encrypted file data */
         $encrypted_data = file_get_contents($encrypted_file_path);
