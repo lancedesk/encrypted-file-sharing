@@ -194,10 +194,15 @@ class EFS_File_Handler
         $file_path = parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
 
+        /* Strip the .enc extension if present */
+        if (substr($file_name, -4) === '.enc') {
+            $file_name = substr($file_name, 0, -4);
+        }
+
         /* Retrieve the encryption key from the database */
         $encryption_key = $this->get_encryption_key($file_name);  /* File name is used to store the key */
         if ($encryption_key === false) {
-            wp_send_json_error(array('message' => 'Encryption key not found.'));
+            wp_send_json_error(array('message' => 'Encryption key not found for file: ' . $file_name));
         }
 
         /* Decrypt the file */
