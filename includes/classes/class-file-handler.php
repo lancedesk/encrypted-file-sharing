@@ -72,9 +72,8 @@ class EFS_File_Handler
 
     private function get_encryption_key($file_name)
     {
-        return EFS_Encryption::get_encryption_key($file_name);
+        return $this->encryption_handler->get_encryption_key($file_name);
     }
-
 
     /**
      * Handle the file upload notifications to selected users.
