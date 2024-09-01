@@ -15,7 +15,7 @@ class EFS_Encryption
      * @return string|false The path to the encrypted file on success, false on failure.
     */
 
-    private function encrypt_file($file_path, $encryption_key)
+    public function encrypt_file($file_path, $encryption_key)
     {
         $output_file = $file_path . '.enc';
         $iv = openssl_random_pseudo_bytes(16); /* Initialization vector for AES-256-CBC */
