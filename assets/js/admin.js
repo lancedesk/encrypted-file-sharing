@@ -7,12 +7,8 @@ jQuery(document).ready(function($) {
         console.log("Upload button clicked.");
         console.log("Storage option: ", efsAdminAjax.efsStorageOption); /* Access localized variable */
 
-        if (mediaUploader) {
-            mediaUploader.open();
-            return;
-        }
-
-        mediaUploader = wp.media.frames.file_frame = wp.media({
+        /* If the media frame already exists, reopen it. */
+        var file_frame = wp.media.frames.file_frame = wp.media({
             title: efsAdminAjax.efsSelectFileTitle, /* Localized variable */
             button: {
                 text: efsAdminAjax.efsSelectFileButtonText /* Localized variable */
@@ -20,11 +16,25 @@ jQuery(document).ready(function($) {
             multiple: false
         });
 
-        mediaUploader.on("select", function() {
-            var attachment = mediaUploader.state().get("selection").first().toJSON();
+        /* When a file is selected, grab the URL and set it as the text field's value */
+        file_frame.on("select", function() {
+            /* Get the selected file */
+            var attachment = file_frame.state().get('selection').first().toJSON();
+
             console.log("File selected URL:", attachment.url);
             console.log("File selected:", attachment);
 
+            // Check if the file object exists before accessing its properties
+            if (attachment && attachment.url) 
+            {
+
+                $('#efs_file_url').val(attachment.url); /* Set the URL in the text input field */
+            } 
+            else 
+            {
+                console.error("Selected file object is undefined.");
+            }
+        
             var fileId = attachment.id;
 
             /* Use the attachment's ID to retrieve the actual file from the media library. */
@@ -106,6 +116,7 @@ jQuery(document).ready(function($) {
             });
         });
 
-        mediaUploader.open();
+        /* Open the media uploader */
+        file_frame.open();
     });
 });
