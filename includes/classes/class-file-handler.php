@@ -70,7 +70,7 @@ class EFS_File_Handler
      * Retrieve the encryption key for a file via the encryption class.
     */
 
-    private function get_encryption_key($file_name)
+    public function get_encryption_key($file_name)
     {
         return $this->encryption_handler->get_encryption_key($file_name);
     }
