@@ -100,79 +100,8 @@ class EFS_Local_File_Handler
     }
 
     /**
-     * Upload the file to a secure location and encrypt it.
-    */
-
-    private function upload_to_local($file)
-    {
-        /* Calculate the expiration date */
-        $expiration_date = $this->calculate_expiration_date();
-        $upload_dir = ABSPATH . '../private_uploads/';
-
-        /* Log the received file and expiration date */
-        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Received file: ' . print_r($file, true));
-        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Expiration date: ' . $expiration_date);
-
-        /* Check if upload directory exists, create it if not */
-        if (!file_exists($upload_dir)) 
-        {
-            if (mkdir($upload_dir, 0755, true)) 
-            {
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Created directory: ' . $upload_dir);
-            } 
-            else 
-            {
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to create directory: ' . $upload_dir);
-                return false;
-            }
-        }
-
-        $file_name = sanitize_file_name($file['name']);
-        $target_file = $upload_dir . $file_name;
-
-        /* Log the target file path */
-        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Target file path: ' . $target_file);
-
-        /* Move the uploaded file to the secure directory */
-        if (move_uploaded_file($file['tmp_name'], $target_file)) 
-        {
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File moved to: ' . $target_file);
-            
-            $encryption_key = openssl_random_pseudo_bytes(32); /* Generate a random encryption key (256-bit) */
-
-            /* Encrypt the file using the EFS_Encryption class */
-            $encrypted_file = $this->efs_encryption->encrypt_file($target_file, $encryption_key);
-
-            if ($encrypted_file) 
-            {
-                /* Save the encryption key securely in the database */
-                $this->efs_encryption->save_encrypted_key($file_name, $encryption_key);
-
-                /* Store the file's expiration date */
-                $this->save_file_metadata($file_name, $expiration_date);
-
-                /* Log the successful encryption and upload */
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
-
-                return $encrypted_file;
-            } 
-            else 
-            {
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
-                return false;
-            }
-        } 
-        else 
-        {
-            /* Log an error if file upload fails */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to move uploaded file to: ' . $target_file);
-            return false;
-        }
-    }
-
-    /**
      * Handle the local file upload via AJAX.
-    */
+     */
 
     public function handle_local_upload_ajax()
     {
@@ -201,20 +130,19 @@ class EFS_Local_File_Handler
         $file_id = intval($_POST['file_id']);
 
         /* Retrieve file information */
-        $file_url = wp_get_attachment_url($file_id);
-        $file_name = get_the_title($file_id);
-        $file_metadata = wp_get_attachment_metadata($file_id);
-
-        if (!$file_url) {
-            wp_send_json_error(['message' => 'File information could not be retrieved.']);
+        $file_path = get_attached_file($file_id);
+        $file_name = basename($file_path);
+        
+        if (!$file_path || !file_exists($file_path)) {
+            wp_send_json_error(['message' => 'File does not exist.']);
         }
 
         /* Log the received file and expiration date */
-        $this->log_message($log_file, 'Received file data: ' . print_r($file_url, true));
+        $this->log_message($log_file, 'Received file path: ' . $file_path);
         $this->log_message($log_file, 'Expiration date: ' . $expiration_date);
 
         /* Call the method to upload and encrypt the file locally */
-        $encrypted_file = $this->upload_to_local($file_url, $expiration_date);
+        $encrypted_file = $this->upload_to_local($file_path, $expiration_date);
 
         /* Check if the file was uploaded and encrypted successfully */
         if ($encrypted_file) {
@@ -223,6 +151,69 @@ class EFS_Local_File_Handler
         } else {
             $this->log_message($log_file, 'File upload or encryption failed.');
             wp_send_json_error(['message' => 'File upload failed.']);
+        }
+    }
+
+    /**
+     * Upload and encrypt the file locally.
+     *
+     * @param string $file_path The path to the file.
+     * @param string $expiration_date The expiration date for the file.
+     * @return mixed The path to the encrypted file or false on failure.
+    */
+
+    private function upload_to_local($file_path, $expiration_date)
+    {
+        $upload_dir = ABSPATH . '../private_uploads/';
+
+        /* Log the received file and expiration date */
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Received file path: ' . $file_path);
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Expiration date: ' . $expiration_date);
+
+        /* Check if upload directory exists, create it if not */
+        if (!file_exists($upload_dir)) {
+            if (mkdir($upload_dir, 0755, true)) {
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Created directory: ' . $upload_dir);
+            } else {
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to create directory: ' . $upload_dir);
+                return false;
+            }
+        }
+
+        $file_name = basename($file_path);
+        $target_file = $upload_dir . $file_name;
+
+        /* Log the target file path */
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Target file path: ' . $target_file);
+
+        /* Copy the file to the secure directory */
+        if (copy($file_path, $target_file)) {
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
+
+            $encryption_key = openssl_random_pseudo_bytes(32); /* Generate a random encryption key (256-bit) */
+
+            /* Encrypt the file using the EFS_Encryption class */
+            $encrypted_file = $this->efs_encryption->encrypt_file($target_file, $encryption_key);
+
+            if ($encrypted_file) {
+                /* Save the encryption key securely in the database */
+                $this->efs_encryption->save_encrypted_key($file_name, $encryption_key);
+
+                /* Store the file's expiration date */
+                $this->save_file_metadata($file_name, $expiration_date);
+
+                /* Log the successful encryption and upload */
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
+
+                return $encrypted_file;
+            } else {
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
+                return false;
+            }
+        } else {
+            /* Log an error if file copy fails */
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to copy file to: ' . $target_file);
+            return false;
         }
     }
 
