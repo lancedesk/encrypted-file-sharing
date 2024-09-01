@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
             console.log("File selected URL:", attachment.url);
             console.log("File selected:", attachment);
 
-            // Check if the file object exists before accessing its properties
+            /* Check if the file object exists before accessing its properties */
             if (attachment && attachment.url) 
             {
 
@@ -37,8 +37,6 @@ jQuery(document).ready(function($) {
             var fileId = attachment.id;
 
             console.log("File ID:", fileId);
-
-            console.log("Fetching actual file from media library:", response);
 
             /* Prepare AJAX request based on storage option */
             var formData = new FormData();
