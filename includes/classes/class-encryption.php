@@ -36,7 +36,7 @@ class EFS_Encryption
         file_put_contents($output_file, $iv . $encrypted_data);
 
         /* Remove the original file for security */
-        /* unlink($file_path); */ /* Remove the original file */
+        unlink($file_path); /* Remove the original file */
 
         return $output_file;
     }
