@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
         console.log("Upload button clicked.");
         console.log("Storage option: ", efsAdminAjax.efsStorageOption); /* Access localized variable */
 
-        /* If the media frame already exists, reopen it. */
+        /* Open the media uploader */
         var file_frame = wp.media.frames.file_frame = wp.media({
             title: efsAdminAjax.efsSelectFileTitle, /* Localized variable */
             button: {
@@ -15,84 +15,66 @@ jQuery(document).ready(function($) {
             multiple: false
         });
 
-        /* When a file is selected, grab the URL and set it as the text field's value */
         file_frame.on("select", function() {
             /* Get the selected file */
             var attachment = file_frame.state().get('selection').first().toJSON();
-
-            console.log("File selected URL:", attachment.url);
-            console.log("File selected:", attachment);
-
-            /* Check if the file object exists before accessing its properties */
-            if (attachment && attachment.url) 
-            {
-
-                $('#efs_file_url').val(attachment.url); /* Set the URL in the text input field */
-            } 
-            else 
-            {
-                console.error("Selected file object is undefined.");
-            }
-        
-            var fileId = attachment.id;
-
-            console.log("File ID:", fileId);
-
-            /* Prepare AJAX request based on storage option */
-            var formData = new FormData();
             
-            /* Pass the entire attachment object to the backend */
-            formData.append("file_data", JSON.stringify(attachment));
-            formData.append("nonce", efsAdminAjax.nonce); /* Nonce for security from localized variable */
+            /* Check if the file object exists */
+            if (attachment && attachment.id) {
+                console.log("File ID:", attachment.id);
 
-            /* Set the upload action based on storage option */
-            var uploadAction = "efs_upload_to_local";
-            switch (efsAdminAjax.efsStorageOption) {
-                case "amazon":
-                    uploadAction = "upload_to_s3";
-                    break;
-                case "google":
-                    uploadAction = "upload_to_google";
-                    break;
-                case "dropbox":
-                    uploadAction = "upload_to_dropbox";
-                    break;
-            }
+                /* Prepare AJAX request to send only the file ID */
+                var formData = new FormData();
+                formData.append("file_id", attachment.id);
+                formData.append("nonce", efsAdminAjax.nonce);
 
-            formData.append("upload_action", uploadAction);
-
-            console.log("Preparing AJAX request with action:", uploadAction);
-            console.log("Form data:", formData);
-
-            /* Send AJAX request */
-            $.ajax({
-                url: ajaxurl,  /* Use WordPress admin-ajax.php */
-                type: "POST",
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    if (response.success) {
-                        console.log("File upload successful.");
-
-                        if (response.data.presigned_url) {
-                            $("#efs_file_url").val(response.data.presigned_url);
-                            console.log("Presigned URL received:", response.data.presigned_url);
-                        }
-                        else {
-                            $("#efs_file_url").val(response.data.file_url);
-                            console.log("File URL received:", response.data.file_url);
-                        }
-                    } else {
-                        console.error("File upload failed:", response.data.message);
-                        alert(efsAdminAjax.efsUploadFailedMessage); /* Localized variable */
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX request failed:", status, error);
-                    alert(efsAdminAjax.efsErrorMessage); /* Localized variable */
+                /* Set the upload action based on storage option */
+                var uploadAction = "efs_upload_to_local"; /* Default local storage action */
+                switch (efsAdminAjax.efsStorageOption) {
+                    case "amazon":
+                        uploadAction = "upload_to_s3";
+                        break;
+                    case "google":
+                        uploadAction = "upload_to_google";
+                        break;
+                    case "dropbox":
+                        uploadAction = "upload_to_dropbox";
+                        break;
                 }
-            });
+
+                formData.append("upload_action", uploadAction);
+
+                /* Send AJAX request */
+                $.ajax({
+                    url: ajaxurl,  /* Use WordPress admin-ajax.php */
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.success) {
+                            console.log("File upload successful.");
+
+                            if (response.data.presigned_url) {
+                                $("#efs_file_url").val(response.data.presigned_url);
+                                console.log("Presigned URL received:", response.data.presigned_url);
+                            } else {
+                                $("#efs_file_url").val(response.data.file_url);
+                                console.log("File URL received:", response.data.file_url);
+                            }
+                        } else {
+                            console.error("File upload failed:", response.data.message);
+                            alert(efsAdminAjax.efsUploadFailedMessage); /* Localized variable */
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX request failed:", status, error);
+                        alert(efsAdminAjax.efsErrorMessage); /* Localized variable */
+                    }
+                });
+            } else {
+                console.error("Selected file ID is undefined.");
+            }
         });
 
         /* Open the media uploader */
