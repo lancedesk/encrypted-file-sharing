@@ -215,7 +215,7 @@ class EFS_File_Handler
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . filesize($file_path));
+        header('Content-Length: ' . strlen($decrypted_data));
         flush(); /* Flush system output buffer */
         echo $decrypted_data;  /* Output the decrypted data */
     
