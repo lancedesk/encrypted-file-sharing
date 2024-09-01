@@ -193,19 +193,12 @@ class EFS_Local_File_Handler
             wp_send_json_error(['message' => 'Invalid nonce.']);
         }
 
-        /* Check if a file was uploaded */
-        if (!isset($_POST['file_data']) || empty($_POST['file_data'])) {
-            wp_send_json_error(['message' => 'No file data provided.']);
+        /* Ensure file ID is provided */
+        if (!isset($_POST['file_id'])) {
+            wp_send_json_error(['message' => 'File ID is missing.']);
         }
 
-        /* Check if an expiration date was provided 
-        if (!isset($_POST['expiration_date'])) {
-            $this->log_message($log_file, 'No expiration date provided.');
-            wp_send_json_error(['message' => 'No expiration date provided.']);
-        }
-        */
-
-        $file_data = json_decode(stripslashes($_POST['file_data']), true);
+        $file_id = intval($_POST['file_id']);
 
         /* Log the received file and expiration date */
         $this->log_message($log_file, 'Received file data: ' . print_r($file_data, true));
