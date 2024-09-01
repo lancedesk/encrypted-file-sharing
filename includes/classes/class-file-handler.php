@@ -76,6 +76,16 @@ class EFS_File_Handler
     }
 
     /**
+     * Decrypt an encrypted file using OpenSSL via the encryption class.
+     *
+    */
+
+    public function decrypt_file($encrypted_file_path, $encryption_key)
+    {
+        return $this->encryption_handler->decrypt_file($encrypted_file_path, $encryption_key);
+    }
+
+    /**
      * Handle the file upload notifications to selected users.
      *
      * @param int $post_id Post ID of the uploaded file.
