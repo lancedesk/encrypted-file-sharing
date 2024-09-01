@@ -118,7 +118,7 @@ class EFS_Encryption
      * Retrieve the encryption key for a file
     */
 
-    private function get_encryption_key($file_name)
+    public function get_encryption_key($file_name)
     {
         global $wpdb;
 
