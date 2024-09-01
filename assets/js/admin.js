@@ -42,7 +42,7 @@ jQuery(document).ready(function($) {
                         break;
                 }
 
-                formData.append("upload_action", uploadAction);
+                formData.append("action", uploadAction);
 
                 /* Send AJAX request */
                 $.ajax({
