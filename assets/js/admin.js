@@ -90,11 +90,6 @@ jQuery(document).ready(function($) {
                 },
                 error: function(xhr, status, error) {
                     console.error("AJAX request failed:", status, error);
-                    console.log("XHR response:", xhr);
-                    console.log("XHR response text:", xhr.responseText);
-                    console.log("XHR response JSON:", xhr.responseJSON);
-                    console.log("Status:", status);
-                    console.log("Error:", error);
                     alert(efsAdminAjax.efsErrorMessage); /* Localized variable */
                 }
             });
