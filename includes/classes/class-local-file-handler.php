@@ -105,11 +105,13 @@ class EFS_Local_File_Handler
 
     private function upload_to_local($file)
     {
-        $expiration_date = ;
+        /* Calculate the expiration date */
+        $expiration_date = $this->calculate_expiration_date();
         $upload_dir = ABSPATH . '../private_uploads/';
 
         /* Log the received file and expiration date */
         $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Received file: ' . print_r($file, true));
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Expiration date: ' . $expiration_date);
 
         /* Check if upload directory exists, create it if not */
         if (!file_exists($upload_dir)) 
@@ -174,7 +176,8 @@ class EFS_Local_File_Handler
 
     public function handle_local_upload_ajax()
     {
-        $expiration_date = ;
+        /* Calculate the expiration date */
+        $expiration_date = $this->calculate_expiration_date();
 
         /* Log a message to the error log to confirm the hook was fired */
         error_log('The handle_local_upload_ajax hook was fired!');
