@@ -177,16 +177,22 @@ class EFS_File_Handler
         if (empty($file_url)) {
             wp_send_json_error(array('message' => 'File URL not found.'));
         }
+
+        /* Parse the file path */
+        $file_path = parse_url($file_url, PHP_URL_PATH);
+        $file_name = basename($file_path);
+
+        /* Retrieve the encryption key from the database */
+        $encryption_key = $this->get_encryption_key($file_name);  /* File name is used to store the key */
+        if ($encryption_key === false) {
+            wp_send_json_error(array('message' => 'Encryption key not found.'));
+        }
     
         /* Update download status and date */
         $current_time = current_time('mysql');
         update_post_meta($file_id, '_efs_download_status', '1'); /* Mark as downloaded */
         /* Set download date as MySQL timestamp */
         update_post_meta($file_id, '_efs_download_date', $current_time);
-
-        /* Serve the file for download */
-        $file_path = parse_url($file_url, PHP_URL_PATH);
-        $file_name = basename($file_path);
     
         /* Retrieve the admin notification setting */
         $send_notifications = get_option('efs_send_notifications', 0); /* Default to 0 (disabled) */
