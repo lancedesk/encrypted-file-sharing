@@ -166,11 +166,11 @@ class EFS_Local_File_Handler
         }
 
         $file_data = json_decode(stripslashes($_POST['file_data']), true);
-        
+
         $expiration_date = sanitize_text_field($_POST['expiration_date']);
 
         /* Log the received file and expiration date */
-        $this->log_message($log_file, 'Handling file upload - File: ' . print_r($file, true));
+        $this->log_message($log_file, 'Received file data: ' . print_r($file_data, true));
         $this->log_message($log_file, 'Expiration date: ' . $expiration_date);
 
         /* Call the method to upload and encrypt the file locally */
