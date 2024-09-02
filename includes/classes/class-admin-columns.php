@@ -81,6 +81,9 @@ class EFS_Admin_Columns
                     $upload_dir = wp_upload_dir();
                     $relative_path = str_replace($upload_dir['baseurl'], '', $file_url);
                     $file_path = $upload_dir['basedir'] . $relative_path;
+
+                    /* Check if the file path contains 'private_uploads' */
+                    $is_secure = strpos($file_path, 'private_uploads') !== false;
     
                     /* Check if the file exists and get its size */
                     if (file_exists($file_path)) {
