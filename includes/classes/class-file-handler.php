@@ -167,14 +167,24 @@ class EFS_File_Handler
         /* Implement Dropbox upload logic */
     }
 
+    /* Helper function to write to log */
+    private function write_to_log($message, $log_file)
+    {
+        $current_time = date('Y-m-d H:i:s');
+        file_put_contents($log_file, "[" . $current_time . "] " . $message . PHP_EOL, FILE_APPEND);
+    }
+
     /**
      * Handle the file download request via AJAX.
     */
 
     public function handle_download_request()
     {
+        $log_file = WP_CONTENT_DIR . '/efs_decrypt_log.txt';
+
         /* Check nonce for security */
         check_ajax_referer('efs_download_nonce', 'security');
+        $this->write_to_log('Nonce checked successfully.', $log_file);
     
         /* Validate user */
         if (!is_user_logged_in()) {
