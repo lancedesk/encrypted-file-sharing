@@ -214,10 +214,13 @@ class EFS_File_Handler
             $this->write_to_log('File URL not found for file ID: ' . $file_id, $log_file);
             wp_send_json_error(array('message' => 'File URL not found.'));
         }
+        $this->write_to_log('File URL: ' . $file_url, $log_file);
 
         /* Parse the file path */
         $file_path = parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
+        $this->write_to_log('Parsed file path: ' . $file_path, $log_file);
+        $this->write_to_log('Parsed file name: ' . $file_name, $log_file);
 
         /* Strip the .enc extension if present */
         if (substr($file_name, -4) === '.enc') {
