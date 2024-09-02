@@ -188,18 +188,22 @@ class EFS_File_Handler
     
         /* Validate user */
         if (!is_user_logged_in()) {
+            $this->write_to_log('User not logged in.', $log_file);
             wp_send_json_error(array('message' => 'User not logged in.'));
         }
     
         /* Check if file ID is set */
         if (!isset($_POST['file_id'])) {
+            $this->write_to_log('File ID is missing.', $log_file);
             wp_send_json_error(array('message' => 'File ID missing.'));
         }
     
         $file_id = intval($_POST['file_id']);
+        $this->write_to_log('Received file ID: ' . $file_id, $log_file);
     
         /* Validate file ID */
         if (get_post_type($file_id) !== 'efs_file') {
+            $this->write_to_log('Invalid file ID: ' . $file_id, $log_file);
             wp_send_json_error(array('message' => 'Invalid file ID.'));
         }
     
@@ -207,6 +211,7 @@ class EFS_File_Handler
         $file_url = get_post_meta($file_id, '_efs_file_url', true);
     
         if (empty($file_url)) {
+            $this->write_to_log('File URL not found for file ID: ' . $file_id, $log_file);
             wp_send_json_error(array('message' => 'File URL not found.'));
         }
 
