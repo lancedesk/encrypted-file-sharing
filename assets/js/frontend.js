@@ -5,7 +5,7 @@ jQuery(document).ready(function($) {
         var fileId = $(this).data('file-id');
 
         $.ajax({
-            url: ajaxurl, /* Use the global variable for AJAX URL */
+            url: efsAdminAjax.ajax_url, /* Use localized variable for AJAX URL */
             type: 'POST',
             data: {
                 action: 'efs_handle_download',
