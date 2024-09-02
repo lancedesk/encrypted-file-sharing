@@ -225,19 +225,25 @@ class EFS_File_Handler
         /* Strip the .enc extension if present */
         if (substr($file_name, -4) === '.enc') {
             $file_name = substr($file_name, 0, -4);
+            $this->write_to_log('Stripped .enc extension. Final file name: ' . $file_name, $log_file);
         }
 
         /* Retrieve the encryption key from the database */
         $encryption_key = $this->get_encryption_key($file_name);  /* File name is used to store the key */
         if ($encryption_key === false) {
+            $this->write_to_log('Encryption key not found for file: ' . $file_name, $log_file);
             wp_send_json_error(array('message' => 'Encryption key not found for file: ' . $file_name));
         }
+        $this->write_to_log('Encryption key retrieved for file: ' . $file_name, $log_file);
 
         /* Decrypt the file */
         $decrypted_data = $this->decrypt_file($file_path, $encryption_key);
         if ($decrypted_data === false) {
+            $this->write_to_log('File decryption failed for file: ' . $file_name, $log_file);
             wp_send_json_error(array('message' => 'File decryption failed.'));
         }
+        $this->write_to_log('File decrypted successfully for file: ' . $file_name, $log_file);
+        $this->write_to_log('Decrypted file size: ' . strlen($decrypted_data) . ' bytes', $log_file);
     
         /* Update download status and date */
         $current_time = current_time('mysql');
