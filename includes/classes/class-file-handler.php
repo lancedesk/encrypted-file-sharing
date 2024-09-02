@@ -260,6 +260,7 @@ class EFS_File_Handler
         if ($send_notifications) {
             $current_user = wp_get_current_user();
             $this->notification_handler->send_download_notification_to_admin($file_id, $current_user);
+            $this->write_to_log('Admin notified of file download for file ID: ' . $file_id, $log_file);
         }
 
         /* Serve the decrypted file for download */
@@ -268,6 +269,7 @@ class EFS_File_Handler
         header('Content-Disposition: attachment; filename="' . $file_name . '"');
         header('Content-Length: ' . strlen($decrypted_data));
         echo $decrypted_data;
+        $this->write_to_log('File served for download: ' . $file_name, $log_file);
     
         /* Terminate script execution */
         exit;
