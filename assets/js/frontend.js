@@ -14,12 +14,8 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    /* Trigger download */
-                    var blob = new Blob([response.data], { type: 'application/octet-stream' });
-                    var link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = response.filename;
-                    link.click();
+                    /* The file download will be triggered automatically by PHP */
+                    alert('Download started.');
                 } else {
                     alert(response.data.message);  /* Show error if decryption/download fails */
                 }
