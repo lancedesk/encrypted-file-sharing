@@ -107,7 +107,10 @@ class EFS_Admin_Columns
                 break;
 
             case 'expiry_date':
-                $expiry_date = get_post_meta($post_id, '_efs_file_expiry_date', true);
+                /* Get the file name */
+
+                $expiry_date = $this->get_expiration_date($file_name);
+
                 if ($expiry_date) {
                     echo esc_html(date('Y/m/d', strtotime($expiry_date)));
                 } else {
@@ -116,7 +119,10 @@ class EFS_Admin_Columns
                 break;
         
             case 'status':
-                $expiry_date = get_post_meta($post_id, '_efs_file_expiry_date', true);
+                /* Get the file name */
+
+                $expiry_date = $this->get_expiration_date($file_name);
+                
                 if ($expiry_date) {
                     $current_date = date('Y-m-d');
                     if ($expiry_date < $current_date) {
