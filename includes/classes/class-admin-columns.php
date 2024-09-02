@@ -92,11 +92,13 @@ class EFS_Admin_Columns
                     {
                     /* Handle secure file path */
                         $file_size = file_exists($relative_path) ? $this->file_display->format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
+                        echo esc_html($file_size);
                     } 
                     else
                     {
                         /* Handle WordPress uploads file path */
                         $file_size = file_exists($file_path) ? $this->file_display->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
+                        echo esc_html($file_size);
                     }
     
                 } else {
