@@ -130,4 +130,27 @@ class EFS_Admin_Columns
                 break;
         }
     }
+
+    /**
+     * Get and format the expiration date for a file from the custom table.
+     *
+     * @param string $file_name The name of the file.
+     * @return string Formatted expiration date or a message if not set.
+    */
+
+    private function get_expiration_date($file_name)
+    {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'efs_file_metadata';
+        
+        /* Prepare SQL query to fetch expiration date */
+        $query = $wpdb->prepare(
+            "SELECT expiration_date FROM $table_name WHERE file_name = %s",
+            $file_name
+        );
+
+        return $result = $wpdb->get_var($query);
+    }
+
 }
