@@ -10,7 +10,7 @@ jQuery(document).ready(function($) {
             data: {
                 action: 'efs_handle_download',
                 file_id: fileId,
-                security: efs_download_nonce /* Use the global variable for security nonce */
+                security: efsAdminAjax.nonce /* Use the global variable for security nonce */
             },
             success: function(response) {
                 if (response.success) {
