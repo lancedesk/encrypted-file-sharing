@@ -87,7 +87,7 @@ class EFS_Admin_Columns
                         $file_size = filesize($file_path);
                         echo esc_html($this->file_display->format_file_size($file_size));
                     } else {
-                        echo __('File not found', 'encrypted-file-sharing');
+                        echo __('File not found' . $relative_path, 'encrypted-file-sharing');
                     }
                 } else {
                     echo __('No file available', 'encrypted-file-sharing');
