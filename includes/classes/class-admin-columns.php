@@ -132,7 +132,21 @@ class EFS_Admin_Columns
             $relative_path = str_replace($upload_dir['baseurl'], '', $file_url);
             $file_path = $upload_dir['basedir'] . $relative_path;
 
-            $file_size = file_exists($file_path) ? $this->file_display->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
+            /* Check if the file path contains 'private_uploads' */
+            $is_secure = strpos($file_path, 'private_uploads') !== false;
+
+            /* Get file size */
+            if ($is_secure) 
+            {
+            /* Handle secure file path */
+                $file_size = file_exists($relative_path) ? $this->file_display->format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
+            } 
+            else
+            {
+                /* Handle WordPress uploads file path */
+                $file_size = file_exists($file_path) ? $this->file_display->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
+            }
+            
             return esc_html($file_size);
         } else {
             return __('No file available', 'encrypted-file-sharing');
