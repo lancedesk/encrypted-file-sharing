@@ -108,6 +108,16 @@ class EFS_Admin_Columns
 
             case 'expiry_date':
                 /* Get the file name */
+                $file_url = get_post_meta($post_id, '_efs_file_url', true);
+
+                /* Extract the file path from the URL */
+                $file_path = parse_url($file_url, PHP_URL_PATH);  /* Extract just the path part */
+                $file_name = basename($file_path);  /* Get the file name, e.g., mom-pdf.pdf.enc */
+                                
+                /* Check and strip the .enc extension */
+                if (substr($file_name, -4) === '.enc') {
+                    $file_name = substr($file_name, 0, -4);  /* Strip the .enc part */
+                }
 
                 $expiry_date = $this->get_expiration_date($file_name);
 
@@ -120,9 +130,19 @@ class EFS_Admin_Columns
         
             case 'status':
                 /* Get the file name */
+                $file_url = get_post_meta($post_id, '_efs_file_url', true);
+
+                /* Extract the file path from the URL */
+                $file_path = parse_url($file_url, PHP_URL_PATH);  /* Extract just the path part */
+                $file_name = basename($file_path);  /* Get the file name, e.g., mom-pdf.pdf.enc */
+                
+                /* Check and strip the .enc extension */
+                if (substr($file_name, -4) === '.enc') {
+                    $file_name = substr($file_name, 0, -4);  /* Strip the .enc part */
+                }
 
                 $expiry_date = $this->get_expiration_date($file_name);
-                
+
                 if ($expiry_date) {
                     $current_date = date('Y-m-d');
                     if ($expiry_date < $current_date) {
