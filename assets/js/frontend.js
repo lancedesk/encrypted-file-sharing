@@ -1,37 +1,33 @@
 jQuery(document).ready(function($) {
-    /* Handle click event for download buttons */
-    $('.download-btn').click(function(e) {
+    /* Handle click event for decrypt / download button */
+    $('.download-btn').on('click', function(e) {
         e.preventDefault();
+        var fileId = $(this).data('file-id');
 
-        /* Get file ID from the data attribute of the button */
-        var fileID = $(this).data('file-id');
-        console.log('File ID:', fileID);  /* Console log for debugging */
-
-        /* Prepare AJAX request data */
-        var actionData = {
-            action: 'efs_handle_download', /* Action name */
-            file_id: fileID, /* File ID to download */
-            security: efsAdminAjax.nonce /* Security nonce */
-        };
-
-        /* Perform AJAX request */
         $.ajax({
-            url: efsAdminAjax.ajax_url,
+            url: ajaxurl, /* Use the global variable for AJAX URL */
             type: 'POST',
-            data: actionData,
+            data: {
+                action: 'efs_handle_download',
+                file_id: fileId,
+                security: efs_download_nonce /* Use the global variable for security nonce */
+            },
             success: function(response) {
-                console.log('AJAX Response:', response);  /* Console log for debugging */
                 if (response.success) {
-                    /* Notify the user that the download is initiated */
-                    alert(response.data.message);
+                    /* Trigger download */
+                    var blob = new Blob([response.data], { type: 'application/octet-stream' });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = response.filename;
+                    link.click();
                 } else {
-                    alert(response.data.message || 'Download failed.');
+                    alert(response.data.message);  /* Show error if decryption/download fails */
                 }
             },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('AJAX Error:', textStatus, errorThrown); /* Log AJAX errors */
-                alert('An error occurred.');
+            error: function() {
+                alert('Failed to download file. Please try again.');
             }
         });
     });
+
 });
