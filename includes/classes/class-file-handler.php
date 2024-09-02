@@ -250,9 +250,11 @@ class EFS_File_Handler
         update_post_meta($file_id, '_efs_download_status', '1'); /* Mark as downloaded */
         /* Set download date as MySQL timestamp */
         update_post_meta($file_id, '_efs_download_date', $current_time);
+        $this->write_to_log('Download status updated for file ID: ' . $file_id, $log_file);
     
         /* Retrieve the admin notification setting */
         $send_notifications = get_option('efs_send_notifications', 0); /* Default to 0 (disabled) */
+        $this->write_to_log('Admin notifications setting: ' . ($send_notifications ? 'Enabled' : 'Disabled'), $log_file);
 
         /* Send notification to admin if notifications are enabled */
         if ($send_notifications) {
