@@ -41,12 +41,13 @@
 }
 
 /* File details like title, size, and date */
-.efs-user-files li a
+.efs-user-files li .file-title
 {
     font-weight: bold;
     color: #0073aa;
     text-decoration: none;
     margin-bottom: 5px;
+    font-size: 16px;
 }
 
 .efs-user-files li a:hover
