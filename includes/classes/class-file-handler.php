@@ -236,11 +236,12 @@ class EFS_File_Handler
             $this->notification_handler->send_download_notification_to_admin($file_id, $current_user);
         }
 
-        /* Return the decrypted data in a format suitable for AJAX. */
-        wp_send_json_success(array(
-            'data' => $decrypted_data,
-            'filename' => $file_name
-        ));
+        /* Serve the decrypted file for download */
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . $file_name . '"');
+        header('Content-Length: ' . strlen($decrypted_data));
+        echo $decrypted_data;
     
         /* Terminate script execution */
         exit;
