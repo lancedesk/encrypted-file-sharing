@@ -76,6 +76,8 @@ class EFS_Admin_Columns
             
             case 'file_size':
                 $file_url = get_post_meta($post_id, '_efs_file_url', true);
+
+                /* Check if the file exists and get its size */
                 if ($file_url) {
                     /* Convert file URL to file path */
                     $upload_dir = wp_upload_dir();
@@ -84,14 +86,19 @@ class EFS_Admin_Columns
 
                     /* Check if the file path contains 'private_uploads' */
                     $is_secure = strpos($file_path, 'private_uploads') !== false;
-    
-                    /* Check if the file exists and get its size */
-                    if (file_exists($file_path)) {
-                        $file_size = filesize($file_path);
-                        echo esc_html($this->file_display->format_file_size($file_size));
-                    } else {
-                        echo __('File not found' . $relative_path, 'encrypted-file-sharing');
+
+                    /* Get file size */
+                    if ($is_secure) 
+                    {
+                    /* Handle secure file path */
+                        $file_size = file_exists($relative_path) ? $this->format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
+                    } 
+                    else
+                    {
+                        /* Handle WordPress uploads file path */
+                        $file_size = file_exists($file_path) ? $this->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
                     }
+    
                 } else {
                     echo __('No file available', 'encrypted-file-sharing');
                 }
