@@ -122,7 +122,9 @@ class EFS_Admin_Columns
                 $expiry_date = $this->get_expiration_date($file_name);
 
                 if ($expiry_date) {
-                    echo esc_html(date('Y/m/d', strtotime($expiry_date)));
+                    /* Convert to date & time format */
+                    $formatted_date = date('Y/m/d \a\t g:i a', strtotime($expiry_date));
+                    echo esc_html($formatted_date);
                 } else {
                     echo __('No expiry set', 'encrypted-file-sharing');
                 }
