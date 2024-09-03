@@ -117,7 +117,8 @@ class EFS_File_Handler
             {
                 /* Send the notification */
                 $this->efs_notification_handler->send_upload_notifications($post_id);
-
+                
+                $this->log_message("File upload notifications sent for post ID: $post_id", $log_file);
                 /* Mark this post as published for the first time */
                 update_post_meta($post_id, '_efs_first_published', 1);
             }
