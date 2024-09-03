@@ -125,6 +125,7 @@ class EFS_Local_File_Handler
         }
 
         $file_id = intval($_POST['file_id']);
+        $post_id = intval($_POST['post_id']);
 
         /* Retrieve file information */
         $file_path = get_attached_file($file_id);
@@ -147,6 +148,12 @@ class EFS_Local_File_Handler
             
             /* Log the file ID */
             $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File ID: ' . $file_id);
+
+            /* Log the post ID */
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Post ID: ' . $post_id);
+
+            /* Update the post meta to mark the post as encrypted */
+            update_post_meta($post_id, '_efs_encrypted', 1);
 
             /* Delete the local file from WordPress media library */
             $deletion_result = $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
