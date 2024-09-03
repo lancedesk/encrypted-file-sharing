@@ -1,10 +1,8 @@
 <?php
-/* require_once 'class-s3-file-handler.php'; Include the S3 file handler class */
 
 class EFS_File_Handler
 {
     private $notification_handler;
-    /* private $s3_file_handler; */
 
     /**
      * Constructor to initialize actions and filters.
@@ -13,7 +11,6 @@ class EFS_File_Handler
     public function __construct()
     {
         $this->notification_handler = new EFS_Notification_Handler();
-        /* $this->s3_file_handler = new EFS_S3_File_Handler(); */
 
         /* Register AJAX actions */
         add_action('wp_ajax_efs_handle_download', [$this, 'handle_download_request']);
@@ -30,7 +27,8 @@ class EFS_File_Handler
 
     public function initialize_s3_client()
     {
-        /* return $this->s3_file_handler->initialize_s3_client(); */
+        global $efs_s3_file_handler;
+        return $efs_s3_file_handler->initialize_s3_client();
     }
 
     /**
@@ -39,7 +37,8 @@ class EFS_File_Handler
 
     public function get_stored_s3_buckets()
     {
-        /* return $this->s3_file_handler->get_stored_s3_buckets(); */
+        global $efs_s3_file_handler;
+        return $efs_s3_file_handler->get_stored_s3_buckets();
     }
 
     /**
@@ -58,7 +57,8 @@ class EFS_File_Handler
 
     public function fetch_s3_buckets_debug()
     {
-        /* return $this->s3_file_handler->fetch_s3_buckets_debug(); */
+        global $efs_local_file_handler;
+        return $efs_local_file_handler->fetch_s3_buckets_debug();
     }
 
     /**
@@ -125,11 +125,12 @@ class EFS_File_Handler
 
     public function handle_file_upload($file)
     {
+        global $efs_local_file_handler;
         $storage_option = get_option('efs_storage_option', 'local');
 
         switch ($storage_option) {
             case 'amazon':
-                /* return $this->s3_file_handler->upload_to_amazon_s3($file); */
+                return $efs_local_file_handler->upload_to_amazon_s3($file);
             case 'google':
                 return $this->upload_to_google_drive($file);
             case 'dropbox':
