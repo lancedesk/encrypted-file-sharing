@@ -103,15 +103,17 @@ class EFS_File_Handler
             $post = get_post($post_id);
 
             /* Check if the post status is 'publish' and if the post is marked as encrypted */
-            $first_published = get_post_meta($post_id, '_efs_first_published', true);
-            $is_encrypted = get_post_meta($post_id, '_efs_encrypted', true);
+            /* Convert meta values to the appropriate types for comparison */
+            /* Trim to ensure it's a clean string */
+            $first_published = trim(get_post_meta($post_id, '_efs_first_published', true));
+            $is_encrypted = trim(get_post_meta($post_id, '_efs_encrypted', true));
 
             /* Log the post details */
             $this->log_message("Post ID: $post_id", $log_file);
             $this->log_message("Post Status: {$post->post_status}", $log_file);
             $this->log_message("First Published Meta: $first_published", $log_file);
 
-            if ($post->post_status === 'publish' && empty($first_published) && !empty($is_encrypted)) 
+            if ($post->post_status === 'publish' && $first_published === '' && $is_encrypted === '1') 
             {
                 /* Send the notification */
                 $this->efs_notification_handler->send_upload_notifications($post_id);
