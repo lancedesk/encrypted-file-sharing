@@ -211,13 +211,17 @@ class EFS_Local_File_Handler
                 /* Delete the local file from WordPress media library */
                 $deletion_result = $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
 
-                if ($deletion_result)
-                {
-                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Local file successfully deleted: ' . $file_path);
-                }
-                else
-                {
-                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to delete local file: ' . $file_path);
+                if ($file_id) {
+                    /* Delete the local file from WordPress media library */
+                    $deletion_result = $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
+    
+                    if ($deletion_result) {
+                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Local file successfully deleted: ' . $file_path);
+                    } else {
+                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to delete local file: ' . $file_path);
+                    }
+                } else {
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File ID not found for: ' . $file_path);
                 }
 
                 return $encrypted_file;
