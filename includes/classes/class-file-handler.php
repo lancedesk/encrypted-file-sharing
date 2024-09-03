@@ -1,13 +1,11 @@
 <?php
 /* require_once 'class-s3-file-handler.php'; Include the S3 file handler class */
-require_once 'class-local-file-handler.php'; /* Include the local file handler class */
 require_once 'class-encryption.php'; /* Include the encryption handler class */
 
 class EFS_File_Handler
 {
     private $notification_handler;
     /* private $s3_file_handler; */
-    private $local_file_handler;
     private $encryption_handler;
 
     /**
@@ -18,7 +16,6 @@ class EFS_File_Handler
     {
         $this->notification_handler = new EFS_Notification_Handler();
         /* $this->s3_file_handler = new EFS_S3_File_Handler(); */
-        $this->local_file_handler = new EFS_Local_File_Handler();
         $this->encryption_handler = new EFS_Encryption();
 
         /* Register AJAX actions */
@@ -54,7 +51,8 @@ class EFS_File_Handler
 
     private function upload_to_local($file)
     {
-        return $this->local_file_handler->upload_to_local($file);
+        global $efs_local_file_handler;
+        return $efs_local_file_handler->upload_to_local($file);
     }
 
     /**
