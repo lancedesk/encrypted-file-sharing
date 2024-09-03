@@ -2,7 +2,7 @@
 
 class EFS_File_Handler
 {
-    private $notification_handler;
+    private $efs_notification_handler;
     private $efs_s3_file_handler;
     private $efs_local_file_handler;
     private $efs_file_encryption;
@@ -10,15 +10,14 @@ class EFS_File_Handler
     /**
      * Constructor to initialize dependencies and actions.
      *
-     * @param object $notification_handler Instance of notification handler.
      * @param object $s3_file_handler Instance of S3 file handler.
      * @param object $local_file_handler Instance of local file handler.
      * @param object $file_encryption Instance of file encryption handler.
     */
 
-    public function __construct($notification_handler, $efs_s3_file_handler, $efs_local_file_handler, $efs_file_encryption)
+    public function __construct($efs_s3_file_handler, $efs_local_file_handler, $efs_file_encryption)
     {
-        $this->notification_handler = new EFS_Notification_Handler();
+        $this->efs_notification_handler = new EFS_Notification_Handler();
         $this->efs_s3_file_handler = $efs_s3_file_handler;
         $this->efs_local_file_handler = $efs_local_file_handler;
         $this->efs_file_encryption = $efs_file_encryption;
@@ -111,7 +110,7 @@ class EFS_File_Handler
                 if (!empty($file_url)) 
                 {
                     /* Send the notification */
-                    $this->notification_handler->send_upload_notifications($post_id);
+                    $this->efs_notification_handler->send_upload_notifications($post_id);
 
                     /* Mark this post as published for the first time */
                     update_post_meta($post_id, '_efs_first_published', 1);
@@ -260,7 +259,7 @@ class EFS_File_Handler
         /* Send notification to admin if notifications are enabled */
         if ($send_notifications) {
             $current_user = wp_get_current_user();
-            $this->notification_handler->send_download_notification_to_admin($file_id, $current_user);
+            $this->efs_notification_handler->send_download_notification_to_admin($file_id, $current_user);
             $this->write_to_log('Admin notified of file download for file ID: ' . $file_id, $log_file);
         }
 
