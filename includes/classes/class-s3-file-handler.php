@@ -1,6 +1,17 @@
 <?php
+/**
+ * Handles file operations with Amazon S3.
+ *
+ * This class provides methods to interact with Amazon S3, such as fetching the list of S3 buckets,
+ * creating a new S3 bucket, and uploading files to S3. It also generates pre-signed URLs for private files.
+ *
+ * @package Encrypted_File_Sharing
+*/
+
+/*  Include the AWS SDK for PHP
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
+*/
 
 class EFS_S3_File_Handler
 {
@@ -13,13 +24,14 @@ class EFS_S3_File_Handler
         /* Initialize S3 Client */
         $this->initialize_s3_client();
 
-        /* Register AJAX actions for managing S3 buckets */
+        /* Register AJAX actions for managing S3 buckets
         add_action('wp_ajax_upload_to_s3', [$this, 'handle_s3_upload_ajax']);
         add_action('wp_ajax_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
         add_action('wp_ajax_nopriv_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets']);
         add_action('wp_ajax_efs_create_s3_bucket', [$this, 'efs_create_s3_bucket']);
         add_action('wp_ajax_nopriv_efs_create_s3_bucket', [$this, 'efs_create_s3_bucket']);
         add_action('wp_ajax_efs_fetch_s3_buckets', [$this, 'efs_fetch_s3_buckets_callback']);
+        */
     }
 
     /**
@@ -30,7 +42,7 @@ class EFS_S3_File_Handler
     public function initialize_s3_client()
     {
         /* Include the AWS SDK */
-        require_once plugin_dir_path(__FILE__) . '../aws-sdk/aws.phar';
+        /* require_once plugin_dir_path(__FILE__) . '../aws-sdk/aws.phar'; */
 
          /* Fetch settings from the stored options */
         $region = get_option('efs_aws_region', '');
@@ -42,14 +54,17 @@ class EFS_S3_File_Handler
             return false;
         }
 
+        /* Initialize the S3 client */
+        /*
         $this->s3_client = new S3Client([
-            'region'  => $region, /* e.g., 'us-east-1' */
+            'region'  => $region, // e.g., 'us-east-1'
             'version' => 'latest',
             'credentials' => [
                 'key'    => $access_key,
                 'secret' => $secret_key,
             ],
         ]);
+        */
 
         /* Test if the connection to S3 is successful */
         try {
