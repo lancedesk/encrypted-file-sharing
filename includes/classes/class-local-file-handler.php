@@ -100,6 +100,8 @@ class EFS_Local_File_Handler
 
     public function handle_local_upload_ajax()
     {
+        global $efs_file_handler;
+
         /* Calculate the expiration date */
         $expiration_date = $this->calculate_expiration_date();
 
@@ -172,7 +174,7 @@ class EFS_Local_File_Handler
 
     private function upload_to_local($file_path, $expiration_date)
     {
-        global $efs_file_handler, $efs_file_encryption;
+        global $efs_file_encryption;
 
         $upload_dir = ABSPATH . '../private_uploads/';
 
