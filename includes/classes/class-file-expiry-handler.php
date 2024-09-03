@@ -5,16 +5,12 @@
 
 class EFS_File_Expiry_Handler
 {
-    private $file_handler; /* Class property. */
-
     /**
      * Constructor to set up hooks and actions.
     */
 
     public function __construct()
     {
-        $this->file_handler = new EFS_File_Handler(); /* Initialize the file handler. */
-
         /* Schedule cron event on init. */
         add_action('init', [$this, 'schedule_file_expiry_cron']);
 
@@ -59,6 +55,8 @@ class EFS_File_Expiry_Handler
 
     public function check_file_expiry()
     {
+        global $efs_file_handler;
+
         /* Check if file expiry is enabled */
         $enable_expiry = get_option('efs_enable_expiry', 0);
 
@@ -84,7 +82,7 @@ class EFS_File_Expiry_Handler
                 if ($storage_option === 'local') 
                 {
                     $file_url = get_post_meta($post_id, '_efs_file_url', true);
-                    $this->file_handler->delete_local_file($file_url);
+                    $efs_file_handler->delete_local_file($file_url);
                 }
 
                 /* Change post status to 'expired' */
