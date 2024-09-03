@@ -93,6 +93,9 @@ class EFS_File_Handler
 
     public function handle_file_upload_notifications($post_id)
     {
+        /* Define the log file path */
+        $log_file = WP_CONTENT_DIR . '/efs_file_upload_notifications_log.txt';
+
         /* Ensure this only runs for the `efs_file` post type */
         if (get_post_type($post_id) === 'efs_file') 
         {
@@ -102,9 +105,17 @@ class EFS_File_Handler
             /* Check if the post status is 'publish' and if the post hasn't been marked as first published */
             $first_published = get_post_meta($post_id, '_efs_first_published', true);
 
+            /* Log the post details */
+            $this->log_message("Post ID: $post_id", $log_file);
+            $this->log_message("Post Status: {$post->post_status}", $log_file);
+            $this->log_message("First Published Meta: $first_published", $log_file);
+
             if ($post->post_status === 'publish' && empty($first_published)) 
             {
                 $file_url = get_post_meta($post_id, '_efs_file_url', true);
+
+                /* Log the file URL */
+                $this->log_message("File URL: $file_url", $log_file);
 
                 /* Check if file URL is set or file is uploaded */
                 if (!empty($file_url)) 
@@ -115,7 +126,19 @@ class EFS_File_Handler
                     /* Mark this post as published for the first time */
                     update_post_meta($post_id, '_efs_first_published', 1);
                 }
+                else 
+                {
+                    $this->log_message("File URL not found for post ID: $post_id", $log_file);
+                }
             }
+            else 
+            {
+                $this->log_message("Post not published or already marked as first published.", $log_file);
+            }
+        }
+        else 
+        {
+            $this->log_message("Post type is not 'efs_file'.", $log_file);
         }
     }
 
