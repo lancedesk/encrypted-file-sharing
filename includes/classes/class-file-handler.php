@@ -36,7 +36,7 @@ class EFS_File_Handler
 
     public function initialize_s3_client()
     {
-        return $this->s3_file_handler->initialize_s3_client();
+        /* return $this->s3_file_handler->initialize_s3_client(); */
     }
 
     /**
@@ -45,7 +45,7 @@ class EFS_File_Handler
 
     public function get_stored_s3_buckets()
     {
-        return $this->s3_file_handler->get_stored_s3_buckets();
+        /* return $this->s3_file_handler->get_stored_s3_buckets(); */
     }
 
     /**
@@ -63,7 +63,7 @@ class EFS_File_Handler
 
     public function fetch_s3_buckets_debug()
     {
-        return $this->s3_file_handler->fetch_s3_buckets_debug();
+        /* return $this->s3_file_handler->fetch_s3_buckets_debug(); */
     }
 
     /**
