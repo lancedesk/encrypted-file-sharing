@@ -286,8 +286,10 @@ class EFS_File_Handler
         $attachment_id = attachment_url_to_postid($file_url);
         if ($attachment_id) 
         {
-            wp_delete_attachment($attachment_id, true); /* Delete permanently */
+            $result = wp_delete_attachment($attachment_id, true); /* Delete permanently */
+            return ($result !== false); /* Return true if deletion succeeded */
         }
+        return false; /* Return false if attachment ID was not found */
     }
 
     /**
