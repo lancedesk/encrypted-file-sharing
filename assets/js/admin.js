@@ -22,6 +22,8 @@ jQuery(document).ready(function($) {
             /* Check if the file object exists */
             if (attachment && attachment.id) {
                 console.log("File ID:", attachment.id);
+                console.log("Attachment attributes: ", attachment);
+                console.log("Uploaded To Post ID:", attachment.uploadedTo);
 
                 /* Prepare AJAX request to send only the file ID */
                 var formData = new FormData();
