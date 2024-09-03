@@ -1,11 +1,7 @@
 <?php
 
-require_once 'class-encryption.php'; /* Include the EFS encryption class */
-require_once 'class-file-handler.php'; /* Include the EFS file handler class */
-
 class EFS_Local_File_Handler
 {
-    private $efs_encryption;
 
     /**
      * Constructor to initialize actions and hooks.
@@ -14,7 +10,6 @@ class EFS_Local_File_Handler
     public function __construct()
     {
         /* Initialize the EFS encryption class. */
-        $this->efs_encryption = new EFS_Encryption();
         add_action('wp_ajax_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
         add_action('wp_ajax_nopriv_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
         add_action('wp_ajax_efs_write_log', [$this, 'write_log']);
@@ -165,7 +160,8 @@ class EFS_Local_File_Handler
 
     private function upload_to_local($file_path, $expiration_date)
     {
-        global $efs_file_handler; /* Declare the global file handler */
+        global $efs_file_handler, $efs_file_encryption;
+
         $upload_dir = ABSPATH . '../private_uploads/';
 
         /* Log the received file and expiration date */
@@ -195,11 +191,11 @@ class EFS_Local_File_Handler
             $encryption_key = openssl_random_pseudo_bytes(32); /* Generate a random encryption key (256-bit) */
 
             /* Encrypt the file using the EFS_Encryption class */
-            $encrypted_file = $this->efs_encryption->encrypt_file($target_file, $encryption_key);
+            $encrypted_file = $efs_file_encryption->encrypt_file($target_file, $encryption_key);
 
             if ($encrypted_file) {
                 /* Save the encryption key securely in the database */
-                $this->efs_encryption->save_encrypted_key($file_name, $encryption_key);
+                $efs_file_encryption->save_encrypted_key($file_name, $encryption_key);
 
                 /* Store the file's expiration date */
                 $this->save_file_metadata($file_name, $expiration_date);
