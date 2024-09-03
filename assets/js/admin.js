@@ -28,6 +28,7 @@ jQuery(document).ready(function($) {
                 /* Prepare AJAX request to send only the file ID */
                 var formData = new FormData();
                 formData.append("file_id", attachment.id);
+                formData.append("post_id", attachment.uploadedTo); /* Post ID for context */
                 formData.append("nonce", efsAdminAjax.nonce);
 
                 /* Set the upload action based on storage option */
