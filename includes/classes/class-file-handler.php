@@ -316,4 +316,11 @@ class EFS_File_Handler
         dbDelta($sql); /* Ensure table creation or update */
     }
 
+    /* Function to log messages */
+    private function log_message($message, $log_file)
+    {
+        $current_time = date('Y-m-d H:i:s');
+        file_put_contents($log_file, "{$current_time} - {$message}\n", FILE_APPEND);
+    }
+
 }
