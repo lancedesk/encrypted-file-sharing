@@ -155,13 +155,21 @@ class EFS_Local_File_Handler
             /* Update the post meta to mark the post as encrypted */
             update_post_meta($post_id, '_efs_encrypted', 1);
 
-            /* Delete the local file from WordPress media library */
-            $deletion_result = $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
+            /* Retrieve deletion  setting */
+            $delete_after_encryption = get_option('efs_delete_files', 0);
+
+            if($delete_after_encryption)
+            {
+                /* Delete the local file from WordPress media library */
+                $deletion_result = $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
+                
+                if ($deletion_result)
+                {
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Local file successfully deleted: ' . $file_path);
+                } else {
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to delete local file: ' . $file_path);
+                }
             
-            if ($deletion_result) {
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Local file successfully deleted: ' . $file_path);
-            } else {
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to delete local file: ' . $file_path);
             }
             
             wp_send_json_success(['file_url' => $encrypted_file]);
