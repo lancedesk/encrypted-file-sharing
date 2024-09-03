@@ -1,6 +1,7 @@
 <?php
 
 require_once 'class-encryption.php'; /* Include the EFS encryption class */
+require_once 'class-file-handler.php'; /* Include the EFS file handler class */
 
 class EFS_Local_File_Handler
 {
@@ -204,6 +205,9 @@ class EFS_Local_File_Handler
 
                 /* Log the successful encryption and upload */
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
+
+                /* Delete the local file from WordPress media library */
+                $this->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
 
                 return $encrypted_file;
             } else {
