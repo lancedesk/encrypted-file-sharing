@@ -102,34 +102,22 @@ class EFS_File_Handler
             /* Retrieve the current post data */
             $post = get_post($post_id);
 
-            /* Check if the post status is 'publish' and if the post hasn't been marked as first published */
+            /* Check if the post status is 'publish' and if the post is marked as encrypted */
             $first_published = get_post_meta($post_id, '_efs_first_published', true);
+            $is_encrypted = get_post_meta($post_id, '_efs_encrypted', true);
 
             /* Log the post details */
             $this->log_message("Post ID: $post_id", $log_file);
             $this->log_message("Post Status: {$post->post_status}", $log_file);
             $this->log_message("First Published Meta: $first_published", $log_file);
 
-            if ($post->post_status === 'publish' && empty($first_published)) 
+            if ($post->post_status === 'publish' && empty($first_published) && !empty($is_encrypted)) 
             {
-                $file_url = get_post_meta($post_id, '_efs_file_url', true);
+                /* Send the notification */
+                $this->efs_notification_handler->send_upload_notifications($post_id);
 
-                /* Log the file URL */
-                $this->log_message("File URL: $file_url", $log_file);
-
-                /* Check if file URL is set or file is uploaded */
-                if (!empty($file_url)) 
-                {
-                    /* Send the notification */
-                    $this->efs_notification_handler->send_upload_notifications($post_id);
-
-                    /* Mark this post as published for the first time */
-                    update_post_meta($post_id, '_efs_first_published', 1);
-                }
-                else 
-                {
-                    $this->log_message("File URL not found for post ID: $post_id", $log_file);
-                }
+                /* Mark this post as published for the first time */
+                update_post_meta($post_id, '_efs_first_published', 1);
             }
             else 
             {
