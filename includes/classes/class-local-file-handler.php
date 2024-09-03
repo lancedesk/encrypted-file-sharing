@@ -209,7 +209,7 @@ class EFS_Local_File_Handler
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
 
                 /* Delete the local file from WordPress media library */
-                $this->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
+                $this->efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
 
                 return $encrypted_file;
             } else {
