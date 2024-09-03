@@ -6,6 +6,7 @@ require_once 'class-file-handler.php'; /* Include the EFS file handler class */
 class EFS_Local_File_Handler
 {
     private $efs_encryption;
+    private $efs_file_handler;
 
     /**
      * Constructor to initialize actions and hooks.
@@ -15,6 +16,7 @@ class EFS_Local_File_Handler
     {
         /* Initialize the EFS encryption class. */
         $this->efs_encryption = new EFS_Encryption();
+        $this->efs_file_handler = new EFS_File_Handler();
         add_action('wp_ajax_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
         add_action('wp_ajax_nopriv_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
         add_action('wp_ajax_efs_write_log', [$this, 'write_log']);
