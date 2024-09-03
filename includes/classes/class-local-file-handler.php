@@ -209,9 +209,16 @@ class EFS_Local_File_Handler
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
 
                 /* Delete the local file from WordPress media library */
-                $this->efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
+                $deletion_result = $this->efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
 
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Local file successfully deleted: ' . $encrypted_file);
+                if ($deletion_result)
+                {
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Local file successfully deleted: ' . $file_path);
+                }
+                else
+                {
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to delete local file: ' . $file_path);
+                }
 
                 return $encrypted_file;
             } else {
