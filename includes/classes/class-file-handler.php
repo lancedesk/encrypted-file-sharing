@@ -1,12 +1,12 @@
 <?php
-require_once 'class-s3-file-handler.php'; /* Include the S3 file handler class */
+/* require_once 'class-s3-file-handler.php'; Include the S3 file handler class */
 require_once 'class-local-file-handler.php'; /* Include the local file handler class */
 require_once 'class-encryption.php'; /* Include the encryption handler class */
 
 class EFS_File_Handler
 {
     private $notification_handler;
-    private $s3_file_handler;
+    /* private $s3_file_handler; */
     private $local_file_handler;
     private $encryption_handler;
 
@@ -17,7 +17,7 @@ class EFS_File_Handler
     public function __construct()
     {
         $this->notification_handler = new EFS_Notification_Handler();
-        $this->s3_file_handler = new EFS_S3_File_Handler();
+        /* $this->s3_file_handler = new EFS_S3_File_Handler(); */
         $this->local_file_handler = new EFS_Local_File_Handler();
         $this->encryption_handler = new EFS_Encryption();
 
@@ -132,7 +132,7 @@ class EFS_File_Handler
 
         switch ($storage_option) {
             case 'amazon':
-                return $this->s3_file_handler->upload_to_amazon_s3($file);
+                /* return $this->s3_file_handler->upload_to_amazon_s3($file); */
             case 'google':
                 return $this->upload_to_google_drive($file);
             case 'dropbox':
