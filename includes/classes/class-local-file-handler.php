@@ -208,9 +208,6 @@ class EFS_Local_File_Handler
                 /* Log the file ID */
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File ID: ' . $file_id);
 
-                /* Delete the local file from WordPress media library */
-                $deletion_result = $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
-
                 if ($file_id) {
                     /* Delete the local file from WordPress media library */
                     $deletion_result = $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
