@@ -3,14 +3,25 @@
 class EFS_File_Handler
 {
     private $notification_handler;
+    private $efs_s3_file_handler;
+    private $efs_local_file_handler;
+    private $efs_file_encryption;
 
     /**
-     * Constructor to initialize actions and filters.
+     * Constructor to initialize dependencies and actions.
+     *
+     * @param object $notification_handler Instance of notification handler.
+     * @param object $s3_file_handler Instance of S3 file handler.
+     * @param object $local_file_handler Instance of local file handler.
+     * @param object $file_encryption Instance of file encryption handler.
     */
 
-    public function __construct()
+    public function __construct($notification_handler, $efs_s3_file_handler, $efs_local_file_handler, $efs_file_encryption)
     {
         $this->notification_handler = new EFS_Notification_Handler();
+        $this->efs_s3_file_handler = $efs_s3_file_handler;
+        $this->efs_local_file_handler = $efs_local_file_handler;
+        $this->efs_file_encryption = $efs_file_encryption;
 
         /* Register AJAX actions */
         add_action('wp_ajax_efs_handle_download', [$this, 'handle_download_request']);
@@ -18,7 +29,6 @@ class EFS_File_Handler
 
         /* Hook after file is uploaded */
         add_action('save_post', [$this, 'handle_file_upload_notifications']);
-
     }
 
     /**
@@ -27,8 +37,7 @@ class EFS_File_Handler
 
     public function initialize_s3_client()
     {
-        global $efs_s3_file_handler;
-        return $efs_s3_file_handler->initialize_s3_client();
+        return $this->efs_s3_file_handler->initialize_s3_client();
     }
 
     /**
@@ -37,8 +46,7 @@ class EFS_File_Handler
 
     public function get_stored_s3_buckets()
     {
-        global $efs_s3_file_handler;
-        return $efs_s3_file_handler->get_stored_s3_buckets();
+        return $this->efs_s3_file_handler->get_stored_s3_buckets();
     }
 
     /**
@@ -47,8 +55,7 @@ class EFS_File_Handler
 
     private function upload_to_local($file)
     {
-        global $efs_local_file_handler;
-        return $efs_local_file_handler->upload_to_local($file);
+        return $this->efs_local_file_handler->upload_to_local($file);
     }
 
     /**
@@ -57,8 +64,7 @@ class EFS_File_Handler
 
     public function fetch_s3_buckets_debug()
     {
-        global $efs_local_file_handler;
-        return $efs_local_file_handler->fetch_s3_buckets_debug();
+        return $this->efs_s3_file_handler->fetch_s3_buckets_debug();
     }
 
     /**
@@ -67,8 +73,7 @@ class EFS_File_Handler
 
     public function get_encryption_key($file_name)
     {
-        global $efs_file_encryption;
-        return $efs_file_encryption->get_encryption_key($file_name);
+        return $this->efs_file_encryption->get_encryption_key($file_name);
     }
 
     /**
@@ -78,8 +83,7 @@ class EFS_File_Handler
 
     public function decrypt_file($encrypted_file_path, $encryption_key)
     {
-        global $efs_file_encryption;
-        return $efs_file_encryption->decrypt_file($encrypted_file_path, $encryption_key);
+        return $this->efs_file_encryption->decrypt_file($encrypted_file_path, $encryption_key);
     }
 
     /**
@@ -125,12 +129,11 @@ class EFS_File_Handler
 
     public function handle_file_upload($file)
     {
-        global $efs_local_file_handler;
         $storage_option = get_option('efs_storage_option', 'local');
 
         switch ($storage_option) {
             case 'amazon':
-                return $efs_local_file_handler->upload_to_amazon_s3($file);
+                return $this->efs_s3_file_handler->upload_to_amazon_s3($file);
             case 'google':
                 return $this->upload_to_google_drive($file);
             case 'dropbox':
