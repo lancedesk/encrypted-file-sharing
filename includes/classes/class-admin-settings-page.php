@@ -252,6 +252,28 @@ class EFS_Admin_Settings_Page
         /* Retrieve the selected storage option from the database */
         $selected_storage = get_option('efs_storage_option', 'local');  /* Default to 'local' if no option is set */
 
+        /* Check if Amazon S3 is selected from the stored option */
+        if ($selected_storage === 'amazon') 
+        {
+            global $efs_s3_file_handler;
+            $result = $efs_s3_file_handler->initialize_s3_client();
+
+            /* Check if S3 client initialization was successful */
+            if (!$result) 
+            {
+                /* Display error message if S3 is not connected */
+                echo '<div class="notice notice-error is-dismissible">';
+                echo '<p>' . __('S3 not connected. Please enter the correct API information to connect.', 'encrypted-file-sharing') . '</p>';
+                echo '</div>';
+            } 
+            else 
+            {
+                /* Display success message if S3 is connected */
+                echo '<div class="notice notice-success is-dismissible">';
+                echo '<p>' . __('S3 client initialized successfully.', 'encrypted-file-sharing') . '</p>';
+                echo '</div>';
+            }
+        }
 
         /* Display note about private folder location */
         if ($folder_exists)
