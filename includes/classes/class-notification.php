@@ -24,7 +24,16 @@ class EFS_Notification_Handler
 
     public function send_upload_notifications($post_id)
     {
+        /* Get the selected users */
         $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+
+        /* Capture the output of var_dump as a string */
+        ob_start();
+        var_dump($selected_users);
+        $selected_users_dump = ob_get_clean();
+
+        /* Log the dump of selected users */
+        $this->log_debug_info("Selected users dump: " . $selected_users_dump);
 
         if (!empty($selected_users) && is_array($selected_users)) {
             $file_name = get_the_title($post_id);
