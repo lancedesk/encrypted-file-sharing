@@ -97,6 +97,9 @@ class EFS_File_Handler
         /* Define the log file path */
         $log_file = WP_CONTENT_DIR . '/efs_file_upload_notifications_log.txt';
 
+        /* Get the selected users */
+        $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+
         /* Ensure this only runs for the `efs_file` post type */
         if (get_post_type($post_id) === 'efs_file') 
         {
@@ -123,7 +126,7 @@ class EFS_File_Handler
             )
             {
                 /* Send the notification */
-                $this->efs_notification_handler->send_upload_notifications($post_id);
+                $this->efs_notification_handler->send_upload_notifications($post_id, $selected_users);
                 
                 $this->log_message("File upload notifications sent for post ID: $post_id", $log_file);
                 /* Mark this post as published for the first time */
