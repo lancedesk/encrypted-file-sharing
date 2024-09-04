@@ -1,12 +1,12 @@
 <?php
 
-class EFS_Settings_Page
+class EFS_Admin_Settings_Page
 {
     public function __construct()
     {
         /* Hook for adding admin menus */
         add_action('admin_menu', [$this, 'add_settings_menu']);
-        add_action('admin_init', [$this, 'handle_form_submission']);
+        /* add_action('admin_init', [$this, 'handle_form_submission']); */
     }
 
     /**
