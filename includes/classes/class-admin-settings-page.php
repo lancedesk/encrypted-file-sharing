@@ -204,6 +204,13 @@ class EFS_Settings_Page
         echo __('Send notifications to selected admin', 'encrypted-file-sharing');
         echo '</label>';
 
+        /* Checkbox for user notifications */
+        echo '<h2>' . __('Enable User Notifications on Post Upload', 'encrypted-file-sharing') . '</h2>';
+        echo '<label for="efs_enable_user_notifications">';
+        echo '<input type="checkbox" id="efs_enable_user_notifications" name="efs_enable_user_notifications" value="1"' . checked(1, get_option('efs_enable_user_notifications', 0), false) . '>';
+        echo __('Send notifications to users when a file is uploaded', 'encrypted-file-sharing');
+        echo '</label>';
+
         /* Checkbox for enabling file expiry */
         echo '<h2>' . __('Enable File Expiry', 'encrypted-file-sharing') . '</h2>';
         echo '<label for="efs_enable_expiry">';
