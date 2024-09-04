@@ -34,6 +34,11 @@
     margin-right: 10px; /* Add spacing between the items */
 }
 
+.efs-user-files li:nth-child(2n) 
+{
+    margin-right: 0; /* Remove the margin from every second item in the row */
+}
+
 /* Flexbox layout for icon and file details */
 .file-icon
 {
@@ -93,7 +98,8 @@
 @media (max-width: 768px)
 {
     .efs-user-files li {
-        width: 48%; /* Smaller screen sizes */
+        width: calc(48% - 10px); /* Two per row for smaller tablets */
+        margin-right: 10px;
     }
 }
 
@@ -101,5 +107,6 @@
 {
     .efs-user-files li {
         width: 100%; /* Single column for mobile */
+        margin-right: 0; /* Remove the margin for single column */
     }
 }
