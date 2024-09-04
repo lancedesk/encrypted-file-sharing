@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
         console.log("Storage option: ", efsAdminAjax.efsStorageOption); /* Access localized variable */
 
         /* Open the media uploader */
-        var file_frame = wp.media.frames.file_frame = wp.media({
+        var file_frame = wp.media({
             title: efsAdminAjax.efsSelectFileTitle, /* Localized variable */
             button: {
                 text: efsAdminAjax.efsSelectFileButtonText /* Localized variable */
@@ -33,6 +33,7 @@ jQuery(document).ready(function($) {
 
                 /* Set the upload action based on storage option */
                 var uploadAction = "efs_upload_to_local"; /* Default local storage action */
+
                 switch (efsAdminAjax.efsStorageOption) {
                     case "amazon":
                         uploadAction = "upload_to_s3";
