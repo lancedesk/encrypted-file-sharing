@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
         console.log("Storage option: ", efsAdminAjax.efsStorageOption); /* Access localized variable */
 
         /* Open the media uploader */
-        var file_frame = wp.media({
+        var file_frame = wp.media.frames.file_frame = wp.media({
             title: efsAdminAjax.efsSelectFileTitle, /* Localized variable */
             button: {
                 text: efsAdminAjax.efsSelectFileButtonText /* Localized variable */
