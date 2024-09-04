@@ -82,9 +82,13 @@ class EFS_Settings_Page
                 update_option('efs_admin_email', sanitize_email($_POST['efs_admin_email']));
             }
 
-            /* Handle notification checkbox */
+            /* Handle admin notification checkbox */
             $efs_send_notifications = isset($_POST['efs_send_notifications']) ? 1 : 0;
             update_option('efs_send_notifications', $efs_send_notifications);
+
+            /* Handle user notification checkbox */
+            $efs_enable_user_notifications = isset($_POST['efs_enable_user_notifications']) ? 1 : 0;
+            update_option('efs_enable_user_notifications', $efs_enable_user_notifications);
 
             /* Handle file expiry checkbox */
             $efs_enable_expiry = isset($_POST['efs_enable_expiry']) ? 1 : 0;
