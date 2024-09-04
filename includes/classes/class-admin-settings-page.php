@@ -248,7 +248,12 @@ class EFS_Admin_Settings_Page
         submit_button(__('Save Settings', 'encrypted-file-sharing'), 'primary', 'save_settings_button');
         echo '</form>';
 
-         /* Display note about private folder location */
+
+        /* Retrieve the selected storage option from the database */
+        $selected_storage = get_option('efs_storage_option', 'local');  /* Default to 'local' if no option is set */
+
+
+        /* Display note about private folder location */
         if ($folder_exists)
         {
             echo '<div class="notice notice-success is-dismissible">';
