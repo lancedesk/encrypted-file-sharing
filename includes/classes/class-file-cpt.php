@@ -200,6 +200,7 @@ class EFS_File_CPT
 
     public function render_expiry_date_meta_box($post)
     {
+        /* An instance of the admin columns class */
         global $efs_admin_columns;
 
         /* Nonce field for verification */
@@ -235,6 +236,7 @@ class EFS_File_CPT
 
     public function save_expiry_meta_box_data($post_id)
     {
+        /* An instance of the admin columns class */
         global $efs_admin_columns;
 
         /* Check if our nonce is set. */
