@@ -201,7 +201,7 @@ class EFS_Admin_Columns
      * @return string The extracted file name.
     */
 
-    private function extract_file_name($file_url)
+    public function extract_file_name($file_url)
     {
         $file_path = parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
@@ -215,7 +215,7 @@ class EFS_Admin_Columns
      * @return string Formatted expiration date or a message if not set.
     */
 
-    private function get_expiration_date($file_name)
+    public function get_expiration_date($file_name)
     {
         global $wpdb;
 
