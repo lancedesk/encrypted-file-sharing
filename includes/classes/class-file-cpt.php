@@ -159,6 +159,23 @@ class EFS_File_CPT
     }
 
     /**
+     * Add meta box for file expiry date.
+    */
+
+    function add_expiry_date_meta_box()
+    {
+        add_meta_box(
+            'expiry_date_meta_box', /* Meta box ID */
+            'File Expiry Date', /* Title */
+            'render_expiry_date_meta_box', /* Callback function */
+            'post', /* Post type
+            'side', /* Position: 'normal', 'side', or 'advanced' */
+            'high' /* Priority */
+        );
+    }
+    add_action('add_meta_boxes', 'add_expiry_date_meta_box');
+
+    /**
      * Render the expiry date meta box.
     */
 
@@ -206,5 +223,7 @@ class EFS_File_CPT
         $expiry_date = isset($_POST['efs_file_expiry_date']) ? sanitize_text_field($_POST['efs_file_expiry_date']) : '';
         update_post_meta($post_id, '_efs_file_expiry_date', $expiry_date);
     }
+
+
 
 }
