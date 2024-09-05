@@ -168,7 +168,7 @@ class EFS_File_CPT
             'expiry_date_meta_box', /* Meta box ID */
             'File Expiry Date', /* Title */
             'render_expiry_date_meta_box', /* Callback function */
-            'post', /* Post type
+            'post', /* Post type */
             'side', /* Position: 'normal', 'side', or 'advanced' */
             'high' /* Priority */
         );
@@ -222,7 +222,5 @@ class EFS_File_CPT
         $expiry_date = isset($_POST['efs_file_expiry_date']) ? sanitize_text_field($_POST['efs_file_expiry_date']) : '';
         update_post_meta($post_id, '_efs_file_expiry_date', $expiry_date);
     }
-
-
 
 }
