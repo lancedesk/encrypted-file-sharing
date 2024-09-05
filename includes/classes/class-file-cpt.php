@@ -235,9 +235,32 @@ class EFS_File_CPT
             return;
         }
 
-        /* Sanitize and save the expiry date */
+        /* Sanitize and prepare date and time inputs */
         $expiry_date = isset($_POST['efs_file_expiry_date']) ? sanitize_text_field($_POST['efs_file_expiry_date']) : '';
-        update_post_meta($post_id, '_efs_file_expiry_date', $expiry_date);
+        $expiry_time = isset($_POST['efs_file_expiry_time']) ? sanitize_text_field($_POST['efs_file_expiry_time']) : '';
+
+        /* Combine date and time */
+        $expiry_datetime = $expiry_date . ' ' . $expiry_time;
+
+        /* Retrieve file name or URL */
+        $file_url = get_post_meta($post_id, '_efs_file_url', true);
+        $file_name = $this->extract_file_name($file_url);
+
+        /* Update expiry date in custom table */
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_file_metadata';
+
+        /* Insert or update expiration date in the custom table */
+        $wpdb->replace(
+            $table_name,
+            array(
+                'file_name' => $file_name,
+                'expiration_date' => $expiry_datetime
+            ),
+            array(
+                '%s', '%s'
+            )
+        );
     }
 
 }
