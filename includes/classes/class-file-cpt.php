@@ -166,19 +166,33 @@ class EFS_File_CPT
     {
         /* Check if expiry is enabled in the admin settings */
         $efs_enable_expiry = trim(get_option('efs_enable_expiry', 0));
-
-        /* Add the meta box only if expiry is enabled */
-        if ($efs_enable_expiry === '1') {
-            add_meta_box(
-                'efs_expiry_date_meta_box', /* Meta box ID */
-                __('File Expiry Date', 'encrypted-file-sharing'), /* Title */
-                [$this, 'render_expiry_date_meta_box'], /* Callback function */
-                'efs_file', /* Post type */
-                'side', /* Position: 'normal', 'side', or 'advanced' */
-                'high' /* Priority */
-            );
+    
+        /* Only add the meta box if expiry is enabled */
+        if ($efs_enable_expiry === '1')
+        {
+            /* Check if we are editing an existing post */
+            global $post;
+    
+            /* Ensure the post object exists and it's not a new post */
+            if (isset($post->ID))
+            {
+                $first_published = trim(get_post_meta($post->ID, '_efs_first_published', true));
+    
+                /* Add the meta box only if the post has been published or saved before */
+                if ($first_published === '1')
+                {
+                    add_meta_box(
+                        'efs_expiry_date_meta_box', /* Meta box ID */
+                        __('File Expiry Date', 'encrypted-file-sharing'), /* Title */
+                        [$this, 'render_expiry_date_meta_box'], /* Callback function */
+                        'efs_file', /* Post type */
+                        'side', /* Position: 'normal', 'side', or 'advanced' */
+                        'high' /* Priority */
+                    );
+                }
+            }
         }
-    }
+    }    
 
     /**
      * Render the expiry date meta box.
