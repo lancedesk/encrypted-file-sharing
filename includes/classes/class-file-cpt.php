@@ -20,7 +20,7 @@ class EFS_File_CPT
 
         /* Hook for adding meta boxes */
         add_action('add_meta_boxes', [$this, 'add_file_meta_box']);
-        /* add_action('add_meta_boxes', array($this, 'add_expiry_date_meta_box')); */
+        add_action('add_meta_boxes', [$this, 'add_expiry_date_meta_box']);
 
         /* Hook for saving meta box data */
         add_action('save_post', [$this, 'save_file_meta_box_data']);
@@ -173,7 +173,6 @@ class EFS_File_CPT
             'high' /* Priority */
         );
     }
-    add_action('add_meta_boxes', 'add_expiry_date_meta_box');
 
     /**
      * Render the expiry date meta box.
