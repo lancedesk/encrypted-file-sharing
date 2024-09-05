@@ -43,10 +43,9 @@ add_action('admin_enqueue_scripts', 'efs_enqueue_admin_scripts');
 function efs_enqueue_admin_scripts($hook_suffix)
 {
     global $post;
-
-    /* Ensure we are editing an efs_file post type or on the EFS settings page */
     $post_type = get_post_type();
 
+    /* Ensure we are editing an efs_file post type or on the EFS settings page */
     if (($hook_suffix === 'post-new.php' || 
          $hook_suffix === 'post.php' || 
          $hook_suffix === 'edit.php' ||
