@@ -180,21 +180,19 @@ class EFS_File_CPT
 
     public function render_expiry_date_meta_box($post)
     {
+
+        /* Nonce field for verification */
+        wp_nonce_field('efs_expiry_meta_box', 'efs_expiry_meta_box_nonce');
+
         /* Retrieve the expiration date from the custom field */
-        $expiry_date = get_post_meta($post->ID, '_promotion_expiry_date', true);
+        $expiry_date = get_post_meta($post->ID, '_efs_file_expiry_date', true);
 
         /* Pre-fill the field with the expiration date or show a placeholder  */
         if (!$expiry_date)
         {
             $expiry_date = '';
         }
-
-        /* Nonce field for verification */
-        wp_nonce_field('efs_expiry_meta_box', 'efs_expiry_meta_box_nonce');
-
-        /* Get existing expiry date */
-        $expiry_date = get_post_meta($post->ID, '_efs_file_expiry_date', true);
-
+        
         echo '<p>';
         echo '<label for="efs_file_expiry_date">' . __('Expiry Date:', 'encrypted-file-sharing') . '</label>';
         echo '<input type="date" id="efs_file_expiry_date" name="efs_file_expiry_date" value="' . esc_attr($expiry_date) . '" />';
