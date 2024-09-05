@@ -165,9 +165,9 @@ class EFS_File_CPT
     function add_expiry_date_meta_box()
     {
         add_meta_box(
-            'expiry_date_meta_box', /* Meta box ID */
-            'File Expiry Date', /* Title */
-            'render_expiry_date_meta_box', /* Callback function */
+            'efs_expiry_date_meta_box', /* Meta box ID */
+            __('File Expiry Date', 'encrypted-file-sharing'), /* Title */
+            [$this, 'render_expiry_date_meta_box'], /* Callback function */
             'efs_file', /* Post type */
             'side', /* Position: 'normal', 'side', or 'advanced' */
             'high' /* Priority */
