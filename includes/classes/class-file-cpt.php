@@ -168,7 +168,7 @@ class EFS_File_CPT
             'expiry_date_meta_box', /* Meta box ID */
             'File Expiry Date', /* Title */
             'render_expiry_date_meta_box', /* Callback function */
-            'post', /* Post type */
+            'efs_file', /* Post type */
             'side', /* Position: 'normal', 'side', or 'advanced' */
             'high' /* Priority */
         );
