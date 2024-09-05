@@ -180,6 +180,15 @@ class EFS_File_CPT
 
     public function render_expiry_date_meta_box($post)
     {
+        /* Retrieve the expiration date from the custom field */
+        $expiry_date = get_post_meta($post->ID, '_promotion_expiry_date', true);
+
+        /* Pre-fill the field with the expiration date or show a placeholder  */
+        if (!$expiry_date)
+        {
+            $expiry_date = '';
+        }
+
         /* Nonce field for verification */
         wp_nonce_field('efs_expiry_meta_box', 'efs_expiry_meta_box_nonce');
 
