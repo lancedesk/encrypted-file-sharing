@@ -10,7 +10,7 @@
  * Version:         1.1.9
  *
  * @package         encrypted-file-sharing
- */
+*/
 
 /* Ensure that WordPress functions are available */
 if (!defined('ABSPATH')) 
@@ -43,8 +43,6 @@ add_action('admin_enqueue_scripts', 'efs_enqueue_admin_scripts');
 function efs_enqueue_admin_scripts($hook_suffix)
 {
     global $post;
-
-    /* Check the query parameters to ensure we're on the right page */
 
     /* Ensure we are editing an efs_file post type or on the EFS settings page */
     $post_type = get_post_type();
