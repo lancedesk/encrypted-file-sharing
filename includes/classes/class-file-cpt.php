@@ -164,14 +164,20 @@ class EFS_File_CPT
 
     function add_expiry_date_meta_box()
     {
-        add_meta_box(
-            'efs_expiry_date_meta_box', /* Meta box ID */
-            __('File Expiry Date', 'encrypted-file-sharing'), /* Title */
-            [$this, 'render_expiry_date_meta_box'], /* Callback function */
-            'efs_file', /* Post type */
-            'side', /* Position: 'normal', 'side', or 'advanced' */
-            'high' /* Priority */
-        );
+        /* Check if expiry is enabled in the admin settings */
+        $efs_enable_expiry = get_option('efs_enable_expiry', 0);
+
+        /* Add the meta box only if expiry is enabled */
+        if (!$efs_enable_expiry) {
+            add_meta_box(
+                'efs_expiry_date_meta_box', /* Meta box ID */
+                __('File Expiry Date', 'encrypted-file-sharing'), /* Title */
+                [$this, 'render_expiry_date_meta_box'], /* Callback function */
+                'efs_file', /* Post type */
+                'side', /* Position: 'normal', 'side', or 'advanced' */
+                'high' /* Priority */
+            );
+        }
     }
 
     /**
