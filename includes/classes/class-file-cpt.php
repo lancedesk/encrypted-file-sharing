@@ -215,6 +215,8 @@ class EFS_File_CPT
 
     public function save_expiry_meta_box_data($post_id)
     {
+        global $efs_admin_columns;
+
         /* Check if our nonce is set. */
         if (!isset($_POST['efs_expiry_meta_box_nonce'])) {
             return;
@@ -244,7 +246,7 @@ class EFS_File_CPT
 
         /* Retrieve file name or URL */
         $file_url = get_post_meta($post_id, '_efs_file_url', true);
-        $file_name = $this->extract_file_name($file_url);
+        $file_name = $efs_admin_columns->extract_file_name($file_url);
 
         /* Update expiry date in custom table */
         global $wpdb;
