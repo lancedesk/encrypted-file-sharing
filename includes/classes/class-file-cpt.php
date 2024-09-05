@@ -165,10 +165,10 @@ class EFS_File_CPT
     function add_expiry_date_meta_box()
     {
         /* Check if expiry is enabled in the admin settings */
-        $efs_enable_expiry = get_option('efs_enable_expiry', 0);
+        $efs_enable_expiry = trim(get_option('efs_enable_expiry', 0));
 
         /* Add the meta box only if expiry is enabled */
-        if (!$efs_enable_expiry) {
+        if ($efs_enable_expiry === '1') {
             add_meta_box(
                 'efs_expiry_date_meta_box', /* Meta box ID */
                 __('File Expiry Date', 'encrypted-file-sharing'), /* Title */
