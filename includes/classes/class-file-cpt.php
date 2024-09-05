@@ -180,22 +180,32 @@ class EFS_File_CPT
 
     public function render_expiry_date_meta_box($post)
     {
+        global $efs_admin_columns;
 
         /* Nonce field for verification */
         wp_nonce_field('efs_expiry_meta_box', 'efs_expiry_meta_box_nonce');
 
-        /* Retrieve the expiration date from the custom field */
-        $expiry_date = get_post_meta($post->ID, '_efs_file_expiry_date', true);
+        /* Retrieve expiration date and time from the custom table */
+        $file_url = get_post_meta($post->ID, '_efs_file_url', true);
+        $file_name = $efs_admin_columns->extract_file_name($file_url);
+        $expiry_datetime = $efs_admin_columns->get_expiration_date($file_name);
 
-        /* Pre-fill the field with the expiration date or show a placeholder  */
-        if (!$expiry_date)
-        {
-            $expiry_date = '';
+        /* Split expiry date and time */
+        $expiry_date = $expiry_time = '';
+        if ($expiry_datetime) {
+            $expiry_date = esc_attr(date('Y-m-d', strtotime($expiry_datetime)));
+            $expiry_time = esc_attr(date('H:i', strtotime($expiry_datetime)));
         }
         
+        /* Display the date and time fields */
         echo '<p>';
         echo '<label for="efs_file_expiry_date">' . __('Expiry Date:', 'encrypted-file-sharing') . '</label>';
-        echo '<input type="date" id="efs_file_expiry_date" name="efs_file_expiry_date" value="' . esc_attr($expiry_date) . '" />';
+        echo '<input type="date" id="efs_file_expiry_date" name="efs_file_expiry_date" value="' . $expiry_date . '" />';
+        echo '</p>';
+
+        echo '<p>';
+        echo '<label for="efs_file_expiry_time">' . __('Expiry Time:', 'encrypted-file-sharing') . '</label>';
+        echo '<input type="time" id="efs_file_expiry_time" name="efs_file_expiry_time" value="' . $expiry_time . '" />';
         echo '</p>';
     }
 
