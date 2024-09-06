@@ -50,7 +50,8 @@ function efs_enqueue_admin_scripts($hook_suffix)
          $hook_suffix === 'post.php' || 
          $hook_suffix === 'edit.php' ||
          (isset($_GET['page']) && $_GET['page'] === 'efs-settings')) && 
-         ($post_type === 'efs_file' || $_GET['page'] === 'efs-settings'))
+         ($post_type === 'efs_file' || $_GET['page'] === 'efs-settings')
+        )
     {
         /* Enqueue admin CSS */
         wp_enqueue_style('efs-admin-css', plugin_dir_url(__FILE__) . 'assets/css/admin.css', array(), '1.0.0');
@@ -111,6 +112,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/classes/class-encryption.php'
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-2fa-auth.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-cpt.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-display.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-init.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/user-permissions.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/install-dependencies.php';
 
@@ -128,12 +130,13 @@ $efs_file_handler =  new EFS_File_Handler(
 
 new EFS_File_Expiry_Handler();
 new EFS_Admin_Settings_Page();
+$efs_init = new EFS_Init();
 new EFS_File_Display();
 new EFS_File_CPT();
 
 /* EFS activation hooks */
-register_activation_hook(__FILE__, [$efs_file_encryption, 'efs_create_encryption_keys_table']);
-register_activation_hook(__FILE__, [$efs_local_file_handler, 'efs_create_private_folder']);
-register_activation_hook(__FILE__, [$efs_file_handler, 'efs_create_file_metadata_table']);
-register_activation_hook(__FILE__, [$create_admin_db_table, 'create_admin_table']);
+register_activation_hook(__FILE__, [$efs_init, 'efs_create_encryption_keys_table']);
+register_activation_hook(__FILE__, [$efs_init, 'efs_create_file_metadata_table']);
+register_activation_hook(__FILE__, [$efs_init, 'efs_create_private_folder']);
+register_activation_hook(__FILE__, [$efs_init, 'efs_create_admin_table']);
 /* register_activation_hook(__FILE__, 'efs_install_dependencies'); */
