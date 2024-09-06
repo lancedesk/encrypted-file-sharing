@@ -204,8 +204,11 @@ class EFS_Local_File_Handler
                     /* Get the selected users from post meta */
                     $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
 
-                    /* Save the encryption key securely in the database */
-                    $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $encryption_key, $expiration_date);
+                    /* Save the encryption key securely for all selected users in the database */
+                    if (!empty($selected_users) && is_array($selected_users))
+                    {
+                        $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $encryption_key, $expiration_date);
+                    }
                 }
 
                 /* Log the successful encryption and upload */
