@@ -80,28 +80,32 @@ class EFS_Encryption
      * @param string $expiration_date The expiration date of the encryption key.
     */
 
-    public function save_encrypted_key($user_id, $file_id, $encryption_key, $expiration_date)
+    public function save_encrypted_key($selected_users, $file_id, $encryption_key, $expiration_date)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'efs_encryption_keys';
 
-        $wpdb->insert(
-            $table_name,
-            [
-                'user_id' => $user_id,
-                'file_id' => $file_id,
-                'encryption_key' => $encryption_key, /* Store the key as binary data */
-                'expiration_date' => $expiration_date,
-                'created_at' => current_time('mysql')
-            ],
-            [
-                '%d', /* user_id */
-                '%d', /* file_id */
-                '%s', /* encryption_key */
-                '%s', /* expiration_date */
-                '%s'  /* created_at */
-            ]
-        );
+        /* Loop through the selected users and insert encryption key for each */
+        foreach ($selected_users as $user_id)
+        {
+            $wpdb->insert(
+                $table_name,
+                [
+                    'user_id' => $user_id,
+                    'file_id' => $file_id,
+                    'encryption_key' => $encryption_key, /* Store the key as binary data */
+                    'expiration_date' => $expiration_date,
+                    'created_at' => current_time('mysql')
+                ],
+                [
+                    '%d', /* user_id */
+                    '%d', /* file_id */
+                    '%s', /* encryption_key */
+                    '%s', /* expiration_date */
+                    '%s'  /* created_at */
+                ]
+            );
+        }
     }
 
     /**
@@ -124,5 +128,6 @@ class EFS_Encryption
 
         return false;
     }
+
 
 }
