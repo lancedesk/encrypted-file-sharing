@@ -189,7 +189,7 @@ class EFS_Local_File_Handler
 
             if ($encrypted_file) {
                 /* Save the encryption key securely in the database */
-                $efs_file_encryption->save_encrypted_key($file_name, $encryption_key);
+                $efs_file_encryption->save_encrypted_key($user_id, $file_id, $encryption_key, $expiration_date);
 
                 /* Store the file's metadata with the target file path */
                 $this->save_file_metadata($file_name, $target_file);
