@@ -71,9 +71,9 @@ class EFS_File_Handler
      * Retrieve the encryption key for a file via the encryption class.
     */
 
-    public function get_encryption_key($file_name)
+    public function get_encryption_key($user_id, $file_name)
     {
-        return $this->efs_file_encryption->get_encryption_key($file_name);
+        return $this->efs_file_encryption->get_encryption_key($user_id, $file_name);
     }
 
     /**
@@ -215,6 +215,11 @@ class EFS_File_Handler
             $this->write_to_log('User not logged in.', $log_file);
             wp_send_json_error(array('message' => 'User not logged in.'));
         }
+
+        /* Get current user ID */
+        $current_user = wp_get_current_user();
+        $user_id = $current_user->ID; /* Retrieve user ID from current user */
+        $this->write_to_log('Current user ID: ' . $user_id, $log_file);
     
         /* Check if file ID is set */
         if (!isset($_POST['file_id'])) {
@@ -238,6 +243,7 @@ class EFS_File_Handler
             $this->write_to_log('File URL not found for file ID: ' . $file_id, $log_file);
             wp_send_json_error(array('message' => 'File URL not found.'));
         }
+
         $this->write_to_log('File URL: ' . $file_url, $log_file);
 
         /* Parse the file path */
@@ -253,11 +259,14 @@ class EFS_File_Handler
         }
 
         /* Retrieve the encryption key from the database */
-        $encryption_key = $this->get_encryption_key($file_name);  /* File name is used to store the key */
+        $encryption_key = $this->get_encryption_key($user_id, $file_name);  /* File name & id are used to store the key */
+
+        /* Check if the key was retrieved */
         if ($encryption_key === false) {
             $this->write_to_log('Encryption key not found for file: ' . $file_name, $log_file);
             wp_send_json_error(array('message' => 'Encryption key not found for file: ' . $file_name));
         }
+
         $this->write_to_log('Encryption key retrieved for file: ' . $file_name, $log_file);
 
         /* Decrypt the file */
