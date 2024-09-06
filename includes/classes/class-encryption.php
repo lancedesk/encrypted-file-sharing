@@ -112,22 +112,27 @@ class EFS_Encryption
      * Retrieve the encryption key for a file
     */
 
-    public function get_encryption_key($file_name)
+    public function get_encryption_key($user_id, $file_name)
     {
         global $wpdb;
+        $file_metadata_table = $wpdb->prefix . 'efs_file_metadata';
+        $encryption_keys_table = $wpdb->prefix . 'efs_encryption_keys';
 
-        $row = $wpdb->get_row(
-            $wpdb->prepare("SELECT encryption_key FROM {$wpdb->prefix}efs_encryption_keys WHERE file_name = %s", $file_name),
-            ARRAY_A
+        /* Query to get the encryption key for a specific user and file */
+        $query = $wpdb->prepare(
+            "SELECT ek.encryption_key
+            FROM $encryption_keys_table ek
+            INNER JOIN $file_metadata_table fm
+            ON ek.file_id = fm.id
+            WHERE ek.user_id = %d
+            AND fm.file_name = %s",
+            $user_id, $file_name
         );
 
-        if ($row) 
-        {
-            return $row['encryption_key'];
-        }
+        /* Execute the query and return the encryption key */
+        $encryption_key = $wpdb->get_var($query);
 
-        return false;
+        return $encryption_key;
     }
-
 
 }
