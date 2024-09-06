@@ -89,6 +89,11 @@ class EFS_Local_File_Handler
             wp_send_json_error(['message' => 'File ID is missing.']);
         }
 
+        /* Ensure post ID is provided */
+        if (!isset($_POST['post_id'])) {
+            wp_send_json_error(['message' => 'Post ID is missing.']);
+        }
+
         $file_id = intval($_POST['file_id']);
         $post_id = intval($_POST['post_id']);
 
@@ -105,7 +110,7 @@ class EFS_Local_File_Handler
         $this->log_message($log_file, 'Expiration date: ' . $expiration_date);
 
         /* Call the method to upload and encrypt the file locally */
-        $encrypted_file = $this->upload_to_local($file_path, $expiration_date);
+        $encrypted_file = $this->upload_to_local($file_path, $expiration_date, $post_id);
 
         /* Check if the file was uploaded and encrypted successfully */
         if ($encrypted_file) {
@@ -152,7 +157,7 @@ class EFS_Local_File_Handler
      * @return mixed The path to the encrypted file or false on failure.
     */
 
-    private function upload_to_local($file_path, $expiration_date)
+    private function upload_to_local($file_path, $expiration_date, $post_id)
     {
         global $efs_file_encryption;
 
@@ -196,12 +201,12 @@ class EFS_Local_File_Handler
                 if ($file_metadata['success']) {
                     $file_id = $file_metadata['file_id'];
 
-                    /* Now you can use $file_id */
-                    $efs_file_encryption->save_encrypted_key($user_id, $file_id, $encryption_key, $expiration_date);
-                }
+                    /* Get the selected users from post meta */
+                    $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
 
-                /* Save the encryption key securely in the database */
-                $efs_file_encryption->save_encrypted_key($user_id, $file_id, $encryption_key, $expiration_date);
+                    /* Save the encryption key securely in the database */
+                    $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $encryption_key, $expiration_date);
+                }
 
                 /* Log the successful encryption and upload */
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
