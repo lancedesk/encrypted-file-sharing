@@ -187,12 +187,21 @@ class EFS_Local_File_Handler
             /* Encrypt the file using the EFS_Encryption class */
             $encrypted_file = $efs_file_encryption->encrypt_file($target_file, $encryption_key);
 
-            if ($encrypted_file) {
-                /* Save the encryption key securely in the database */
-                $efs_file_encryption->save_encrypted_key($user_id, $file_id, $encryption_key, $expiration_date);
+            if ($encrypted_file)
+            {
 
                 /* Store the file's metadata with the target file path */
-                $this->save_file_metadata($file_name, $target_file);
+                $file_metadata = $this->save_file_metadata($file_name, $target_file);
+
+                if ($file_metadata['success']) {
+                    $file_id = $file_metadata['file_id'];
+
+                    /* Now you can use $file_id */
+                    $efs_file_encryption->save_encrypted_key($user_id, $file_id, $encryption_key, $expiration_date);
+                }
+
+                /* Save the encryption key securely in the database */
+                $efs_file_encryption->save_encrypted_key($user_id, $file_id, $encryption_key, $expiration_date);
 
                 /* Log the successful encryption and upload */
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
