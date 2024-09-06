@@ -237,7 +237,24 @@ class EFS_Local_File_Handler
             ]
         );
 
-        return $result !== false;
+        /* Retrieve the file ID of the inserted/updated row */
+        $file_id = $wpdb->insert_id;
+
+        /* Return an array containing the success status and file_id */
+        if ($result !== false)
+        {
+            return [
+                'success' => true,
+                'file_id' => $file_id
+            ];
+        }
+        else
+        {
+            return [
+                'success' => false,
+                'file_id' => null
+            ];
+        }
     }
 
     /**
