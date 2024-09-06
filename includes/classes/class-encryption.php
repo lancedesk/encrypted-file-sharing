@@ -72,19 +72,34 @@ class EFS_Encryption
     }
     
     /**
-     * Save the encrypted symmetric key in the database
+     * Save the encrypted symmetric key for a specific user and file.
+     *
+     * @param int $user_id The ID of the user.
+     * @param int $file_id The ID of the file (from `efs_file_metadata`).
+     * @param string $encryption_key The encrypted key to be saved.
+     * @param string $expiration_date The expiration date of the encryption key.
     */
 
-    public function save_encrypted_key($file_name, $encryption_key)
+    public function save_encrypted_key($user_id, $file_id, $encryption_key, $expiration_date)
     {
         global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_encryption_keys';
 
         $wpdb->insert(
-            $wpdb->prefix . 'efs_encryption_keys',
+            $table_name,
             [
-                'file_name' => $file_name,
+                'user_id' => $user_id,
+                'file_id' => $file_id,
                 'encryption_key' => $encryption_key, /* Store the key as binary data */
+                'expiration_date' => $expiration_date,
                 'created_at' => current_time('mysql')
+            ],
+            [
+                '%d', /* user_id */
+                '%d', /* file_id */
+                '%s', /* encryption_key */
+                '%s', /* expiration_date */
+                '%s'  /* created_at */
             ]
         );
     }
@@ -109,6 +124,5 @@ class EFS_Encryption
 
         return false;
     }
-
 
 }
