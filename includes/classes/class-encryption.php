@@ -70,31 +70,6 @@ class EFS_Encryption
 
         return $decrypted_data;
     }
-
-    /**
-     * Create the `efs_encryption_keys` table in the database.
-     * This method is called during plugin activation.
-    */
-
-    public function efs_create_encryption_keys_table()
-    {
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'efs_encryption_keys';
-        $charset_collate = $wpdb->get_charset_collate();
-
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            id INT NOT NULL AUTO_INCREMENT,
-            file_name VARCHAR(255) NOT NULL,
-            encryption_key BLOB NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            UNIQUE KEY file_name (file_name)
-        ) $charset_collate;";
-
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql); /* Ensures the table is created or updated if it already exists */
-    }
     
     /**
      * Save the encrypted symmetric key in the database
