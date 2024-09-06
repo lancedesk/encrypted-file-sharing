@@ -191,8 +191,8 @@ class EFS_Local_File_Handler
                 /* Save the encryption key securely in the database */
                 $efs_file_encryption->save_encrypted_key($file_name, $encryption_key);
 
-                /* Store the file's expiration date */
-                $this->save_file_metadata($file_name, $expiration_date);
+                /* Store the file's metadata with the target file path */
+                $this->save_file_metadata($file_name, $target_file);
 
                 /* Log the successful encryption and upload */
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
