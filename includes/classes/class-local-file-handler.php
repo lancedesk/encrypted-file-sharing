@@ -239,7 +239,7 @@ class EFS_Local_File_Handler
      * @param string $message The message to log
     */
 
-    private function log_message($file, $message)
+    public function log_message($file, $message)
     {
         if (file_exists($file)) 
         {
