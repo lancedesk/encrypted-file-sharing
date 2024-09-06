@@ -62,7 +62,7 @@ class EFS_Init
      * Create the database table for storing admin user information.
     */
 
-    public function create_admin_table()
+    public function efs_create_admin_table()
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'efs_admin_users';
