@@ -7,7 +7,7 @@
  * Author URI:      https://profiles.wordpress.org/lancedesk/
  * Text Domain:     encrypted-file-sharing
  * Domain Path:     /languages
- * Version:         1.1.9
+ * Version:         1.2.1
  *
  * @package         encrypted-file-sharing
 */
