@@ -160,7 +160,11 @@ class EFS_Encryption
     }
 
     /**
-     * Retrieve the encryption key for a file
+     * Retrieve and decrypt the Data Encryption Key (DEK) for a file.
+     *
+     * @param int $user_id The ID of the user who owns the file.
+     * @param string $file_name The name of the file for which the DEK is needed.
+     * @return string|false Returns the decrypted DEK if successful, false on failure.
     */
 
     public function get_encryption_key($user_id, $file_name)
@@ -169,9 +173,9 @@ class EFS_Encryption
         $file_metadata_table = $wpdb->prefix . 'efs_file_metadata';
         $encryption_keys_table = $wpdb->prefix . 'efs_encryption_keys';
 
-        /* Query to get the encryption key for a specific user and file */
+        /* Query to get the encrypted DEK and KEK for the specific user and file */
         $query = $wpdb->prepare(
-            "SELECT ek.encryption_key
+            "SELECT ek.encryption_key, ek.user_kek
             FROM $encryption_keys_table ek
             INNER JOIN $file_metadata_table fm
             ON ek.file_id = fm.id
@@ -180,10 +184,37 @@ class EFS_Encryption
             $user_id, $file_name
         );
 
-        /* Execute the query and return the encryption key */
-        $encryption_key = $wpdb->get_var($query);
+        $result = $wpdb->get_row($query);
 
-        return $encryption_key;
+        if (!$result) {
+            /* No key found for the specified user and file */
+            return false;
+        }
+
+        $encrypted_dek = $result->encryption_key;
+        $encrypted_kek = $result->user_kek;
+
+        /* Retrieve the master key */
+        $master_key = $this->get_master_key();
+
+        if ($master_key === false) {
+            return false;
+        }
+
+        /* Decrypt the KEK using the master key */
+        $iv = substr(base64_decode($encrypted_kek), 0, 16); /* Use the first 16 bytes of encrypted KEK as IV */
+        $decrypted_kek = openssl_decrypt($encrypted_kek, 'AES-256-CBC', $master_key, 0, $iv);
+        if ($decrypted_kek === false) {
+            return false;
+        }
+
+        /* Decrypt the DEK using the decrypted KEK */
+        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, 0, $iv);
+        if ($decrypted_dek === false) {
+            return false;
+        }
+
+        return $decrypted_dek; /* Return the decrypted DEK */
     }
 
 }
