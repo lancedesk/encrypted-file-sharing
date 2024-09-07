@@ -8,6 +8,57 @@ class EFS_Encryption
     }
 
     /**
+     * Save the encrypted symmetric key for a specific user and file.
+     *
+     * @param int $user_id The ID of the user.
+     * @param int $file_id The ID of the file (from `efs_file_metadata`).
+     * @param string $data_encryption_key The encrypted key to be saved.
+     * @param string $expiration_date The expiration date of the encryption key.
+    */
+
+    public function save_encrypted_key($selected_users, $file_id, $data_encryption_key, $expiration_date)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_encryption_keys';
+
+        /* Loop through the selected users and insert encryption key for each */
+        foreach ($selected_users as $user_id)
+        {
+            /* Generate a unique Key Encryption Key (KEK) for each user */
+            $user_kek = openssl_random_pseudo_bytes(32); /* 256-bit key */
+
+            /* Use the first 16 bytes of KEK as the IV for AES-256-CBC */
+            $iv = substr($user_kek, 0, 16);
+
+            /* Encrypt the DEK with the user's KEK using AES-256-CBC */
+            $encrypted_dek = openssl_encrypt($data_encryption_key, 'AES-256-CBC', $user_kek, 0, $iv);
+
+            if ($encrypted_dek === false) {
+                // Log error or handle the encryption failure
+                continue;
+            }
+
+            $wpdb->insert(
+                $table_name,
+                [
+                    'user_id' => $user_id,
+                    'file_id' => $file_id,
+                    'encryption_key' => $encrypted_dek, /* Store encrypted DEK */
+                    'expiration_date' => $expiration_date,
+                    'created_at' => current_time('mysql')
+                ],
+                [
+                    '%d', /* user_id */
+                    '%d', /* file_id */
+                    '%s', /* encrypted_dek */
+                    '%s', /* expiration_date */
+                    '%s'  /* created_at */
+                ]
+            );
+        }
+    }
+
+    /**
      * Encrypt the file using OpenSSL.
      *
      * @param string $file_path The file path to encrypt.
@@ -72,43 +123,6 @@ class EFS_Encryption
         }
 
         return $decrypted_data;
-    }
-    
-    /**
-     * Save the encrypted symmetric key for a specific user and file.
-     *
-     * @param int $user_id The ID of the user.
-     * @param int $file_id The ID of the file (from `efs_file_metadata`).
-     * @param string $encryption_key The encrypted key to be saved.
-     * @param string $expiration_date The expiration date of the encryption key.
-    */
-
-    public function save_encrypted_key($selected_users, $file_id, $encryption_key, $expiration_date)
-    {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'efs_encryption_keys';
-
-        /* Loop through the selected users and insert encryption key for each */
-        foreach ($selected_users as $user_id)
-        {
-            $wpdb->insert(
-                $table_name,
-                [
-                    'user_id' => $user_id,
-                    'file_id' => $file_id,
-                    'encryption_key' => $encryption_key, /* Store the key as binary data */
-                    'expiration_date' => $expiration_date,
-                    'created_at' => current_time('mysql')
-                ],
-                [
-                    '%d', /* user_id */
-                    '%d', /* file_id */
-                    '%s', /* encryption_key */
-                    '%s', /* expiration_date */
-                    '%s'  /* created_at */
-                ]
-            );
-        }
     }
 
     /**
