@@ -34,16 +34,20 @@ class EFS_Encryption
             $encrypted_dek = openssl_encrypt($data_encryption_key, 'AES-256-CBC', $user_kek, 0, $iv);
 
             if ($encrypted_dek === false) {
-                // Log error or handle the encryption failure
+                /* Log error or handle the encryption failure later */
                 continue;
             }
 
+            $encrypted_kek = openssl_encrypt($user_kek, 'AES-256-CBC', $master_key, 0, $iv);  /* Encrypt KEK with a master key */
+
+            /* Save the encrypted DEK and KEK */
             $wpdb->insert(
                 $table_name,
                 [
                     'user_id' => $user_id,
                     'file_id' => $file_id,
                     'encryption_key' => $encrypted_dek, /* Store encrypted DEK */
+                    'user_kek' => $encrypted_kek,  /* Save encrypted KEK */
                     'expiration_date' => $expiration_date,
                     'created_at' => current_time('mysql')
                 ],
@@ -51,6 +55,7 @@ class EFS_Encryption
                     '%d', /* user_id */
                     '%d', /* file_id */
                     '%s', /* encrypted_dek */
+                    '%s', /* user_kek */
                     '%s', /* expiration_date */
                     '%s'  /* created_at */
                 ]
@@ -95,15 +100,28 @@ class EFS_Encryption
         return $output_file;
     }
 
+    public function get_master_key() 
+    {
+        $master_key = get_option('efs_master_key');
+
+        if ($master_key === false) 
+        {
+            /* Handle the case where the master key doesn't exist (error or regeneration) */
+            return false;
+        }
+
+        return base64_decode($master_key);
+    }
+
     /**
      * Decrypt an encrypted file using OpenSSL.
      *
      * @param string $encrypted_file_path The path to the encrypted file.
-     * @param string $encryption_key The encryption key to decrypt the file.
+     * @param string $encrypted_dek The encryption key to decrypt the file.
      * @return string|false The decrypted file contents on success, false on failure.
     */
 
-    public function decrypt_file($encrypted_file_path, $encryption_key)
+    public function decrypt_file($encrypted_file_path, $encrypted_dek)
     {
         /* Read the encrypted file data */
         $encrypted_data = file_get_contents($encrypted_file_path);
@@ -116,7 +134,7 @@ class EFS_Encryption
         $ciphertext = substr($encrypted_data, 16);
 
         /* Decrypt the file content */
-        $decrypted_data = openssl_decrypt($ciphertext, 'AES-256-CBC', $encryption_key, 0, $iv);
+        $decrypted_data = openssl_decrypt($ciphertext, 'AES-256-CBC', $encrypted_dek, 0, $iv);
 
         if ($decrypted_data === false) {
             return false;
