@@ -160,7 +160,6 @@ class EFS_Local_File_Handler
     private function upload_to_local($file_path, $expiration_date, $post_id)
     {
         global $efs_file_encryption;
-
         $upload_dir = ABSPATH . '../private_uploads/';
 
         /* Log the received file and expiration date */
