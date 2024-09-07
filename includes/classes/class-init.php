@@ -124,7 +124,7 @@ class EFS_Init
         /* Check if the master key already exists */
         $master_key = get_option('efs_master_key');
 
-        if ($master_key === false) 
+        if ($master_key === false || empty($master_key)) 
         {
             /* Generate a 256-bit master key */
             $master_key = base64_encode(openssl_random_pseudo_bytes(32));
