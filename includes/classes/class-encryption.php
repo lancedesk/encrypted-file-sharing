@@ -273,7 +273,8 @@ class EFS_Encryption
         $dek_iv = substr($decrypted_kek, 0, 16);
 
         /* Decrypt the DEK using the decrypted KEK */
-        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, OPENSSL_RAW_DATA, $iv);
+        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, 0, $dek_iv);
+        /* $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, OPENSSL_RAW_DATA, $iv); */
 
         if ($decrypted_dek === false) {
             $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name.");
