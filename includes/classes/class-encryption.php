@@ -264,7 +264,7 @@ class EFS_Encryption
         $decrypted_kek = openssl_decrypt($encrypted_kek, 'AES-256-CBC', $master_key, 0, $iv);
 
         if ($decrypted_kek === false) {
-            $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name.");
+            $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
             return false;
         }
 
@@ -279,7 +279,7 @@ class EFS_Encryption
         $this->log_message("DEK IV: " . bin2hex($dek_iv));
 
         if ($decrypted_dek === false) {
-            $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name.");
+            $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
             return false;
         }
 
