@@ -79,6 +79,10 @@ class EFS_Encryption
                 continue;
             }
 
+            /* Base64 encode the encrypted DEK and KEK before saving */
+            $encrypted_dek = base64_encode($encrypted_dek);
+            $encrypted_kek = base64_encode($encrypted_kek);
+
             /* Save the encrypted DEK and KEK */
             $result = $wpdb->insert(
                 $table_name,
