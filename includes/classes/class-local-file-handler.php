@@ -187,8 +187,11 @@ class EFS_Local_File_Handler
         if (copy($file_path, $target_file)) {
             $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
 
+            /* Generate a random DEK (256-bit key for AES encryption) */
+            $data_encryption_key = openssl_random_pseudo_bytes(32);
+
             /* Encrypt the file using the EFS_Encryption class */
-            $encrypted_file = $efs_file_encryption->encrypt_file($target_file);
+            $encrypted_file = $efs_file_encryption->encrypt_file($target_file, $data_encryption_key);
 
             if ($encrypted_file)
             {
@@ -205,7 +208,7 @@ class EFS_Local_File_Handler
                     /* Save the encryption key securely for all selected users in the database */
                     if (!empty($selected_users) && is_array($selected_users))
                     {
-                        $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $encryption_key, $expiration_date);
+                        $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $data_encryption_key, $expiration_date);
                     }
                 }
 
