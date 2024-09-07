@@ -246,18 +246,23 @@ class EFS_Encryption
             return false;
         }
 
-        /* Decrypt the KEK using the master key */
-        $iv = openssl_random_pseudo_bytes(16); /* Generate a new IV */
-        $decrypted_kek = openssl_decrypt(base64_decode($encrypted_kek), 'AES-256-CBC', $master_key, 0, $iv);
+        /* Decode the base64 encoded KEK and DEK */
+        $encrypted_kek = base64_decode($encrypted_kek);
+        $encrypted_dek = base64_decode($encrypted_dek);
 
-        if ($decrypted_kek === false)
-        {
+        /* Use the first 16 bytes of KEK as IV (since it was used for encryption) */
+        $iv = substr($encrypted_kek, 0, 16);
+
+        /* Decrypt the KEK using the master key */
+        $decrypted_kek = openssl_decrypt(substr($encrypted_kek, 16), 'AES-256-CBC', $master_key, OPENSSL_RAW_DATA, $iv);
+
+        if ($decrypted_kek === false) {
             $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name.");
             return false;
         }
 
         /* Decrypt the DEK using the decrypted KEK */
-        $decrypted_dek = openssl_decrypt(base64_decode($encrypted_dek), 'AES-256-CBC', $decrypted_kek, 0, $iv);
+        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, OPENSSL_RAW_DATA, $iv);
 
         if ($decrypted_dek === false) {
             $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name.");
