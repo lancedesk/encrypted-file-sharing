@@ -11,14 +11,17 @@ class EFS_Encryption
      * Encrypt the file using OpenSSL.
      *
      * @param string $file_path The file path to encrypt.
-     * @param string $encryption_key A key to encrypt the file.
+     * @param string $data_encryption_key A key to encrypt the file.
      * @return string|false The path to the encrypted file on success, false on failure.
     */
 
-    public function encrypt_file($file_path, $encryption_key)
+    public function encrypt_file($file_path, &$data_encryption_key)
     {
         $output_file = $file_path . '.enc';
         $iv = openssl_random_pseudo_bytes(16); /* Initialization vector for AES-256-CBC */
+
+        /* Generate a random DEK (256-bit key for AES encryption) */
+        $data_encryption_key = openssl_random_pseudo_bytes(32);
 
         /* Read the file content */
         $file_data = file_get_contents($file_path);
@@ -26,8 +29,8 @@ class EFS_Encryption
             return false;
         }
 
-        /* Encrypt the file content */
-        $encrypted_data = openssl_encrypt($file_data, 'AES-256-CBC', $encryption_key, 0, $iv);
+        /* Encrypt the file content using the DEK */
+        $encrypted_data = openssl_encrypt($file_data, 'AES-256-CBC', $data_encryption_key, 0, $iv);
         if ($encrypted_data === false) {
             return false;
         }
