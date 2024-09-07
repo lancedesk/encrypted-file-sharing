@@ -109,6 +109,13 @@ class EFS_Encryption
         return $output_file;
     }
 
+    /**
+     * Retrieves and decodes the stored master key from the WordPress options table.
+     *
+     * @return string|false Returns the decoded master key as a string if successful,
+     *                      or false if the master key doesn't exist.
+    */
+
     public function get_master_key() 
     {
         $master_key = get_option('efs_master_key');
