@@ -155,9 +155,12 @@ class EFS_Encryption
             return false;
         }
 
-        /* Decode the base64 encoded KEK and DEK */
+        /* Decode the base64 encoded KEK and DEK
         $encrypted_kek = base64_decode($result->encryption_key);
         $encrypted_dek = base64_decode($result->user_kek);
+        */
+        $encrypted_kek = $result->encryption_key;
+        $encrypted_dek = $result->user_kek;
 
         /* Log more information about the encrypted data */
         $this->log_message("Raw Encrypted DEK: " . bin2hex($encrypted_dek));
@@ -166,29 +169,40 @@ class EFS_Encryption
         /* Use the first 16 bytes of KEK as IV (since it was used for encryption) */
         $iv = substr($encrypted_kek, 0, 16);
 
-        /* Decrypt the KEK using the master key */
+        /* Decrypt the KEK using the master key
         $decrypted_kek = openssl_decrypt($encrypted_kek, 'AES-256-CBC', $master_key, 0, $iv);
 
         if ($decrypted_kek === false) {
             $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
             return false;
         }
+        */
 
-        /* Use the first 16 bytes of the decrypted KEK as the IV for DEK decryption */
+        /* Use the first 16 bytes of the decrypted KEK as the IV for DEK decryption
         $dek_iv = substr($decrypted_kek, 0, 16);
+        */
 
-        /* Log decrypted KEK */
+        /* Log decrypted KEK
         $this->log_message("Decrypted KEK: " . bin2hex($decrypted_kek));
+        */
 
-        /* Decrypt the DEK using the decrypted KEK */
+        /* Decrypt the DEK using the decrypted KEK
         $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, 0, $dek_iv);
+        */
 
-        $this->log_message("Encrypted DEK: " . base64_encode($encrypted_dek));
-        $this->log_message("Decrypted KEK: " . bin2hex($decrypted_kek));
+        /* Decrypt the DEK using the KEK */
+        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $user_kek, 0, $iv);
+
+        /*
         $this->log_message("DEK IV: " . bin2hex($dek_iv));
-        /* Log IV and key lengths for debugging */
+        $this->log_message("Decrypted KEK: " . bin2hex($decrypted_kek));
         $this->log_message("Decrypted KEK length: " . strlen($decrypted_kek));
         $this->log_message("DEK IV length: " . strlen($dek_iv));
+        */
+
+        $this->log_message("Encrypted DEK: " . base64_encode($encrypted_dek));
+        
+        /* Log IV and key lengths for debugging */
 
         if ($decrypted_dek === false) {
             $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
