@@ -40,18 +40,6 @@ class EFS_Encryption
         $this->log_message("Data Encryption Key received: $data_encryption_key");
         $this->log_message("Expiration date: $expiration_date");
 
-        /* Retrieve the master key */
-        $master_key = $this->get_master_key();
-
-        if ($master_key === false) {
-            /* Log error if master key retrieval fails */
-            $this->log_message("Error: Master key retrieval failed.");
-            return;
-        }
-
-        /* Log master key retrieval success */
-        $this->log_message("Master key retrieved successfully.");
-
         /* Loop through the selected users and insert encryption key for each */
         foreach ($selected_users as $user_id)
         {
@@ -70,15 +58,6 @@ class EFS_Encryption
                 continue;
             }
 
-            /* Encrypt KEK with a master key */
-            $encrypted_kek = openssl_encrypt($user_kek, 'AES-256-CBC', $master_key, 0, $iv);
-
-            if ($encrypted_kek === false) {
-                /* Log encryption failure */
-                $this->log_message("Error: Encryption of KEK failed for user ID: $user_id.");
-                continue;
-            }
-
             /* Save the encrypted DEK and KEK */
             $result = $wpdb->insert(
                 $table_name,
@@ -86,7 +65,7 @@ class EFS_Encryption
                     'user_id' => $user_id,
                     'file_id' => $file_id,
                     'encryption_key' => $encrypted_dek, /* Store encrypted DEK */
-                    'user_kek' => $encrypted_kek,  /* Save encrypted KEK */
+                    'user_kek' => $user_kek,  /* Save user KEK */
                     'expiration_date' => $expiration_date,
                     'created_at' => current_time('mysql')
                 ],
@@ -144,51 +123,15 @@ class EFS_Encryption
             return false;
         }
 
-        /* Retrieve the master key */
-        $master_key = $this->get_master_key();
-
-        if ($master_key === false) {
-            return false;
-        }
-
-        /* Decode the base64 encoded KEK and DEK */
-        $encrypted_kek = $result->user_kek;
+        /* Get user KEK and encrypted DEK from the database */
+        $user_kek = $result->user_kek;
         $encrypted_dek = $result->encryption_key;
 
-        /* Log more information about the encrypted data */
-        $this->log_message("Raw Encrypted DEK: " . bin2hex($encrypted_dek));
-        $this->log_message("Raw Encrypted KEK: " . bin2hex($encrypted_kek));
-
         /* Use the first 16 bytes of KEK as IV (since it was used for encryption) */
-        $iv = substr($encrypted_kek, 0, 16);
+        $iv = substr($user_kek, 0, 16);
 
-        /* Decrypt the KEK using the master key */
-        $decrypted_kek = openssl_decrypt($encrypted_kek, 'AES-256-CBC', $master_key, 0, $iv);
-
-        if ($decrypted_kek === false) {
-            $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
-            return false;
-        }
-
-        /* Use the first 16 bytes of the decrypted KEK as the IV for DEK decryption */
-        $dek_iv = substr($decrypted_kek, 0, 16);
-
-        /* Log decrypted KEK */
-        $this->log_message("Decrypted KEK: " . bin2hex($decrypted_kek));
-
-        /* Decrypt the DEK using the decrypted KEK */
-        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, 0, $dek_iv);
-
-        /* Decrypt the DEK using the KEK */
-        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $encrypted_kek, 0, $iv);
-
-        /* Log more information for debugging */
-        $this->log_message("DEK IV: " . bin2hex($dek_iv));
-        $this->log_message("Decrypted KEK: " . bin2hex($decrypted_kek));
-        $this->log_message("Decrypted KEK length: " . strlen($decrypted_kek));
-        $this->log_message("DEK IV length: " . strlen($dek_iv));
-
-        $this->log_message("Encrypted DEK: " . base64_encode($encrypted_dek));
+        /* Decrypt the DEK using KEK */
+        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $user_kek, 0, $iv);
         
         /* Log IV and key lengths for debugging */
         if ($decrypted_dek === false) {
