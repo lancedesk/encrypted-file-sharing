@@ -269,6 +269,9 @@ class EFS_Encryption
             return false;
         }
 
+        /* Use the first 16 bytes of the decrypted KEK as the IV for DEK decryption */
+        $dek_iv = substr($decrypted_kek, 0, 16);
+
         /* Decrypt the DEK using the decrypted KEK */
         $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, OPENSSL_RAW_DATA, $iv);
 
