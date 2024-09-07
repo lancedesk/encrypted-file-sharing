@@ -160,11 +160,19 @@ class EFS_Encryption
 
         if ($master_key === false) 
         {
-            /* Handle the case where the master key doesn't exist (error or regeneration) */
+            error_log('Master key not found.');
             return false;
         }
 
-        return base64_decode($master_key);
+        $decoded_key = base64_decode($master_key);
+
+        if ($decoded_key === false) 
+        {
+            error_log('Failed to decode master key.');
+            return false;
+        }
+
+        return $decoded_key;
     }
 
     /**
