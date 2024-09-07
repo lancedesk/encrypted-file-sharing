@@ -185,7 +185,9 @@ class EFS_Encryption
     {
         /* Read the encrypted file data */
         $encrypted_data = file_get_contents($encrypted_file_path);
+
         if ($encrypted_data === false) {
+            $this->log_message("Error: Unable to read encrypted file.");
             return false;
         }
 
@@ -197,6 +199,7 @@ class EFS_Encryption
         $decrypted_data = openssl_decrypt($ciphertext, 'AES-256-CBC', $decrypted_dek, 0, $iv);
 
         if ($decrypted_data === false) {
+            $this->log_message("Error: Decryption failed.");
             return false;
         }
 
