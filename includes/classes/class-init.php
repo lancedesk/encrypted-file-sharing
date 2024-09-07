@@ -47,6 +47,7 @@ class EFS_Init
             user_id INT NOT NULL,
             file_id INT NOT NULL,  -- Reference to the file in `efs_file_metadata`
             encryption_key BLOB NOT NULL,
+            user_kek BLOB NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             expiration_date DATETIME NOT NULL,
             download_date DATETIME DEFAULT NULL,
@@ -87,6 +88,7 @@ class EFS_Init
 
     public function efs_create_private_folder() 
     {
+
         /* Path outside the web root */
         $private_dir = ABSPATH . '../private_uploads/';
 
@@ -113,6 +115,22 @@ class EFS_Init
         {
             /* Log that the folder already exists */
             $this->log_message($log_file, 'Private uploads folder already exists at: ' . realpath($private_dir));
+        }
+    }
+
+    private function log_message($file, $message)
+    {
+        if (file_exists($file)) 
+        {
+            $current = file_get_contents($file);
+            $current .= "[" . date('Y-m-d H:i:s') . "] " . $message . "\n";
+            file_put_contents($file, $current);
+        } 
+        else 
+        {
+            $timestamp = date('Y-m-d H:i:s');
+            $log_message = $timestamp . ' - ' . $message . PHP_EOL;
+            file_put_contents($file, $log_message, FILE_APPEND);
         }
     }
 }
