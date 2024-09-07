@@ -80,7 +80,7 @@ class EFS_Encryption
             }
 
             /* Base64 encode the encrypted DEK and KEK before saving */
-            $encrypted_dek = base64_encode($encrypted_dek);
+            /* $encrypted_dek = base64_encode($encrypted_dek); */
             $encrypted_kek = base64_encode($encrypted_kek);
 
             /* Save the encrypted DEK and KEK */
@@ -90,7 +90,7 @@ class EFS_Encryption
                     'user_id' => $user_id,
                     'file_id' => $file_id,
                     'encryption_key' => $encrypted_dek, /* Store encrypted DEK */
-                    'user_kek' => $encrypted_kek,  /* Save encrypted KEK */
+                    'user_kek' => $user_kek,  /* Save encrypted KEK */
                     'expiration_date' => $expiration_date,
                     'created_at' => current_time('mysql')
                 ],
@@ -112,6 +112,90 @@ class EFS_Encryption
                 $this->log_message("Successfully saved encrypted keys for user ID: $user_id.");
             }
         }
+    }
+
+
+    /**
+     * Retrieve and decrypt the Data Encryption Key (DEK) for a file.
+     *
+     * @param int $user_id The ID of the user who owns the file.
+     * @param string $file_name The name of the file for which the DEK is needed.
+     * @return string|false Returns the decrypted DEK if successful, false on failure.
+    */
+
+    public function get_encryption_key($user_id, $file_name)
+    {
+        global $wpdb;
+        $file_metadata_table = $wpdb->prefix . 'efs_file_metadata';
+        $encryption_keys_table = $wpdb->prefix . 'efs_encryption_keys';
+
+        /* Query to get the encrypted DEK and KEK for the specific user and file */
+        $query = $wpdb->prepare(
+            "SELECT ek.encryption_key, ek.user_kek
+            FROM $encryption_keys_table ek
+            INNER JOIN $file_metadata_table fm
+            ON ek.file_id = fm.id
+            WHERE ek.user_id = %d
+            AND fm.file_name = %s",
+            $user_id, $file_name
+        );
+
+        $result = $wpdb->get_row($query);
+
+        if (!$result) {
+            /* No key found for the specified user and file */
+            $this->log_message("No key found for user ID $user_id and file name $file_name.");
+            return false;
+        }
+
+        /* Retrieve the master key */
+        $master_key = $this->get_master_key();
+
+        if ($master_key === false) {
+            return false;
+        }
+
+        /* Decode the base64 encoded KEK and DEK */
+        $encrypted_kek = base64_decode($result->encryption_key);
+        $encrypted_dek = base64_decode($result->user_kek);
+
+        /* Log more information about the encrypted data */
+        $this->log_message("Raw Encrypted DEK: " . bin2hex($encrypted_dek));
+        $this->log_message("Raw Encrypted KEK: " . bin2hex($encrypted_kek));
+
+        /* Use the first 16 bytes of KEK as IV (since it was used for encryption) */
+        $iv = substr($encrypted_kek, 0, 16);
+
+        /* Decrypt the KEK using the master key */
+        $decrypted_kek = openssl_decrypt($encrypted_kek, 'AES-256-CBC', $master_key, 0, $iv);
+
+        if ($decrypted_kek === false) {
+            $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
+            return false;
+        }
+
+        /* Use the first 16 bytes of the decrypted KEK as the IV for DEK decryption */
+        $dek_iv = substr($decrypted_kek, 0, 16);
+
+        /* Log decrypted KEK */
+        $this->log_message("Decrypted KEK: " . bin2hex($decrypted_kek));
+
+        /* Decrypt the DEK using the decrypted KEK */
+        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, 0, $dek_iv);
+
+        $this->log_message("Encrypted DEK: " . base64_encode($encrypted_dek));
+        $this->log_message("Decrypted KEK: " . bin2hex($decrypted_kek));
+        $this->log_message("DEK IV: " . bin2hex($dek_iv));
+        /* Log IV and key lengths for debugging */
+        $this->log_message("Decrypted KEK length: " . strlen($decrypted_kek));
+        $this->log_message("DEK IV length: " . strlen($dek_iv));
+
+        if ($decrypted_dek === false) {
+            $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
+            return false;
+        }
+
+        return $decrypted_dek; /* Return the decrypted DEK */
     }
 
     /**
@@ -208,86 +292,6 @@ class EFS_Encryption
         }
 
         return $decrypted_data; /* Return the decrypted file content */
-    }
-
-    /**
-     * Retrieve and decrypt the Data Encryption Key (DEK) for a file.
-     *
-     * @param int $user_id The ID of the user who owns the file.
-     * @param string $file_name The name of the file for which the DEK is needed.
-     * @return string|false Returns the decrypted DEK if successful, false on failure.
-    */
-
-    public function get_encryption_key($user_id, $file_name)
-    {
-        global $wpdb;
-        $file_metadata_table = $wpdb->prefix . 'efs_file_metadata';
-        $encryption_keys_table = $wpdb->prefix . 'efs_encryption_keys';
-
-        /* Query to get the encrypted DEK and KEK for the specific user and file */
-        $query = $wpdb->prepare(
-            "SELECT ek.encryption_key, ek.user_kek
-            FROM $encryption_keys_table ek
-            INNER JOIN $file_metadata_table fm
-            ON ek.file_id = fm.id
-            WHERE ek.user_id = %d
-            AND fm.file_name = %s",
-            $user_id, $file_name
-        );
-
-        $result = $wpdb->get_row($query);
-
-        if (!$result) {
-            /* No key found for the specified user and file */
-            $this->log_message("No key found for user ID $user_id and file name $file_name.");
-            return false;
-        }
-
-        $encrypted_dek = $result->encryption_key;
-        $encrypted_kek = $result->user_kek;
-
-        /* Retrieve the master key */
-        $master_key = $this->get_master_key();
-
-        if ($master_key === false) {
-            return false;
-        }
-
-        /* Decode the base64 encoded KEK and DEK */
-        $encrypted_kek = base64_decode($encrypted_kek);
-        $encrypted_dek = base64_decode($encrypted_dek);
-
-        /* Use the first 16 bytes of KEK as IV (since it was used for encryption) */
-        $iv = substr($encrypted_kek, 0, 16);
-
-        /* Decrypt the KEK using the master key */
-        $decrypted_kek = openssl_decrypt($encrypted_kek, 'AES-256-CBC', $master_key, 0, $iv);
-
-        if ($decrypted_kek === false) {
-            $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
-            return false;
-        }
-
-        /* Use the first 16 bytes of the decrypted KEK as the IV for DEK decryption */
-        $dek_iv = substr($decrypted_kek, 0, 16);
-
-        /* Log IV and key lengths for debugging */
-        $this->log_message("Decrypted KEK length: " . strlen($decrypted_kek));
-        $this->log_message("DEK IV length: " . strlen($dek_iv));
-
-        /* Decrypt the DEK using the decrypted KEK */
-        $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, 0, $dek_iv);
-
-        $this->log_message("Encrypted DEK: " . base64_encode($encrypted_dek));
-        $this->log_message("Decrypted KEK: " . bin2hex($decrypted_kek));
-        $this->log_message("DEK IV: " . bin2hex($dek_iv));
-
-        if ($decrypted_dek === false) {
-            $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
-            return false;
-        }
-
-        return $decrypted_dek; /* Return the decrypted DEK */
     }
 
 }
