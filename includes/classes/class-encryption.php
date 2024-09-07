@@ -8,6 +8,19 @@ class EFS_Encryption
     }
 
     /**
+     * Logs messages to a file.
+     *
+     * @param string $message The message to log.
+    */
+
+    private function log_message($message)
+    {
+        $log_file = WP_CONTENT_DIR . '/efs_encryption_log.txt';
+        $timestamp = date('Y-m-d H:i:s');
+        file_put_contents($log_file, "[$timestamp] $message\n", FILE_APPEND);
+    }
+
+    /**
      * Save the encrypted symmetric key for a specific user and file.
      *
      * @param int $user_id The ID of the user.
