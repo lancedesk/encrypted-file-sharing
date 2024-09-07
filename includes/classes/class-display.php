@@ -37,6 +37,13 @@ public function render_user_files_shortcode($atts) {
 
         $query = new WP_Query($args);
 
+        $master_key = get_option('efs_master_key');
+
+        if (empty($master_key)) {
+            echo '<p>' . __('Error: Master key not found.', 'encrypted-file-sharing') . '</p>';
+            return;
+        }
+
         if ($query->have_posts()) {
             echo '<div class="efs-user-files">';
             
