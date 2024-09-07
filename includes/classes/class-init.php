@@ -130,7 +130,13 @@ class EFS_Init
             $master_key = base64_encode(openssl_random_pseudo_bytes(32));
 
             /* Save the master key to the WordPress options table */
-            add_option('efs_master_key', $master_key);
+            $saved = add_option('efs_master_key', $master_key);
+
+            if (!$saved) {
+                error_log('Failed to save the master key.');
+            } else {
+                error_log('Master key saved successfully.');
+            }
         }
     }
 
