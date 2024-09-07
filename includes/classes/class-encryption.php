@@ -271,6 +271,10 @@ class EFS_Encryption
         /* Use the first 16 bytes of the decrypted KEK as the IV for DEK decryption */
         $dek_iv = substr($decrypted_kek, 0, 16);
 
+        /* Log IV and key lengths for debugging */
+        $this->log_message("Decrypted KEK length: " . strlen($decrypted_kek));
+        $this->log_message("DEK IV length: " . strlen($dek_iv));
+
         /* Decrypt the DEK using the decrypted KEK */
         $decrypted_dek = openssl_decrypt($encrypted_dek, 'AES-256-CBC', $decrypted_kek, 0, $dek_iv);
 
