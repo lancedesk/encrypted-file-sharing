@@ -21,6 +21,14 @@ class EFS_Encryption
         global $wpdb;
         $table_name = $wpdb->prefix . 'efs_encryption_keys';
 
+        /* Retrieve the master key */
+        $master_key = $this->get_master_key();
+
+        if ($master_key === false) {
+            /* Handle error if master key retrieval fails */
+            return;
+        }
+
         /* Loop through the selected users and insert encryption key for each */
         foreach ($selected_users as $user_id)
         {
@@ -38,7 +46,8 @@ class EFS_Encryption
                 continue;
             }
 
-            $encrypted_kek = openssl_encrypt($user_kek, 'AES-256-CBC', $master_key, 0, $iv);  /* Encrypt KEK with a master key */
+            /* Encrypt KEK with a master key */
+            $encrypted_kek = openssl_encrypt($user_kek, 'AES-256-CBC', $master_key, 0, $iv);
 
             /* Save the encrypted DEK and KEK */
             $wpdb->insert(
