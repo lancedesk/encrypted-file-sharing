@@ -187,10 +187,8 @@ class EFS_Local_File_Handler
         if (copy($file_path, $target_file)) {
             $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
 
-            $encryption_key = openssl_random_pseudo_bytes(32); /* Generate a random encryption key (256-bit) */
-
             /* Encrypt the file using the EFS_Encryption class */
-            $encrypted_file = $efs_file_encryption->encrypt_file($target_file, $encryption_key);
+            $encrypted_file = $efs_file_encryption->encrypt_file($target_file);
 
             if ($encrypted_file)
             {
