@@ -118,6 +118,22 @@ class EFS_Init
         }
     }
 
+    /* Plugin activation hook to generate and save the master key */
+    public function efs_generate_master_key() 
+    {
+        /* Check if the master key already exists */
+        $master_key = get_option('efs_master_key');
+
+        if ($master_key === false) 
+        {
+            /* Generate a 256-bit master key */
+            $master_key = base64_encode(openssl_random_pseudo_bytes(32));
+
+            /* Save the master key to the WordPress options table */
+            add_option('efs_master_key', $master_key);
+        }
+    }
+
     private function log_message($file, $message)
     {
         if (file_exists($file)) 
