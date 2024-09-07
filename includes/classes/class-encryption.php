@@ -34,13 +34,23 @@ class EFS_Encryption
         global $wpdb;
         $table_name = $wpdb->prefix . 'efs_encryption_keys';
 
+        /* Log received parameters */
+        $this->log_message("Selected users: " . implode(', ', $selected_users));
+        $this->log_message("File ID: $file_id");
+        $this->log_message("Data Encryption Key received: $data_encryption_key");
+        $this->log_message("Expiration date: $expiration_date");
+
         /* Retrieve the master key */
         $master_key = $this->get_master_key();
 
         if ($master_key === false) {
-            /* Handle error if master key retrieval fails */
+            /* Log error if master key retrieval fails */
+            $this->log_message("Error: Master key retrieval failed.");
             return;
         }
+
+        /* Log master key retrieval success */
+        $this->log_message("Master key retrieved successfully.");
 
         /* Loop through the selected users and insert encryption key for each */
         foreach ($selected_users as $user_id)
@@ -55,15 +65,22 @@ class EFS_Encryption
             $encrypted_dek = openssl_encrypt($data_encryption_key, 'AES-256-CBC', $user_kek, 0, $iv);
 
             if ($encrypted_dek === false) {
-                /* Log error or handle the encryption failure later */
+                /* Log encryption failure */
+                $this->log_message("Error: Encryption of DEK failed for user ID: $user_id.");
                 continue;
             }
 
             /* Encrypt KEK with a master key */
             $encrypted_kek = openssl_encrypt($user_kek, 'AES-256-CBC', $master_key, 0, $iv);
 
+            if ($encrypted_kek === false) {
+                /* Log encryption failure */
+                $this->log_message("Error: Encryption of KEK failed for user ID: $user_id.");
+                continue;
+            }
+
             /* Save the encrypted DEK and KEK */
-            $wpdb->insert(
+            $result = $wpdb->insert(
                 $table_name,
                 [
                     'user_id' => $user_id,
@@ -82,6 +99,14 @@ class EFS_Encryption
                     '%s'  /* created_at */
                 ]
             );
+
+            if ($result === false) {
+                /* Log insertion failure */
+                $this->log_message("Error: Failed to insert data into database for user ID: $user_id.");
+            } else {
+                /* Log successful insertion */
+                $this->log_message("Successfully saved encrypted keys for user ID: $user_id.");
+            }
         }
     }
 
