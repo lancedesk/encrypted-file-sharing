@@ -130,14 +130,14 @@ class EFS_Encryption
     }
 
     /**
-     * Decrypt an encrypted file using OpenSSL.
+     * Decrypt the file using the decrypted DEK.
      *
      * @param string $encrypted_file_path The path to the encrypted file.
-     * @param string $encrypted_dek The encryption key to decrypt the file.
-     * @return string|false The decrypted file contents on success, false on failure.
+     * @param string $decrypted_dek The decrypted data encryption key.
+     * @return string|false Returns the decrypted file content if successful, false on failure.
     */
 
-    public function decrypt_file($encrypted_file_path, $encrypted_dek)
+    public function decrypt_file($encrypted_file_path, $decrypted_dek)
     {
         /* Read the encrypted file data */
         $encrypted_data = file_get_contents($encrypted_file_path);
@@ -149,14 +149,14 @@ class EFS_Encryption
         $iv = substr($encrypted_data, 0, 16);
         $ciphertext = substr($encrypted_data, 16);
 
-        /* Decrypt the file content */
-        $decrypted_data = openssl_decrypt($ciphertext, 'AES-256-CBC', $encrypted_dek, 0, $iv);
+        /* Decrypt the file content using the DEK */
+        $decrypted_data = openssl_decrypt($ciphertext, 'AES-256-CBC', $decrypted_dek, 0, $iv);
 
         if ($decrypted_data === false) {
             return false;
         }
 
-        return $decrypted_data;
+        return $decrypted_data; /* Return the decrypted file content */
     }
 
     /**
