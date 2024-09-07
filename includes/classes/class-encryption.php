@@ -79,10 +79,6 @@ class EFS_Encryption
                 continue;
             }
 
-            /* Base64 encode the encrypted DEK and KEK before saving */
-            $encrypted_dek = base64_encode($encrypted_dek);
-            $encrypted_kek = base64_encode($encrypted_kek);
-
             /* Save the encrypted DEK and KEK */
             $result = $wpdb->insert(
                 $table_name,
@@ -156,8 +152,8 @@ class EFS_Encryption
         }
 
         /* Decode the base64 encoded KEK and DEK */
-        $encrypted_kek = base64_decode($result->user_kek);
-        $encrypted_dek = base64_decode($result->encryption_key);
+        $encrypted_kek = $result->user_kek;
+        $encrypted_dek = $result->encryption_key;
 
         /* Log more information about the encrypted data */
         $this->log_message("Raw Encrypted DEK: " . bin2hex($encrypted_dek));
