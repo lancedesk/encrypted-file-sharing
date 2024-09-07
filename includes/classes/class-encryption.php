@@ -114,11 +114,10 @@ class EFS_Encryption
      * Encrypt the file using OpenSSL.
      *
      * @param string $file_path The file path to encrypt.
-     * @param string $data_encryption_key A key to encrypt the file.
      * @return string|false The path to the encrypted file on success, false on failure.
     */
 
-    public function encrypt_file($file_path, &$data_encryption_key)
+    public function encrypt_file($file_path)
     {
         $output_file = $file_path . '.enc';
         $iv = openssl_random_pseudo_bytes(16); /* Initialization vector for AES-256-CBC */
