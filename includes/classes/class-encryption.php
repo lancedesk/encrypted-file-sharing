@@ -46,6 +46,16 @@ class EFS_Encryption
             /* Generate a unique Key Encryption Key (KEK) for each user */
             $user_kek = openssl_random_pseudo_bytes(32); /* 256-bit key */
 
+            /* Encrypt the KEK with the master key */
+            $encrypted_kek = $this->encrypt_with_master_key($user_kek);
+
+            if ($encrypted_kek === false)
+            {
+                /* Log encryption failure */
+                $this->log_message("Error: Encryption of KEK failed for user ID: $user_id.");
+                continue;
+            }
+
             /* Use the first 16 bytes of KEK as the IV for AES-256-CBC */
             $iv = substr($user_kek, 0, 16);
 
