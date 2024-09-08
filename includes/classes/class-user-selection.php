@@ -87,8 +87,12 @@ class EFS_User_Selection
         if (isset($_POST['efs_user_selection']) && is_array($_POST['efs_user_selection'])) {
             $selected_users = array_map('intval', $_POST['efs_user_selection']);
             update_post_meta($post_id, '_efs_user_selection', $selected_users);
+
+            /* Set flag meta when user selection is fully saved */
+            update_post_meta($post_id, '_efs_user_selection_saved', true);
         } else {
             delete_post_meta($post_id, '_efs_user_selection');
         }
     }
+
 }
