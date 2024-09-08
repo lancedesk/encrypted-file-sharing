@@ -119,41 +119,64 @@ class EFS_Init
     }
 
     /**
-     * Generate and save the master key for encryption.
-     *
-     * This method will delete any existing master key, set it to false temporarily,
-     * generate a new 256-bit master key, and save it.
+     * Create the custom table for storing the master key.
     */
 
-    public function efs_generate_master_key() 
+    public function efs_create_master_key_table()
     {
-        /* Check if the master key already exists */
-        $master_key = get_option('efs_master_key');
+        global $wpdb;
 
-        if ($master_key !== false && !empty($master_key)) 
+        $table_name = $wpdb->prefix . 'efs_master_key';
+
+        /* SQL to create the table */
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE $table_name (
+            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            master_key BLOB NOT NULL,
+            PRIMARY KEY (id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
+    /**
+     * Generate and save the master key to the custom database table.
+    */
+
+    public function efs_generate_master_key()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_master_key';
+
+        /* Check if a master key already exists */
+        $existing_key = $wpdb->get_var("SELECT master_key FROM $table_name LIMIT 1");
+
+        if ($existing_key !== null)
         {
             /* Delete the existing master key */
-            $deleted = delete_option('efs_master_key');
+            $deleted = $wpdb->delete($table_name, array('id' => 1));
 
-            if (!$deleted)
+            if ($deleted === false)
             {
                 error_log('Failed to delete the existing master key.');
+                return;
             }
-            else
-            {
-                /* Set the master key to false temporarily */
-                update_option('efs_master_key', false);
-                error_log('Master key deleted and set to false temporarily.');
-            }
+
+            error_log('Master key deleted.');
         }
 
-        /* Generate and rerialize a new 256-bit master key as raw bytes */
-        $master_key = base64_encode(openssl_random_pseudo_bytes(32));
+        /* Generate a new master key */
+        $master_key = openssl_random_pseudo_bytes(32);
 
-        /* Save the serialized master key to the WordPress options table */
-        $saved = add_option('efs_master_key', $master_key);
+        /* Save the new master key */
+        $inserted = $wpdb->insert(
+            $table_name,
+            array('master_key' => $master_key),
+            array('%s')
+        );
 
-        if (!$saved)
+        if ($inserted === false)
         {
             error_log('Failed to save the new master key.');
         }
