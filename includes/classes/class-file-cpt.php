@@ -1,20 +1,13 @@
 <?php
 
-require_once 'class-user-selection.php'; /* Include the user selection class */
-
 class EFS_File_CPT
 {
-    private $file_handler; /* File handler instance */
-    private $user_selection; /* User selection instance */
-
     /**
      * Constructor to initialize actions and hooks.
     */
 
     public function __construct()
     {
-        $this->user_selection = new EFS_User_Selection(); /* Instantiate user selection */
-
         /* Hook for initializing the custom post type */
         add_action('init', [$this, 'register_file_cpt']);
 
@@ -148,8 +141,8 @@ class EFS_File_CPT
         /* Handle file upload */
         if (isset($_FILES['file']) && !empty($_FILES['file']['name'])) 
         {
-            $file_handler = new EFS_Local_File_Handler();
-            $file_path = $file_handler->upload_to_local($_FILES['file']);
+            global $efs_local_file_handler;
+            $file_path = $efs_local_file_handler->upload_to_local($_FILES['file']);
 
             if ($file_path) 
             {
