@@ -40,7 +40,7 @@ class EFS_User_Selection
         wp_nonce_field('efs_user_selection_meta_box', 'efs_user_selection_meta_box_nonce');
 
         /* Get recipients from the database */
-        $selected_users = $this->get_recipients_from_db($post->ID);
+        $selected_users = $this->get_recipients_from_db($post->ID)['results'];
 
         /* Get all users for selection */
         $all_users = get_users(['fields' => ['ID', 'display_name', 'user_email']]);
