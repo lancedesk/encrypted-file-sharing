@@ -118,28 +118,48 @@ class EFS_Init
         }
     }
 
-    /* Plugin activation hook to generate and save the master key */
+    /**
+     * Generate and save the master key for encryption.
+     *
+     * This method will delete any existing master key, set it to false temporarily,
+     * generate a new 256-bit master key, and save it.
+    */
+
     public function efs_generate_master_key() 
     {
         /* Check if the master key already exists */
         $master_key = get_option('efs_master_key');
 
-        if ($master_key === false || empty($master_key)) 
+        if ($master_key !== false && !empty($master_key)) 
         {
-            /* Generate a 256-bit master key as raw bytes */
-            $master_key = openssl_random_pseudo_bytes(32);
+            /* Delete the existing master key */
+            $deleted = delete_option('efs_master_key');
 
-            /* Save the master key to the WordPress options table */
-            $saved = add_option('efs_master_key', $master_key);
-
-            if (!$saved)
+            if (!$deleted)
             {
-                error_log('Failed to save the master key.');
+                error_log('Failed to delete the existing master key.');
             }
             else
             {
-                error_log('Master key saved successfully.');
+                /* Set the master key to false temporarily */
+                update_option('efs_master_key', false);
+                error_log('Master key deleted and set to false temporarily.');
             }
+        }
+
+        /* Generate a new 256-bit master key as raw bytes */
+        $master_key = openssl_random_pseudo_bytes(32);
+
+        /* Save the new master key to the WordPress options table */
+        $saved = add_option('efs_master_key', $master_key);
+
+        if (!$saved)
+        {
+            error_log('Failed to save the new master key.');
+        }
+        else
+        {
+            error_log('New master key saved successfully.');
         }
     }
 
