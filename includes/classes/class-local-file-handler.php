@@ -199,16 +199,20 @@ class EFS_Local_File_Handler
                 $file_metadata = $this->save_file_metadata($file_name, $target_file);
 
                 /* Log the file metadata result */
-                if ($file_metadata['success']) {
+                if ($file_metadata['success'])
+                {
                     $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
-                } else {
+                }
+                else
+                {
                     $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
                 }
 
                 /* Check if the file metadata was saved successfully */
                 $selected_users = get_transient('efs_user_selection_' . $post_id);
 
-                if (false === $selected_users) {
+                if (false === $selected_users)
+                {
                     $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
                 }
 
@@ -218,21 +222,16 @@ class EFS_Local_File_Handler
                 if ($file_metadata['success'])
                 {
                     $file_id = $file_metadata['file_id'];
-
-                    if($is_user_selection_saved)
+    
+                    if (!empty($selected_users) && is_array($selected_users))
                     {
-
-                        
                         /* Save the encryption key securely for all selected users in the database */
-                        if (!empty($selected_users) && is_array($selected_users))
-                        {
-                            $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $data_encryption_key, $expiration_date);
-                            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
-                        }
+                        $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $data_encryption_key, $expiration_date);
+                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
                     }
                     else
                     {
-                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'User selection meta is not saved yet for post ID: ' . $post_id);
+                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users selected or invalid user selection for post ID: ' . $post_id);
                     }
                 }
 
