@@ -164,17 +164,25 @@ class EFS_Local_File_Handler
                     $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
                 }
 
-                /* Retrieve the selected users from database */
-                $selected_users = $efs_user_selection->get_recipients_from_db($post_id);
+                $response = $this->get_recipients_from_db($post->ID);
+                $selected_users = $response['results'];
 
-                if (false === $selected_users)
+                /* Log the database query and retrieved users */
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Database query executed: ' . $response['query']);
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from database: ' . implode(',', $selected_users));
+
+                if (empty($selected_users))
                 {
-                    $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users found in database for post ID: ' . $post->ID);
+
+                    /* Fallback to retrieving from post meta */
+                    $selected_users = get_post_meta($post->ID, '_efs_user_selection', true);
                     $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from post meta: ' . implode(',', $selected_users));
                 }
-
-                /* Log the selected users */
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved: ' . implode(',', $selected_users));
+                else
+                {
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from database: ' . implode(',', $selected_users));
+                }
 
                 if ($file_metadata['success'])
                 {
