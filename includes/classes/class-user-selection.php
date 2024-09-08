@@ -101,4 +101,40 @@ class EFS_User_Selection
         }
     }
 
+    /**
+     * Save selected recipients to the 'efs_recipients' table.
+     *
+     * @param int $post_id The ID of the post to assign recipients.
+     * @param array $recipients Array of recipient IDs to save.
+     *
+     * @return void
+    */
+
+    public function efs_save_recipients_to_db($post_id, $recipients)
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'efs_recipients';
+
+        /* Delete existing recipients for this post */
+        $wpdb->delete($table_name, ['post_id' => $post_id]);
+
+        /* Insert each recipient */
+        foreach ($recipients as $recipient_id)
+        {
+            $wpdb->insert(
+                $table_name,
+                [
+                    'post_id' => $post_id,
+                    'recipient_id' => $recipient_id
+                ],
+                [
+                    '%d',
+                    '%d'
+                ]
+            );
+        }
+    }
+
+
 }
