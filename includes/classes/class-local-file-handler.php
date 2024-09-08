@@ -227,6 +227,10 @@ class EFS_Local_File_Handler
                             $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
                         }
                     }
+                    else
+                    {
+                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'User selection meta is not saved yet for post ID: ' . $post_id);
+                    }
                 }
 
                 /* Log the successful encryption and upload */
