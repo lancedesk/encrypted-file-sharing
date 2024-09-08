@@ -201,18 +201,21 @@ class EFS_Local_File_Handler
                 /* Check if the file metadata was saved successfully */
                 $is_user_selection_saved = get_post_meta($post_id, '_efs_user_selection_saved', true);
 
-                if ($file_metadata['success'] && $is_user_selection_saved)
+                if ($file_metadata['success'])
                 {
                     $file_id = $file_metadata['file_id'];
 
-                    /* Get the selected users from post meta */
-                    $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
-
-                    /* Save the encryption key securely for all selected users in the database */
-                    if (!empty($selected_users) && is_array($selected_users))
+                    if($is_user_selection_saved)
                     {
-                        $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $data_encryption_key, $expiration_date);
-                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
+                        /* Get the selected users from post meta */
+                        $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+
+                        /* Save the encryption key securely for all selected users in the database */
+                        if (!empty($selected_users) && is_array($selected_users))
+                        {
+                            $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $data_encryption_key, $expiration_date);
+                            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
+                        }
                     }
                 }
 
