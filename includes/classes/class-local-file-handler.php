@@ -211,6 +211,7 @@ class EFS_Local_File_Handler
                     if (!empty($selected_users) && is_array($selected_users))
                     {
                         $efs_file_encryption->save_encrypted_key($selected_users, $file_id, $data_encryption_key, $expiration_date);
+                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
                     }
                 }
 
