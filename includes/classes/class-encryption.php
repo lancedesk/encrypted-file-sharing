@@ -134,9 +134,18 @@ class EFS_Encryption
             return false;
         }
 
-        /* Get user KEK and encrypted DEK from the database */
-        $user_kek = $result->user_kek;
+        /* Get the encrypted KEK and DEK from the database */
+        $encrypted_kek = $result->user_kek;
         $encrypted_dek = $result->encryption_key;
+
+        /* Decrypt the KEK with the master key */
+        $user_kek = $this->decrypt_with_master_key($encrypted_kek);
+
+        if ($user_kek === false)
+        {
+            $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name.");
+            return false;
+        }
 
         /* Use the first 16 bytes of KEK as IV (since it was used for encryption) */
         $iv = substr($user_kek, 0, 16);
