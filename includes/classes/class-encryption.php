@@ -62,7 +62,8 @@ class EFS_Encryption
             /* Encrypt the DEK with the user's KEK using AES-256-CBC */
             $encrypted_dek = openssl_encrypt($data_encryption_key, 'AES-256-CBC', $user_kek, 0, $iv);
 
-            if ($encrypted_dek === false) {
+            if ($encrypted_dek === false)
+            {
                 /* Log encryption failure */
                 $this->log_message("Error: Encryption of DEK failed for user ID: $user_id.");
                 continue;
@@ -75,7 +76,7 @@ class EFS_Encryption
                     'user_id' => $user_id,
                     'file_id' => $file_id,
                     'encryption_key' => $encrypted_dek, /* Store encrypted DEK */
-                    'user_kek' => $user_kek,  /* Save user KEK */
+                    'user_kek' => $encrypted_kek, /* Save encrypted KEK */
                     'expiration_date' => $expiration_date,
                     'created_at' => current_time('mysql')
                 ],
