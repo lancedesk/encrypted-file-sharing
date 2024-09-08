@@ -277,9 +277,6 @@ class EFS_Encryption
             return false;
         }
 
-        /* Use the first 16 bytes of KEK as the IV for AES-256-CBC
-        $iv = substr($user_kek, 0, 16); */
-
         /* Generate a random IV (16 bytes for AES-256-CBC) */
         $iv = openssl_random_pseudo_bytes(16);
 
@@ -295,17 +292,17 @@ class EFS_Encryption
         /* Prepend the IV to the encrypted KEK for storage */
         $encrypted_kek_with_iv = base64_encode($iv . $encrypted_kek);
 
-        return $encrypted_kek;
+        return $encrypted_kek_with_iv;
     }
 
     /**
      * Decrypt the Key Encryption Key (KEK) with the master key.
      *
-     * @param string $encrypted_kek The encrypted KEK to decrypt.
+     * @param string $encrypted_kek_with_iv The encrypted KEK to decrypt.
      * @return string|false The decrypted KEK if successful, false on failure.
     */
 
-    private function decrypt_with_master_key($encrypted_kek)
+    private function decrypt_with_master_key($encrypted_kek_with_iv)
     {
         $master_key = $this->get_master_key();
 
@@ -316,16 +313,16 @@ class EFS_Encryption
         }
 
         /* Decode the base64 encoded data */
-        $decoded_data = base64_decode($encrypted_kek);
+        $decoded_data = base64_decode($encrypted_kek_with_iv);
 
-        /* Extract the first 16 bytes as the IV for AES-256-CBC*/
-        $iv = substr($decoded_data, 0, 16);
+        /* Extract the first 16 bytes as the IV */
+         $iv = substr($decoded_data, 0, 16);
 
         /* Extract the remaining bytes as the encrypted KEK */
-        $encrypted_kek_without_iv = substr($decoded_data, 16);
+        $encrypted_kek = substr($decoded_data, 16);
 
         /* Decrypt the KEK with the master key using AES-256-CBC */
-        $user_kek = openssl_decrypt($encrypted_kek_without_iv, 'AES-256-CBC', $master_key, 0, $iv);
+        $user_kek = openssl_decrypt($encrypted_kek, 'AES-256-CBC', $master_key, 0, $iv);
 
         if ($user_kek === false)
         {
