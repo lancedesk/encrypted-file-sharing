@@ -92,6 +92,9 @@ class EFS_User_Selection
             update_post_meta($post_id, '_efs_user_selection_saved', true);
         } else {
             delete_post_meta($post_id, '_efs_user_selection');
+
+            /* Remove the saved flag if no users are selected */
+            delete_post_meta($post_id, '_efs_user_selection_saved');
         }
     }
 
