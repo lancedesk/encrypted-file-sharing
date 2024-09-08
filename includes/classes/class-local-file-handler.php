@@ -200,7 +200,8 @@ class EFS_Local_File_Handler
                 /* Check if user selection meta is fully saved */
                 $is_user_selection_saved = get_post_meta($post_id, '_efs_user_selection_saved', true);
 
-                if ($file_metadata['success']) {
+                if ($file_metadata['success'] && $is_user_selection_saved)
+                {
                     $file_id = $file_metadata['file_id'];
 
                     /* Get the selected users from post meta */
