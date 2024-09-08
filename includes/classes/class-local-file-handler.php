@@ -197,8 +197,24 @@ class EFS_Local_File_Handler
 
                 /* Store the file's metadata with the target file path */
                 $file_metadata = $this->save_file_metadata($file_name, $target_file);
-                /* Check if user selection meta is fully saved */
-                $is_user_selection_saved = get_post_meta($post_id, '_efs_user_selection_saved', true);
+
+                /* Wait for user selection meta to be saved, max 5 seconds */
+                $max_wait_time = 5; /* Maximum wait time in seconds */
+                $check_interval = 0.5; /* Check every 500ms */
+                $elapsed_time = 0;
+
+                while ($elapsed_time < $max_wait_time)
+                {
+                    $is_user_selection_saved = get_post_meta($post_id, '_efs_user_selection_saved', true);
+                    if ($is_user_selection_saved)
+                    {
+                        break;
+                    }
+
+                    /* Wait for a bit before checking again */
+                    usleep($check_interval * 1000000); /* Convert seconds to microseconds */
+                    $elapsed_time += $check_interval;
+                }
 
                 if ($file_metadata['success'] && $is_user_selection_saved)
                 {
