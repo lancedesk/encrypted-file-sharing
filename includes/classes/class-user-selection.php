@@ -88,6 +88,9 @@ class EFS_User_Selection
             $selected_users = array_map('intval', $_POST['efs_user_selection']);
             update_post_meta($post_id, '_efs_user_selection', $selected_users);
 
+            /* Save user selection to transient for immediate use */
+            set_transient('efs_user_selection_' . $post_id, $selected_users, 12 * HOUR_IN_SECONDS);
+
             /* Set flag meta when user selection is fully saved */
             update_post_meta($post_id, '_efs_user_selection_saved', true);
         } else {
