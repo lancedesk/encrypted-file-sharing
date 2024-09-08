@@ -104,6 +104,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/classes/class-local-file-hand
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-protection.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-s3-file-handler.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-user-dashboard.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-user-selection.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-columns.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-notification.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-handler.php';
@@ -120,6 +121,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/functions/install-dependencie
 $efs_local_file_handler = new EFS_Local_File_Handler();
 $efs_s3_file_handler = new EFS_S3_File_Handler();
 $create_admin_db_table = new EFS_Admin_Users();
+$efs_user_selection = new EFS_User_Selection();
 $efs_admin_columns = new EFS_Admin_Columns();
 $efs_file_encryption = new EFS_Encryption();
 $efs_file_handler =  new EFS_File_Handler(
