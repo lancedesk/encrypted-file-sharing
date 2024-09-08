@@ -138,5 +138,30 @@ class EFS_User_Selection
         }
     }
 
+    /**
+     * Retrieve recipients from the 'efs_recipients' table for a post.
+     *
+     * @param int $post_id The ID of the post.
+     *
+     * @return array Array of recipient IDs.
+    */
+
+    public function get_recipients_from_db($post_id)
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'efs_recipients';
+
+        /* Get all recipients for the post */
+        $results = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT recipient_id FROM $table_name WHERE post_id = %d",
+                $post_id
+            )
+        );
+
+        return $results ? $results : [];
+    }
+
 
 }
