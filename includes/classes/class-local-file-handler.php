@@ -214,6 +214,7 @@ class EFS_Local_File_Handler
                 if (false === $selected_users)
                 {
                     $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from post meta: ' . implode(',', $selected_users));
                 }
 
                 /* Log the selected users */
