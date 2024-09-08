@@ -186,6 +186,33 @@ class EFS_Init
         }
     }
 
+    /**
+     * Create the 'efs_recipients' table to store post-to-recipient relationships.
+     *
+     * @return void
+    */
+
+    public function efs_create_recipients_table()
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'efs_recipients';
+
+        /* SQL to create the table */
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE $table_name (
+            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            post_id BIGINT(20) UNSIGNED NOT NULL,
+            recipient_id BIGINT(20) UNSIGNED NOT NULL,
+            PRIMARY KEY (id),
+            KEY post_id (post_id),
+            KEY recipient_id (recipient_id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
     private function log_message($file, $message)
     {
         if (file_exists($file)) 
