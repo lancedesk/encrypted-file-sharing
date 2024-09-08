@@ -186,6 +186,7 @@ class EFS_Encryption
 
     public function get_master_key() 
     {
+        /* Log master key retrieval */
         $master_key = get_option('efs_master_key');
 
         if ($master_key === false) 
@@ -194,15 +195,8 @@ class EFS_Encryption
             return false;
         }
 
-        $decoded_key = base64_decode($master_key);
-
-        if ($decoded_key === false) 
-        {
-            error_log('Failed to decode master key.');
-            return false;
-        }
-
-        return $decoded_key;
+        /* Return the master key */
+        return $master_key;
     }
 
     /**
