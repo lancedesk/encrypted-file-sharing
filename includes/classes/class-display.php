@@ -1,5 +1,7 @@
 <?php 
-class EFS_File_Display {
+
+class EFS_File_Display
+{
 
 /**
  * Constructor to initialize actions and hooks.
@@ -21,122 +23,126 @@ public function render_user_files_shortcode($atts) {
     /* Ensure user is logged in */
     if (is_user_logged_in()) {
         $current_user_id = get_current_user_id();
+        
+        /* Query for post IDs where the current user is a recipient */
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_recipients';
 
-        /* Query for files associated with the logged-in user */
-        $args = [
-            'post_type'      => 'efs_file',
-            'posts_per_page' => -1,
-            'meta_query'     => [
-                [
-                    'key'     => '_efs_user_selection',
-                    'value'   => $current_user_id,
-                    'compare' => 'LIKE'
-                ]
-            ]
-        ];
+        /* Get all post IDs associated with the current user */
+        $post_ids = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT post_id FROM $table_name WHERE recipient_id = %d",
+                $current_user_id
+            )
+        );
 
-        $query = new WP_Query($args);
+        if (!empty($post_ids)) {
+            $args = [
+                'post_type'      => 'efs_file',
+                'posts_per_page' => -1,
+                'post__in'       => $post_ids,
+                'orderby'        => 'post_date',
+                'order'          => 'DESC'
+            ];
 
-        $master_key = get_option('efs_master_key');
+            $query = new WP_Query($args);
 
-        if (empty($master_key)) {
-            echo '<p>' . __('Error: Master key not found.', 'encrypted-file-sharing') . '</p>';
-            return;
-        }
+            if ($query->have_posts()) {
+                echo '<div class="efs-user-files">';
+                
+                /* Display files categorized by their categories */
+                $categories = get_terms([
+                    'taxonomy'   => 'category',
+                    'hide_empty' => true
+                ]);
 
-        if ($query->have_posts()) {
-            echo '<div class="efs-user-files">';
-            
-            /* Display files categorized by their categories */
-            $categories = get_terms([
-                'taxonomy'   => 'category',
-                'hide_empty' => true
-            ]);
+                foreach ($categories as $category) {
+                    echo '<h2>' . esc_html($category->name) . '</h2>';
+                    echo '<ul>';
 
-            foreach ($categories as $category) {
-                echo '<h2>' . esc_html($category->name) . '</h2>';
-                echo '<ul>';
+                    while ($query->have_posts()) {
+                        $query->the_post();
+                        
+                        if (has_term($category->term_id, 'category')) {
+                            $file_url = get_post_meta(get_the_ID(), '_efs_file_url', true);
 
-                while ($query->have_posts()) {
-                    $query->the_post();
-                    
-                    if (has_term($category->term_id, 'category')) {
-                        $file_url = get_post_meta(get_the_ID(), '_efs_file_url', true);
+                            /* Extract the file path from the URL */
+                            $file_path = parse_url($file_url, PHP_URL_PATH);  /* Extract just the path part */
+                            $file_name = basename($file_path);  /* Get the file name, e.g., mom-pdf.pdf.enc */
 
-                        /* Extract the file path from the URL */
-                        $file_path = parse_url($file_url, PHP_URL_PATH);  /* Extract just the path part */
-                        $file_name = basename($file_path);  /* Get the file name, e.g., mom-pdf.pdf.enc */
+                            /* Check and strip the .enc extension */
+                            if (substr($file_name, -4) === '.enc') {
+                                $file_name = substr($file_name, 0, -4);  /* Strip the .enc part */
+                            }
 
-                        /* Check and strip the .enc extension */
-                        if (substr($file_name, -4) === '.enc') {
-                            $file_name = substr($file_name, 0, -4);  /* Strip the .enc part */
+                            /* Retrieve file extension separately if needed */
+                            $file_type = pathinfo($file_name, PATHINFO_EXTENSION);
+
+                            $icon = $this->get_file_type_icon($file_type);
+
+                            /* Convert file URL to file path */
+                            $upload_dir = wp_upload_dir();
+                            $relative_path = str_replace($upload_dir['baseurl'], '', $file_url);
+                            $file_path = $upload_dir['basedir'] . $relative_path;
+
+                            /* Check if the file path contains 'private_uploads' */
+                            $is_secure = strpos($file_path, 'private_uploads') !== false;
+
+                            /* Get file size */
+                            if ($is_secure) {
+                                /* Handle secure file path */
+                                $file_size = file_exists($relative_path) ? $this->format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
+                            } else {
+                                /* Handle WordPress uploads file path */
+                                $file_size = file_exists($file_path) ? $this->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
+                            }
+
+                            /* Excerpt and description logic */
+                            $excerpt = get_the_excerpt();
+                            $description = get_the_content();
+
+                            /* Get upload date and format it to show time */
+                            $upload_date = get_the_date('F j, Y \a\t g:i A');
+
+                            echo '<li>';
+                            
+                            /* Display file type icon */
+                            echo '<span class="file-icon">' . $icon . '</span>';
+                            
+                            /* Display title */
+                            echo '<p class="file-title">' . get_the_title() . '</p>';
+
+                            /* Display upload/creation date */
+                            echo '<p class="file-date">' . __('Uploaded on: ', 'encrypted-file-sharing') . esc_html($upload_date) . '</p>';
+                            
+                            /* Display file size */
+                            echo '<p class="file-size">' . __('File size: ', 'encrypted-file-sharing') . esc_html($file_size) . '</p>';
+                            
+                            /* Show excerpt or description */
+                            if (!empty($excerpt)) {
+                                echo '<p>' . esc_html($excerpt) . '</p>';
+                            } elseif (!empty($description)) {
+                                echo '<p>' . esc_html(wp_trim_words($description, 20)) . '</p>';
+                            }
+
+                            /* Download button */
+                            echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '">' . __('Download', 'encrypted-file-sharing') . '</a>';
+                            echo '</li>';
                         }
-
-                        /* Retrieve file extension separately if needed */
-                        $file_type = pathinfo($file_name, PATHINFO_EXTENSION);
-
-                        $icon = $this->get_file_type_icon($file_type);
-
-                        /* Convert file URL to file path */
-                        $upload_dir = wp_upload_dir();
-                        $relative_path = str_replace($upload_dir['baseurl'], '', $file_url);
-                        $file_path = $upload_dir['basedir'] . $relative_path;
-
-                        /* Check if the file path contains 'private_uploads' */
-                        $is_secure = strpos($file_path, 'private_uploads') !== false;
-
-                        /* Get file size */
-                        if ($is_secure) {
-                            /* Handle secure file path */
-                            $file_size = file_exists($relative_path) ? $this->format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
-                        } else {
-                            /* Handle WordPress uploads file path */
-                            $file_size = file_exists($file_path) ? $this->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
-                        }
-
-                        /* Excerpt and description logic */
-                        $excerpt = get_the_excerpt();
-                        $description = get_the_content();
-
-                        /* Get upload date and format it to show time */
-                        $upload_date = get_the_date('F j, Y \a\t g:i A');
-
-                        echo '<li>';
-                        
-                        /* Display file type icon */
-                        echo '<span class="file-icon">' . $icon . '</span>';
-                        
-                        /* Display title */
-                        echo '<p class="file-title">' . get_the_title() . '</p>';
-
-                        /* Display upload/creation date */
-                        echo '<p class="file-date">' . __('Uploaded on: ', 'encrypted-file-sharing') . esc_html($upload_date) . '</p>';
-                        
-                        /* Display file size */
-                        echo '<p class="file-size">' . __('File size: ', 'encrypted-file-sharing') . esc_html($file_size) . '</p>';
-                        
-                        /* Show excerpt or description */
-                        if (!empty($excerpt)) {
-                            echo '<p>' . esc_html($excerpt) . '</p>';
-                        } elseif (!empty($description)) {
-                            echo '<p>' . esc_html(wp_trim_words($description, 20)) . '</p>';
-                        }
-
-                        /* Download button */
-                        echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '">' . __('Download', 'encrypted-file-sharing') . '</a>';
-                        echo '</li>';
                     }
+
+                    echo '</ul>';
                 }
 
-                echo '</ul>';
+                echo '</div>';
+            } else {
+                echo '<p>' . __('No files found for you.', 'encrypted-file-sharing') . '</p>';
             }
 
-            echo '</div>';
+            wp_reset_postdata();
         } else {
             echo '<p>' . __('No files found for you.', 'encrypted-file-sharing') . '</p>';
         }
-
-        wp_reset_postdata();
     } else {
         echo '<p>' . __('You need to be logged in to view your files.', 'encrypted-file-sharing') . '</p>';
     }
