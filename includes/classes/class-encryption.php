@@ -206,14 +206,17 @@ class EFS_Encryption
 
     public function get_master_key() 
     {
-        /* Log master key retrieval */
-        $master_key = get_option('efs_master_key');
+        /* Retrieve the serialized master key from the options table */
+        $serialized_master_key = get_option('efs_master_key');
 
-        if ($master_key === false) 
+        if ($serialized_master_key === false || empty($serialized_master_key)) 
         {
             error_log('Master key not found.');
             return false;
         }
+
+        /* Unserialize the master key */
+        $master_key = base64_decode($serialized_master_key);
 
         /* Return the master key */
         return $master_key;
