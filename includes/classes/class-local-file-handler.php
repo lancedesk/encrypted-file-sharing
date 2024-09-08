@@ -2,7 +2,6 @@
 
 class EFS_Local_File_Handler
 {
-    private $efs_user_selection;
     /**
      * Constructor to initialize actions and hooks.
     */
@@ -14,52 +13,6 @@ class EFS_Local_File_Handler
         add_action('wp_ajax_nopriv_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
         add_action('wp_ajax_efs_write_log', [$this, 'write_log']);
         add_action('wp_ajax_nopriv_efs_write_log', [$this, 'write_log']);
-        $this->efs_user_selection = new EFS_User_Selection();
-
-    }
-
-    /**
-     * Write a log message to a file.
-    */
-
-    public function write_log()
-    {
-        $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
-        $this->log_message($log_file, 'Ajax method called.');
-    }
-
-    /**
-     * Calculate the expiration date based on admin settings.
-     *
-     * @return string Expiration date in 'Y-m-d H:i:s' format.
-    */
-
-    private function calculate_expiration_date()
-    {
-        /* Get the expiration period and unit from the admin settings */
-        $expiry_period = get_option('efs_expiry_period', 1); /* Default to 1 if not set */
-        $expiry_unit = get_option('efs_expiry_unit', 'days'); /* Default to 'days' if not set */
-
-        /* Get the current date and time */
-        $current_time = current_time('timestamp');
-
-        /* Calculate the expiration date based on the unit */
-        switch ($expiry_unit) 
-        {
-            case 'minutes':
-                $expiration_time = strtotime("+{$expiry_period} minutes", $current_time);
-                break;
-            case 'hours':
-                $expiration_time = strtotime("+{$expiry_period} hours", $current_time);
-                break;
-            case 'days':
-            default:
-                $expiration_time = strtotime("+{$expiry_period} days", $current_time);
-                break;
-        }
-
-        /* Return the expiration date in 'Y-m-d H:i:s' format */
-        return date('Y-m-d H:i:s', $expiration_time);
     }
 
     /**
@@ -162,7 +115,7 @@ class EFS_Local_File_Handler
 
     private function upload_to_local($file_path, $expiration_date, $post_id)
     {
-        global $efs_file_encryption;
+        global $efs_file_encryption, $efs_user_selection;
         $upload_dir = ABSPATH . '../private_uploads/';
 
         /* Log the received file and expiration date */
@@ -212,7 +165,7 @@ class EFS_Local_File_Handler
                 }
 
                 /* Retrieve the selected users from database */
-                $selected_users = $this->efs_user_selection->get_recipients_from_db($post_id);
+                $selected_users = $efs_user_selection->get_recipients_from_db($post_id);
 
                 if (false === $selected_users)
                 {
@@ -323,6 +276,50 @@ class EFS_Local_File_Handler
             $log_message = $timestamp . ' - ' . $message . PHP_EOL;
             file_put_contents($file, $log_message, FILE_APPEND);
         }
+    }
+
+        /**
+     * Write a log message to a file.
+    */
+
+    public function write_log()
+    {
+        $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
+        $this->log_message($log_file, 'Ajax method called.');
+    }
+
+    /**
+     * Calculate the expiration date based on admin settings.
+     *
+     * @return string Expiration date in 'Y-m-d H:i:s' format.
+    */
+
+    private function calculate_expiration_date()
+    {
+        /* Get the expiration period and unit from the admin settings */
+        $expiry_period = get_option('efs_expiry_period', 1); /* Default to 1 if not set */
+        $expiry_unit = get_option('efs_expiry_unit', 'days'); /* Default to 'days' if not set */
+
+        /* Get the current date and time */
+        $current_time = current_time('timestamp');
+
+        /* Calculate the expiration date based on the unit */
+        switch ($expiry_unit) 
+        {
+            case 'minutes':
+                $expiration_time = strtotime("+{$expiry_period} minutes", $current_time);
+                break;
+            case 'hours':
+                $expiration_time = strtotime("+{$expiry_period} hours", $current_time);
+                break;
+            case 'days':
+            default:
+                $expiration_time = strtotime("+{$expiry_period} days", $current_time);
+                break;
+        }
+
+        /* Return the expiration date in 'Y-m-d H:i:s' format */
+        return date('Y-m-d H:i:s', $expiration_time);
     }
 
 }
