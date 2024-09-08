@@ -2,6 +2,7 @@
 
 class EFS_Local_File_Handler
 {
+    private $efs_user_selection;
     /**
      * Constructor to initialize actions and hooks.
     */
@@ -13,6 +14,8 @@ class EFS_Local_File_Handler
         add_action('wp_ajax_nopriv_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
         add_action('wp_ajax_efs_write_log', [$this, 'write_log']);
         add_action('wp_ajax_nopriv_efs_write_log', [$this, 'write_log']);
+        $this->efs_user_selection = new EFS_User_Selection();
+
     }
 
     /**
@@ -208,8 +211,8 @@ class EFS_Local_File_Handler
                     $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
                 }
 
-                /* Check if the file metadata was saved successfully */
-                $selected_users = get_transient('efs_user_selection_' . $post_id);
+                /* Retrieve the selected users from database */
+                $selected_users = $this->efs_user_selection->get_recipients_from_db($post_id);
 
                 if (false === $selected_users)
                 {
