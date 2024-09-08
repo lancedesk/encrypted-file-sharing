@@ -126,15 +126,18 @@ class EFS_Init
 
         if ($master_key === false || empty($master_key)) 
         {
-            /* Generate a 256-bit master key */
-            $master_key = base64_encode(openssl_random_pseudo_bytes(32));
+            /* Generate a 256-bit master key as raw bytes */
+            $master_key = openssl_random_pseudo_bytes(32);
 
             /* Save the master key to the WordPress options table */
             $saved = add_option('efs_master_key', $master_key);
 
-            if (!$saved) {
+            if (!$saved)
+            {
                 error_log('Failed to save the master key.');
-            } else {
+            }
+            else
+            {
                 error_log('Master key saved successfully.');
             }
         }
