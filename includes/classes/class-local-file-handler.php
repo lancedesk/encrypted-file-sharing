@@ -197,6 +197,8 @@ class EFS_Local_File_Handler
 
                 /* Store the file's metadata with the target file path */
                 $file_metadata = $this->save_file_metadata($file_name, $target_file);
+                /* Check if user selection meta is fully saved */
+                $is_user_selection_saved = get_post_meta($post_id, '_efs_user_selection_saved', true);
 
                 if ($file_metadata['success']) {
                     $file_id = $file_metadata['file_id'];
