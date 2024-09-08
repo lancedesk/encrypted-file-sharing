@@ -39,8 +39,10 @@ class EFS_User_Selection
         /* Nonce field for verification */
         wp_nonce_field('efs_user_selection_meta_box', 'efs_user_selection_meta_box_nonce');
 
-        /* Get existing user selection */
-        $selected_users = get_post_meta($post->ID, '_efs_user_selection', true);
+        /* Get recipients from the database */
+        $selected_users = $this->get_recipients_from_db($post->ID);
+
+        /* Get all users for selection */
         $all_users = get_users(['fields' => ['ID', 'display_name', 'user_email']]);
 
         echo '<p>';
@@ -110,7 +112,7 @@ class EFS_User_Selection
      * @return void
     */
 
-    public function efs_save_recipients_to_db($post_id, $recipients)
+    public function save_recipients_to_db($post_id, $recipients)
     {
         global $wpdb;
 
