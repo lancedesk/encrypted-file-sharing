@@ -154,16 +154,9 @@ class EFS_Init
 
         if ($existing_key !== null)
         {
-            /* Delete the existing master key */
-            $deleted = $wpdb->delete($table_name, array('id' => 1));
-
-            if ($deleted === false)
-            {
-                error_log('Failed to delete the existing master key.');
-                return;
-            }
-
-            error_log('Master key deleted.');
+            /* A master key already exists, do nothing */
+            error_log('Master key already exists, no action taken.');
+            return;
         }
 
         /* Generate a new master key */
