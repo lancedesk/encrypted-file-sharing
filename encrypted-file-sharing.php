@@ -138,6 +138,7 @@ new EFS_File_CPT();
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_encryption_keys_table']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_file_metadata_table']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_master_key_table']);
+register_activation_hook(__FILE__, [$efs_init, 'efs_create_recipients_table']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_private_folder']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_generate_master_key']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_admin_table']);
