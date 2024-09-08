@@ -206,7 +206,11 @@ class EFS_Local_File_Handler
                 }
 
                 /* Check if the file metadata was saved successfully */
-                $is_user_selection_saved = get_post_meta($post_id, '_efs_user_selection_saved', true);
+                $selected_users = get_transient('efs_user_selection_' . $post_id);
+
+                if (false === $selected_users) {
+                    $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+                }
 
                 if ($file_metadata['success'])
                 {
