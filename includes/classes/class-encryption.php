@@ -277,8 +277,11 @@ class EFS_Encryption
             return false;
         }
 
-        /* Use the first 16 bytes of KEK as the IV for AES-256-CBC */
-        $iv = substr($user_kek, 0, 16);
+        /* Use the first 16 bytes of KEK as the IV for AES-256-CBC
+        $iv = substr($user_kek, 0, 16); */
+
+        /* Generate a random IV (16 bytes for AES-256-CBC) */
+        $iv = openssl_random_pseudo_bytes(16);
 
         /* Encrypt the KEK with the master key using AES-256-CBC */
         $encrypted_kek = openssl_encrypt($user_kek, 'AES-256-CBC', $master_key, 0, $iv);
@@ -288,6 +291,9 @@ class EFS_Encryption
             error_log('Error: Encryption of KEK failed.');
             return false;
         }
+
+        /* Prepend the IV to the encrypted KEK for storage */
+        $encrypted_kek_with_iv = base64_encode($iv . $encrypted_kek);
 
         return $encrypted_kek;
     }
