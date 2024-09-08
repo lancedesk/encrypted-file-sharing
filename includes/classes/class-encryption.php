@@ -315,11 +315,17 @@ class EFS_Encryption
             return false;
         }
 
-        /* Use the first 16 bytes of KEK as the IV for AES-256-CBC */
-        $iv = substr($encrypted_kek, 0, 16);
+        /* Decode the base64 encoded data */
+        $decoded_data = base64_decode($encrypted_kek);
+
+        /* Extract the first 16 bytes as the IV for AES-256-CBC*/
+        $iv = substr($decoded_data, 0, 16);
+
+        /* Extract the remaining bytes as the encrypted KEK */
+        $encrypted_kek_without_iv = substr($decoded_data, 16);
 
         /* Decrypt the KEK with the master key using AES-256-CBC */
-        $user_kek = openssl_decrypt($encrypted_kek, 'AES-256-CBC', $master_key, 0, $iv);
+        $user_kek = openssl_decrypt($encrypted_kek_without_iv, 'AES-256-CBC', $master_key, 0, $iv);
 
         if ($user_kek === false)
         {
