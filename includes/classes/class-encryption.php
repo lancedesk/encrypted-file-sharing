@@ -198,41 +198,32 @@ class EFS_Encryption
     }
 
     /**
-     * Retrieves and decodes the stored master key from the WordPress options table.
+     * Retrieve the master key from the custom database table.
      *
-     * @return string|false Returns the decoded master key as a string if successful,
-     *                      or false if the master key doesn't exist.
+     * @return string|false The master key as raw bytes, or false if retrieval fails.
     */
 
-    public function get_master_key() 
+    private function get_master_key()
     {
-        /* Retrieve the serialized master key from the options table */
-        $serialized_master_key = get_option('efs_master_key');
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_master_key';
 
-        if ($serialized_master_key === false || empty($serialized_master_key)) 
+        /* Query to get the master key */
+        $master_key = $wpdb->get_var("SELECT master_key FROM $table_name LIMIT 1");
+
+        if ($master_key === null)
         {
-            error_log('Master key not found.');
-            return false;
-        }
-
-        /* Unserialize the master key */
-        $master_key = base64_decode($serialized_master_key);
-
-        /* Validate the base64 decoding */
-        if ($master_key === false)
-        {
-            error_log('Error: Base64 decoding of master key failed.');
+            error_log('No master key found in the database.');
             return false;
         }
 
         /* Validate the length of the master key (should be 256 bits / 32 bytes) */
         if (strlen($master_key) !== 32)
         {
-            error_log('Error: Invalid length of decoded master key.');
+            error_log('Error: Invalid length of retrieved master key.');
             return false;
         }
 
-        /* Return the master key */
         return $master_key;
     }
 
