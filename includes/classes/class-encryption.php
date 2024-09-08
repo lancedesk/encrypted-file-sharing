@@ -218,6 +218,20 @@ class EFS_Encryption
         /* Unserialize the master key */
         $master_key = base64_decode($serialized_master_key);
 
+        /* Validate the base64 decoding */
+        if ($master_key === false)
+        {
+            error_log('Error: Base64 decoding of master key failed.');
+            return false;
+        }
+
+        /* Validate the length of the master key (should be 256 bits / 32 bytes) */
+        if (strlen($master_key) !== 32)
+        {
+            error_log('Error: Invalid length of decoded master key.');
+            return false;
+        }
+
         /* Return the master key */
         return $master_key;
     }
