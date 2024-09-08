@@ -212,18 +212,17 @@ class EFS_Local_File_Handler
                     $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
                 }
 
+                /* Log the selected users */
+                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved: ' . implode(',', $selected_users));
+
                 if ($file_metadata['success'])
                 {
                     $file_id = $file_metadata['file_id'];
 
                     if($is_user_selection_saved)
                     {
-                        /* Get the selected users from post meta */
-                        $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
 
-                        /* Log the selected users */
-                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved: ' . implode(',', $selected_users));
-
+                        
                         /* Save the encryption key securely for all selected users in the database */
                         if (!empty($selected_users) && is_array($selected_users))
                         {
