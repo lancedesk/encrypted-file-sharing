@@ -160,7 +160,13 @@ class EFS_User_Selection
             )
         );
 
-        return $results ? $results : [];
+        /* Response array with result and query*/
+        $response = [
+            'results' => $results ? $results : [],
+            'query'   => $wpdb->last_query  /* Store the last executed query for debugging */
+        ];
+
+        return $response;
     }
 
 
