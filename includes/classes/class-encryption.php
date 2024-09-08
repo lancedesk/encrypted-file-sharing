@@ -232,4 +232,36 @@ class EFS_Encryption
         return $decrypted_data; /* Return the decrypted file content */
     }
 
+    /**
+     * Encrypt the Key Encryption Key (KEK) with the master key.
+     *
+     * @param string $user_kek The KEK to encrypt.
+     * @return string|false The encrypted KEK if successful, false on failure.
+    */
+
+    private function encrypt_with_master_key($user_kek)
+    {
+        $master_key = $this->get_master_key();
+
+        if ($master_key === false)
+        {
+            error_log('Master key retrieval failed.');
+            return false;
+        }
+
+        /* Use the first 16 bytes of KEK as the IV for AES-256-CBC */
+        $iv = substr($user_kek, 0, 16);
+
+        /* Encrypt the KEK with the master key using AES-256-CBC */
+        $encrypted_kek = openssl_encrypt($user_kek, 'AES-256-CBC', $master_key, 0, $iv);
+
+        if ($encrypted_kek === false)
+        {
+            error_log('Error: Encryption of KEK failed.');
+            return false;
+        }
+
+        return $encrypted_kek;
+    }
+
 }
