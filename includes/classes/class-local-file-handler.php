@@ -198,6 +198,13 @@ class EFS_Local_File_Handler
                 /* Store the file's metadata with the target file path */
                 $file_metadata = $this->save_file_metadata($file_name, $target_file);
 
+                /* Log the file metadata result */
+                if ($file_metadata['success']) {
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
+                } else {
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
+                }
+
                 /* Check if the file metadata was saved successfully */
                 $is_user_selection_saved = get_post_meta($post_id, '_efs_user_selection_saved', true);
 
