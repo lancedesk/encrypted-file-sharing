@@ -100,7 +100,10 @@ class EFS_User_Selection
                 global $efs_local_file_handler;
 
                 /* Handle file encryption for the post */
-                $efs_local_file_handler->handle_file_encryption($post_id);
+                if (isset($efs_local_file_handler) && is_object($efs_local_file_handler)) 
+                {
+                    $efs_local_file_handler->handle_file_encryption($post_id);
+                }
 
                 /* Set flag meta when user selection is fully saved */
                 update_post_meta($post_id, '_efs_user_selection_saved', true);
