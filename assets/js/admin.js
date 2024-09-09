@@ -25,10 +25,13 @@ jQuery(document).ready(function($) {
                 console.log("Attachment attributes: ", attachment);
                 console.log("Uploaded To Post ID:", attachment.uploadedTo);
 
-                /* Prepare AJAX request to send only the file ID */
+                /* Pass currentPostId (from PHP) as the post_id */
+                console.log("Uploaded To Post ID:", currentPostId); /* currentPostId instead of attachment.uploadedTo */
+
+                /* Prepare AJAX request to send file & post IDs */
                 var formData = new FormData();
                 formData.append("file_id", attachment.id);
-                formData.append("post_id", attachment.uploadedTo); /* Post ID for context */
+                formData.append("post_id", currentPostId); /* Manually pass current post ID for context */
                 formData.append("nonce", efsAdminAjax.nonce);
 
                 /* Set the upload action based on storage option */
