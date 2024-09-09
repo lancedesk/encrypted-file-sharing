@@ -239,6 +239,30 @@ class EFS_Local_File_Handler
     }
 
     /**
+     * Retrieve encrypted file metadata by post ID.
+     *
+     * @param int $post_id The ID of the post to retrieve the encrypted file metadata for.
+     * @return array|false An associative array of the metadata if found, false otherwise.
+    */
+
+    public function efs_get_encrypted_file_metadata_by_post_id($post_id)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_encrypted_files';
+
+        /* Prepare SQL query */
+        $sql = $wpdb->prepare(
+            "SELECT * FROM $table_name WHERE post_id = %d",
+            $post_id
+        );
+
+        /* Execute query and retrieve results */
+        $result = $wpdb->get_row($sql, ARRAY_A);
+
+        return $result;
+    }
+
+    /**
      * Save file metadata such as expiration date.
      *
      * @param int $post_id The post ID of the post the file is uploaded.
