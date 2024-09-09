@@ -109,6 +109,14 @@ class EFS_Local_File_Handler
                     $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
                 }
 
+                /* Log the success data */
+                $this->log_message($log_file, 'File uploaded and encrypted successfully.');
+                $this->log_message($log_file, 'File ID: ' . $file_id);
+                $this->log_message($log_file, 'Post ID: ' . $post_id);
+                $this->log_message($log_file, 'Data Encryption Key: ' . bin2hex($data_encryption_key)); /* Convert binary data to hex for logging */
+                $this->log_message($log_file, 'Expiration Date: ' . $expiration_date);
+                $this->log_message($log_file, 'Encrypted File Path: ' . $encrypted_file);
+
                 /* Return success data */
                 return [
                     'file_id' => $file_id,
