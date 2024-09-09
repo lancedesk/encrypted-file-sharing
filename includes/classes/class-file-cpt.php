@@ -83,6 +83,9 @@ class EFS_File_CPT
         /* Nonce field for verification */
         wp_nonce_field('efs_file_meta_box', 'efs_file_meta_box_nonce');
 
+        /* Pass the post ID to JavaScript */
+        echo '<script type="text/javascript"> var currentPostId = ' . intval($post->ID) . '; </script>';
+
         /* Create a nonce for the AJAX request */
         $nonce = wp_create_nonce('efs_upload_nonce');
 
