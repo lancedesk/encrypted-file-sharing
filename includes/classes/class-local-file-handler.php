@@ -139,48 +139,6 @@ class EFS_Local_File_Handler
     }
 
     /**
-     * Formats upload data for internal use.
-     *
-     * @return array
-    */
-
-    private function get_upload_data()
-    {
-        $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
-
-        /* Log the success data */
-        $this->log_message($log_file, 'File uploaded and encrypted successfully.');
-        $this->log_message($log_file, 'File ID: ' . $this->file_id);
-        $this->log_message($log_file, 'Post ID: ' . $this->post_id);
-        /* Convert binary data to hex for logging */
-        if (!is_null($this->data_encryption_key))
-        {
-            $this->log_message($log_file, 'Data Encryption Key: ' . bin2hex($this->data_encryption_key));
-        }
-        else
-        {
-            $this->log_message($log_file, 'Data Encryption Key: null');
-        }
-
-        $this->log_message($log_file, 'Expiration Date: ' . $this->expiration_date);
-        $this->log_message($log_file, 'Encrypted File Path: ' . $this->encrypted_file);
-
-        /* Ensure the data is stored in properties that are accessible across the class */
-        $data = [
-            'file_id' => $this->file_id,
-            'post_id' => $this->post_id,
-            'data_encryption_key' => $this->data_encryption_key,
-            'expiration_date' => $this->expiration_date,
-            'encrypted_file' => $this->encrypted_file,
-        ];
-
-        /* Log the retrieved data */
-        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Retrieved upload data: ' . print_r($data, true));
-
-        return $data;
-    }
-
-    /**
      * Handles the AJAX request for file upload.
     */
 
