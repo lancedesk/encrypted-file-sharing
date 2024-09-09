@@ -147,7 +147,7 @@ class EFS_File_CPT
             global $efs_local_file_handler;
 
             /* Handle the file upload and get the result */
-            $result = $efs_local_file_handler->process_file_upload();
+            $result = $efs_local_file_handler->get_upload_data();
 
             if ($result && isset($result['encrypted_file'])) 
             {
