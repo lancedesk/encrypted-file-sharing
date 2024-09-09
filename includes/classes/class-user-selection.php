@@ -199,5 +199,22 @@ class EFS_User_Selection
         return $response;
     }
 
+    /**
+     * Logs messages to a file.
+     *
+     * @param string $log_file Path to the log file.
+     * @param string $message The message to log.
+    */
+
+    private function log_message($log_file, $message)
+    {
+        $timestamp = date('Y-m-d H:i:s');
+        $formatted_message = '[' . $timestamp . '] ' . $message . PHP_EOL;
+
+        /* Append the message to the log file */
+        file_put_contents($log_file, $formatted_message, FILE_APPEND);
+    }
+
+
 
 }
