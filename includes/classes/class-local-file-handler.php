@@ -21,7 +21,7 @@ class EFS_Local_File_Handler
 
     public function process_file_upload()
     {
-        global $efs_file_handler;
+        global $efs_file_handler, $efs_file_encryption;
         $upload_dir = ABSPATH . '../private_uploads/';
 
         /* Check if upload directory exists, create it if not */
