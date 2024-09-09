@@ -45,6 +45,7 @@ class EFS_Init
 
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id INT NOT NULL AUTO_INCREMENT,
+            post_id INT NOT NULL,
             user_id INT NOT NULL,
             file_id INT NOT NULL,  -- Reference to the file in `efs_file_metadata`
             encryption_key BLOB NOT NULL,
