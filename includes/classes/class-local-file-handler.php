@@ -22,6 +22,7 @@ class EFS_Local_File_Handler
     public function handle_local_upload_ajax()
     {
         global $efs_file_handler;
+        $upload_dir = ABSPATH . '../private_uploads/';
 
         /* Calculate the expiration date */
         $expiration_date = $this->calculate_expiration_date();
@@ -56,6 +57,7 @@ class EFS_Local_File_Handler
         /* Retrieve file information */
         $file_path = get_attached_file($file_id);
         $file_name = basename($file_path);
+        $target_file = $upload_dir . $file_name;
         
         if (!$file_path || !file_exists($file_path)) {
             wp_send_json_error(['message' => 'File does not exist.']);
@@ -65,44 +67,22 @@ class EFS_Local_File_Handler
         $this->log_message($log_file, 'Received file path: ' . $file_path);
         $this->log_message($log_file, 'Expiration date: ' . $expiration_date);
 
-        /* Call the method to upload and encrypt the file locally */
-        $encrypted_file = $this->upload_to_local($file_path, $expiration_date, $post_id);
 
-        /* Check if the file was uploaded and encrypted successfully */
-        if ($encrypted_file) {
-            $this->log_message($log_file, 'File upload and encryption successful. Encrypted file: ' . $encrypted_file);
-            
-            /* Log the file ID */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File ID: ' . $file_id);
+        /* Store the file's metadata with the target file path */
+        $metadata = $this->save_file_metadata($post_id, $file_name, $target_file);
 
-            /* Log the post ID */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Post ID: ' . $post_id);
-
-            /* Update the post meta to mark the post as encrypted */
-            update_post_meta($post_id, '_efs_encrypted', 1);
-
-            /* Retrieve deletion  setting */
-            $delete_after_encryption = get_option('efs_delete_files', 0);
-
-            if($delete_after_encryption)
-            {
-                /* Delete the local file from WordPress media library */
-                $deletion_result = $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id)); /* Using the file's URL */
-                
-                if ($deletion_result)
-                {
-                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Local file successfully deleted: ' . $file_path);
-                } else {
-                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to delete local file: ' . $file_path);
-                }
-            
-            }
-            
-            wp_send_json_success(['file_url' => $encrypted_file]);
-        } else {
-            $this->log_message($log_file, 'File upload or encryption failed.');
-            wp_send_json_error(['message' => 'File upload failed.']);
+        if (!$metadata['success']) {
+            wp_send_json_error(['message' => 'File metadata save failed.']);
         }
+    
+        /* Optionally delete the original file after saving metadata */
+        $delete_after_encryption = get_option('efs_delete_files', 0);
+        if ($delete_after_encryption) {
+            $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
+        }
+    
+        /* Return success response */
+        wp_send_json_success(['message' => 'File uploaded successfully.', 'file_id' => $file_id, 'post_id' => $post_id]);
     }
 
     /**
