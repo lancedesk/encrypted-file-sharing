@@ -40,8 +40,6 @@ class EFS_Local_File_Handler
         /* Log file path */
         $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
 
-        $this->log_message($log_file, 'Ajax method called.');
-
         /* Verify the nonce */
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'efs_upload_nonce')) {
             $this->log_message($log_file, 'Invalid nonce.');
@@ -109,25 +107,11 @@ class EFS_Local_File_Handler
                     $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
                 }
 
-                /* Log the success data */
-                $this->log_message($log_file, 'File uploaded and encrypted successfully.');
-                $this->log_message($log_file, 'File ID: ' . $file_id);
-                $this->log_message($log_file, 'Post ID: ' . $post_id);
-                $this->log_message($log_file, 'Data Encryption Key: ' . bin2hex($data_encryption_key)); /* Convert binary data to hex for logging */
-                $this->log_message($log_file, 'Expiration Date: ' . $expiration_date);
-                $this->log_message($log_file, 'Encrypted File Path: ' . $encrypted_file);
+                /* Get and log sensitive data (avoid sending it as JSON) */
+                $this->get_upload_data($file_id, $post_id, $data_encryption_key, $expiration_date, $encrypted_file);
 
                 /* Send encrypted file URL as JSON response */
                 wp_send_json_success(['file_url' => $encrypted_file]);
-
-                /* Return success data */
-                return [
-                    'file_id' => $file_id,
-                    'post_id' => $post_id,
-                    'data_encryption_key' => $data_encryption_key,
-                    'expiration_date' => $expiration_date,
-                    'encrypted_file' => $encrypted_file,
-                ];
 
             } else {
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
@@ -157,6 +141,14 @@ class EFS_Local_File_Handler
 
     private function get_upload_data($file_id, $post_id, $data_encryption_key, $expiration_date, $encrypted_file)
     {
+        /* Log the success data */
+        $this->log_message($log_file, 'File uploaded and encrypted successfully.');
+        $this->log_message($log_file, 'File ID: ' . $file_id);
+        $this->log_message($log_file, 'Post ID: ' . $post_id);
+        $this->log_message($log_file, 'Data Encryption Key: ' . bin2hex($data_encryption_key)); /* Convert binary data to hex for logging */
+        $this->log_message($log_file, 'Expiration Date: ' . $expiration_date);
+        $this->log_message($log_file, 'Encrypted File Path: ' . $encrypted_file);
+                        
         return [
             'file_id' => $file_id,
             'post_id' => $post_id,
