@@ -2,11 +2,6 @@
 
 class EFS_Local_File_Handler
 {
-    private $file_id;
-    private $post_id;
-    private $data_encryption_key;
-    private $expiration_date;
-    private $encrypted_file;
 
     /**
      * Constructor to initialize actions and hooks.
@@ -97,12 +92,24 @@ class EFS_Local_File_Handler
                 /* Log the file metadata result */
                 if ($file_metadata['success'])
                 {
-                    $this->file_id = $file_metadata['file_id'];
-                    $this->post_id = $post_id;
-                    $this->data_encryption_key = $data_encryption_key;
-                    $this->expiration_date = $expiration_date;
-                    $this->encrypted_file = $encrypted_file;
-                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
+                    /* Log the successful metadata save */
+                    $success = $this->efs_insert_encrypted_file_metadata
+                    (
+                        $file_metadata['file_id'], 
+                        $post_id, 
+                        $data_encryption_key, 
+                        $expiration_date, 
+                        $encrypted_file
+                    );
+
+                    if ($success) {
+                        /* Metadata was successfully inserted */
+                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
+                    } else {
+                        /* Handle insertion failure */
+                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
+                    }
+
                 }
                 else
                 {
