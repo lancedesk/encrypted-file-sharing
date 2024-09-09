@@ -97,6 +97,11 @@ class EFS_Local_File_Handler
                 /* Log the file metadata result */
                 if ($file_metadata['success'])
                 {
+                    $this->file_id = $file_metadata['file_id'];
+                    $this->post_id = $post_id;
+                    $this->data_encryption_key = $data_encryption_key;
+                    $this->expiration_date = $expiration_date;
+                    $this->encrypted_file = $encrypted_file;
                     $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
                 }
                 else
