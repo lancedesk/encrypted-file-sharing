@@ -22,10 +22,10 @@ class EFS_Local_File_Handler
     }
 
     /**
-     * Handle the local file upload via AJAX.
+     * Handle the local file upload.
     */
 
-    public function process_file_upload()
+    public function handle_local_upload()
     {
         global $efs_file_handler, $efs_file_encryption;
         $upload_dir = ABSPATH . '../private_uploads/';
@@ -186,7 +186,7 @@ class EFS_Local_File_Handler
         /* Log a message to the error log to confirm the hook was fired */
         error_log('The handle_local_upload_ajax hook was fired!');
 
-        $result = $this->process_file_upload();
+        $result = $this->handle_local_upload();
 
         if (isset($result['error'])) {
             wp_send_json_error(['message' => $result['error']]);
