@@ -84,11 +84,15 @@ class EFS_Encryption
             if ($result === false) {
                 /* Log insertion failure */
                 $this->log_message("Error: Failed to insert data into database for user ID: $user_id.");
+                return false;  /* Return false immediately if database insertion fails */
             } else {
                 /* Log successful insertion */
                 $this->log_message("Successfully saved encrypted keys for user ID: $user_id.");
             }
         }
+
+        /* If everything succeeded, return true */
+        return true;
     }
 
 
