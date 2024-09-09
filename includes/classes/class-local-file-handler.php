@@ -19,13 +19,10 @@ class EFS_Local_File_Handler
      * Handle the local file upload via AJAX.
     */
 
-    public function handle_local_upload_ajax()
+    public function process_file_upload()
     {
         global $efs_file_handler;
         $upload_dir = ABSPATH . '../private_uploads/';
-
-        /* Log a message to the error log to confirm the hook was fired */
-        error_log('The handle_local_upload_ajax hook was fired!');
 
         /* Check if upload directory exists, create it if not */
         if (!file_exists($upload_dir)) {
@@ -105,7 +102,23 @@ class EFS_Local_File_Handler
         
                 /* Log the successful encryption and upload */
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
-        
+
+                /* Optionally delete the original file after saving metadata */
+                $delete_after_encryption = get_option('efs_delete_files', 0);
+                if ($delete_after_encryption) {
+                    $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
+                }
+
+                 /* Return success response with DEK and required data */
+                wp_send_json_success([
+                    'message' => 'File uploaded and encrypted successfully.',
+                    'file_id' => $file_id,
+                    'post_id' => $post_id,
+                    'data_encryption_key' => $data_encryption_key,
+                    'expiration_date' => $expiration_date,
+                    'selected_users' => $selected_users
+                ]);
+
                 return $encrypted_file;
             } else {
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
@@ -117,14 +130,26 @@ class EFS_Local_File_Handler
             return false;
         }
     
-        /* Optionally delete the original file after saving metadata */
-        $delete_after_encryption = get_option('efs_delete_files', 0);
-        if ($delete_after_encryption) {
-            $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
-        }
-    
         /* Return success response */
         wp_send_json_success(['message' => 'File uploaded successfully.', 'file_id' => $file_id, 'post_id' => $post_id]);
+    }
+
+    /**
+     * Handles the AJAX request for file upload.
+    */
+
+    public function handle_local_upload_ajax()
+    {
+        /* Log a message to the error log to confirm the hook was fired */
+        error_log('The handle_local_upload_ajax hook was fired!');
+
+        $result = $this->process_file_upload();
+
+        if (isset($result['error'])) {
+            wp_send_json_error(['message' => $result['error']]);
+        } else {
+            wp_send_json_success($result);
+        }
     }
 
     /**
