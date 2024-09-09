@@ -155,7 +155,16 @@ class EFS_Local_File_Handler
         $this->log_message($log_file, 'File uploaded and encrypted successfully.');
         $this->log_message($log_file, 'File ID: ' . $this->file_id);
         $this->log_message($log_file, 'Post ID: ' . $this->post_id);
-        $this->log_message($log_file, 'Data Encryption Key: ' . bin2hex($this->data_encryption_key)); /* Convert binary data to hex for logging */
+        /* Convert binary data to hex for logging */
+        if (!is_null($this->data_encryption_key))
+        {
+            $this->log_message($log_file, 'Data Encryption Key: ' . bin2hex($this->data_encryption_key));
+        }
+        else
+        {
+            $this->log_message($log_file, 'Data Encryption Key: null');
+        }
+
         $this->log_message($log_file, 'Expiration Date: ' . $this->expiration_date);
         $this->log_message($log_file, 'Encrypted File Path: ' . $this->encrypted_file);
 
@@ -192,7 +201,7 @@ class EFS_Local_File_Handler
 
         $upload_data = $this->get_upload_data();
         $selected_users = $efs_user_selection->get_recipients_from_db($post_id)['results'];
-        $response = $efs_user_selection->get_recipients_from_db($post_id)['response'];
+        $response = $efs_user_selection->get_recipients_from_db($post_id)['query'];
 
         if (empty($selected_users))
         {
@@ -214,7 +223,7 @@ class EFS_Local_File_Handler
         if (!empty($selected_users) && is_array($selected_users))
         {
             /* Save the encryption key securely for all selected users in the database */
-            $efs_file_encryption->save_encrypted_key($upload_data['post_id'], $upload_data['selected_users'], $upload_data['file_id'], $upload_data['data_encryption_key'], $upload_data['expiration_date']);
+            $efs_file_encryption->save_encrypted_key($upload_data['post_id'], $selected_users, $upload_data['file_id'], $upload_data['data_encryption_key'], $upload_data['expiration_date']);
             $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
         }
         else
