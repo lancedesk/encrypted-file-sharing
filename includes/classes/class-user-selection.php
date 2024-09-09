@@ -119,7 +119,13 @@ class EFS_User_Selection
         $table_name = $wpdb->prefix . 'efs_recipients';
 
         /* Delete existing recipients for this post */
-        $wpdb->delete($table_name, ['post_id' => $post_id]);
+        $delete_result = $wpdb->delete($table_name, ['post_id' => $post_id]);
+
+        /* Check if delete operation failed */
+        if ($delete_result === false)
+        {
+            return false;
+        }
 
         /* Insert each recipient */
         foreach ($recipients as $recipient_id)
