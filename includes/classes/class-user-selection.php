@@ -90,10 +90,22 @@ class EFS_User_Selection
             $selected_users = array_map('intval', $_POST['efs_user_selection']);
 
             /* Save selected recipients to the database */
-            $this->save_recipients_to_db($post_id, $selected_users);
+            $result = $this->save_recipients_to_db($post_id, $selected_users);
 
-            /* Set flag meta when user selection is fully saved */
-            update_post_meta($post_id, '_efs_user_selection_saved', true);
+            if ($result === false) {
+                return;
+            }
+            else
+            {
+                global $efs_local_file_handler;
+
+                /* Handle file encryption for the post */
+                $efs_local_file_handler->handle_file_encryption($post_id);
+
+                /* Set flag meta when user selection is fully saved */
+                update_post_meta($post_id, '_efs_user_selection_saved', true);
+            }
+
         } else {
             /* If no users selected, delete from the database */
             $this->save_recipients_to_db($post_id, []);
