@@ -130,7 +130,7 @@ class EFS_User_Selection
         /* Insert each recipient */
         foreach ($recipients as $recipient_id)
         {
-            $wpdb->insert(
+            $insert_result = $wpdb->insert(
                 $table_name,
                 [
                     'post_id' => $post_id,
@@ -141,7 +141,16 @@ class EFS_User_Selection
                     '%d'
                 ]
             );
+
+            /* Check if insert operation failed */
+            if ($insert_result === false)
+            {
+                return false;
+            }
         }
+
+        /* Return true if all operations were successful */
+        return true;
     }
 
     /**
