@@ -117,6 +117,9 @@ class EFS_Local_File_Handler
                 $this->log_message($log_file, 'Expiration Date: ' . $expiration_date);
                 $this->log_message($log_file, 'Encrypted File Path: ' . $encrypted_file);
 
+                /* Send encrypted file URL as JSON response */
+                wp_send_json_success(['file_url' => $encrypted_file]);
+
                 /* Return success data */
                 return [
                     'file_id' => $file_id,
@@ -128,6 +131,7 @@ class EFS_Local_File_Handler
 
             } else {
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
+                wp_send_json_error(['message' => 'File upload failed.']);
                 return false;
             }
         } else {
@@ -138,6 +142,28 @@ class EFS_Local_File_Handler
     
         /* Return success response */
         wp_send_json_success(['message' => 'File uploaded successfully.', 'file_id' => $file_id, 'post_id' => $post_id]);
+    }
+
+    /**
+     * Formats sensitive data for internal use.
+     *
+     * @param int $file_id
+     * @param int $post_id
+     * @param string $data_encryption_key
+     * @param string $expiration_date
+     * @param string $encrypted_file
+     * @return array
+    */
+
+    private function get_upload_data($file_id, $post_id, $data_encryption_key, $expiration_date, $encrypted_file)
+    {
+        return [
+            'file_id' => $file_id,
+            'post_id' => $post_id,
+            'data_encryption_key' => $data_encryption_key,
+            'expiration_date' => $expiration_date,
+            'encrypted_file' => $encrypted_file,
+        ];
     }
 
     /**
