@@ -134,6 +134,32 @@ class EFS_Init
     }
 
     /**
+     * Create the database table for storing encrypted file metadata.
+    */
+
+    public function efs_create_encrypted_files_table()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_encrypted_files';
+
+        /* SQL to create the table */
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            file_id INT(11) NOT NULL,
+            post_id INT(11) NOT NULL,
+            data_encryption_key VARBINARY(255) NOT NULL,
+            expiration_date DATETIME NOT NULL,
+            encrypted_file VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql); /* Ensures the table is created or updated if it already exists */
+    }
+
+    /**
      * Generate and save the master key to the custom database table.
     */
 
