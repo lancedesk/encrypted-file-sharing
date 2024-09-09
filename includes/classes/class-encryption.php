@@ -8,34 +8,23 @@ class EFS_Encryption
     }
 
     /**
-     * Logs messages to a file.
-     *
-     * @param string $message The message to log.
-    */
-
-    private function log_message($message)
-    {
-        $log_file = WP_CONTENT_DIR . '/efs_encryption_log.txt';
-        $timestamp = date('Y-m-d H:i:s');
-        file_put_contents($log_file, "[$timestamp] $message\n", FILE_APPEND);
-    }
-
-    /**
      * Save the encrypted symmetric key for a specific user and file.
      *
+     * @param int $post_id The ID of the post (file).
      * @param int $user_id The ID of the user.
      * @param int $file_id The ID of the file (from `efs_file_metadata`).
      * @param string $data_encryption_key The encrypted key to be saved.
      * @param string $expiration_date The expiration date of the encryption key.
     */
 
-    public function save_encrypted_key($selected_users, $file_id, $data_encryption_key, $expiration_date)
+    public function save_encrypted_key($post_id, $selected_users, $file_id, $data_encryption_key, $expiration_date)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'efs_encryption_keys';
 
         /* Log received parameters */
         $this->log_message("Selected users: " . implode(', ', $selected_users));
+        $this->log_message("Post ID: $post_id");
         $this->log_message("File ID: $file_id");
         $this->log_message("Data Encryption Key received: $data_encryption_key");
         $this->log_message("Expiration date: $expiration_date");
@@ -73,6 +62,7 @@ class EFS_Encryption
             $result = $wpdb->insert(
                 $table_name,
                 [
+                    'post_id' => $post_id,
                     'user_id' => $user_id,
                     'file_id' => $file_id,
                     'encryption_key' => $encrypted_dek, /* Store encrypted DEK */
@@ -81,6 +71,7 @@ class EFS_Encryption
                     'created_at' => current_time('mysql')
                 ],
                 [
+                    '%d', /* post_id */
                     '%d', /* user_id */
                     '%d', /* file_id */
                     '%s', /* encrypted_dek */
@@ -331,6 +322,19 @@ class EFS_Encryption
         }
 
         return $user_kek;
+    }
+
+    /**
+     * Logs messages to a file.
+     *
+     * @param string $message The message to log.
+    */
+
+    private function log_message($message)
+    {
+        $log_file = WP_CONTENT_DIR . '/efs_encryption_log.txt';
+        $timestamp = date('Y-m-d H:i:s');
+        file_put_contents($log_file, "[$timestamp] $message\n", FILE_APPEND);
     }
 
 }
