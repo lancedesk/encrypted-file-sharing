@@ -114,7 +114,7 @@ class EFS_Local_File_Handler
                 }
 
                 /* Get and log sensitive data (avoid sending it as JSON) */
-                $this->get_upload_data($file_id, $post_id, $data_encryption_key, $expiration_date, $encrypted_file);
+                $this->get_upload_data();
 
                 /* Send encrypted file URL as JSON response */
                 wp_send_json_success(['file_url' => $encrypted_file]);
@@ -124,7 +124,9 @@ class EFS_Local_File_Handler
                 wp_send_json_error(['message' => 'File upload failed.']);
                 return false;
             }
-        } else {
+        }
+        else
+        {
             /* Log an error if file copy fails */
             $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to copy file to: ' . $target_file);
             return false;
@@ -135,32 +137,29 @@ class EFS_Local_File_Handler
     }
 
     /**
-     * Formats sensitive data for internal use.
+     * Formats upload data for internal use.
      *
-     * @param int $file_id
-     * @param int $post_id
-     * @param string $data_encryption_key
-     * @param string $expiration_date
-     * @param string $encrypted_file
      * @return array
     */
 
-    private function get_upload_data($file_id, $post_id, $data_encryption_key, $expiration_date, $encrypted_file)
+    private function get_upload_data()
     {
+        $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
+
         /* Log the success data */
         $this->log_message($log_file, 'File uploaded and encrypted successfully.');
-        $this->log_message($log_file, 'File ID: ' . $file_id);
-        $this->log_message($log_file, 'Post ID: ' . $post_id);
-        $this->log_message($log_file, 'Data Encryption Key: ' . bin2hex($data_encryption_key)); /* Convert binary data to hex for logging */
-        $this->log_message($log_file, 'Expiration Date: ' . $expiration_date);
-        $this->log_message($log_file, 'Encrypted File Path: ' . $encrypted_file);
-                        
+        $this->log_message($log_file, 'File ID: ' . $this->file_id);
+        $this->log_message($log_file, 'Post ID: ' . $this->post_id);
+        $this->log_message($log_file, 'Data Encryption Key: ' . bin2hex($this->data_encryption_key)); /* Convert binary data to hex for logging */
+        $this->log_message($log_file, 'Expiration Date: ' . $this->expiration_date);
+        $this->log_message($log_file, 'Encrypted File Path: ' . $this->encrypted_file);
+
         return [
-            'file_id' => $file_id,
-            'post_id' => $post_id,
-            'data_encryption_key' => $data_encryption_key,
-            'expiration_date' => $expiration_date,
-            'encrypted_file' => $encrypted_file,
+            'file_id' => $this->file_id,
+            'post_id' => $this->post_id,
+            'data_encryption_key' => $this->data_encryption_key,
+            'expiration_date' => $this->expiration_date,
+            'encrypted_file' => $this->encrypted_file,
         ];
     }
 
