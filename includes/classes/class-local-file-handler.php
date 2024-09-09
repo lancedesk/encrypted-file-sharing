@@ -167,7 +167,19 @@ class EFS_Local_File_Handler
     {
         global $efs_user_selection, $efs_file_encryption;
 
-        $upload_data = $this->get_upload_data();
+        $upload_data = $this->efs_get_encrypted_file_metadata_by_post_id($post_id);
+
+        if ($upload_data)
+        {
+            /* Metadata found */
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Metadata found for post ID: ' . $post_id . $upload_data['file_id'] . $upload_data['expiration_date']);
+        }
+        else
+        {
+            /* No metadata found for the given post ID */
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No data found for the specified post ID: ' . $post_id);
+        }
+
         $selected_users = $efs_user_selection->get_recipients_from_db($post_id)['results'];
         $response = $efs_user_selection->get_recipients_from_db($post_id)['query'];
 
