@@ -186,6 +186,44 @@ class EFS_Local_File_Handler
         }
     }
 
+    public function handle_file_encryption($post_id)
+    {
+        global $efs_user_selection, $efs_file_encryption;
+
+        $upload_data = $this->get_upload_data();
+        $selected_users = $efs_user_selection->get_recipients_from_db($post_id)['results'];
+        $response = $efs_user_selection->get_recipients_from_db($post_id)['response'];
+
+        if (empty($selected_users))
+        {
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users found in database for post ID: ' . $post_id);
+
+            /* Fallback to retrieving from post meta */
+            $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from post meta: ' . implode(',', $selected_users));
+        }
+        else
+        {
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from database: ' . implode(',', $selected_users));
+        }
+
+        /* Log the database query and retrieved users */
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Database query executed: ' . $response);
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from database: ' . implode(',', $selected_users));
+
+        if (!empty($selected_users) && is_array($selected_users))
+        {
+            /* Save the encryption key securely for all selected users in the database */
+            $efs_file_encryption->save_encrypted_key($upload_data['post_id'], $upload_data['selected_users'], $upload_data['file_id'], $upload_data['data_encryption_key'], $upload_data['expiration_date']);
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
+        }
+        else
+        {
+            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users selected or invalid user selection for post ID: ' . $post_id);
+        }
+        
+    }
+
     /**
      * Upload and encrypt the file locally.
      *
