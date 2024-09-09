@@ -61,23 +61,33 @@ class EFS_User_Selection
 
     public function save_user_selection_meta_box_data($post_id)
     {
+        $log_file = WP_CONTENT_DIR . '/efs_save_user_selection_log.txt'; // Path to the log file
+
+        /* Log start of function execution */
+        $this->log_message($log_file, 'Started save_user_selection_meta_box_data for post ID: ' . $post_id);
+
         /* Check if nonce is set */
-        if (!isset($_POST['efs_user_selection_meta_box_nonce'])) {
+        if (!isset($_POST['efs_user_selection_meta_box_nonce']))
+        {
+            $this->log_message($log_file, 'Nonce not set. Exiting.');
             return;
         }
 
         /* Verify nonce */
         if (!wp_verify_nonce($_POST['efs_user_selection_meta_box_nonce'], 'efs_user_selection_meta_box')) {
+            $this->log_message($log_file, 'Nonce verification failed for post ID: ' . $post_id);
             return;
         }
 
         /* Check autosave */
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            $this->log_message($log_file, 'Incorrect post type. Exiting.');
             return;
         }
 
         /* Check permissions */
         if ('efs_file' !== $_POST['post_type']) {
+            $this->log_message($log_file, 'User does not have permission to edit post ID: ' . $post_id);
             return;
         }
 
@@ -89,33 +99,47 @@ class EFS_User_Selection
         if (isset($_POST['efs_user_selection']) && is_array($_POST['efs_user_selection'])) {
             $selected_users = array_map('intval', $_POST['efs_user_selection']);
 
+            $this->log_message($log_file, 'Selected users: ' . implode(', ', $selected_users));
+
             /* Save selected recipients to the database */
             $result = $this->save_recipients_to_db($post_id, $selected_users);
 
             if ($result === false) {
+                $this->log_message($log_file, 'Failed to save recipients to the database for post ID: ' . $post_id);
                 return;
             }
             else
             {
                 global $efs_local_file_handler;
 
+                $this->log_message($log_file, 'Recipients saved successfully.');
+
                 /* Handle file encryption for the post */
                 if (isset($efs_local_file_handler) && is_object($efs_local_file_handler)) 
                 {
+                    $this->log_message($log_file, 'Starting file encryption for post ID: ' . $post_id);
                     $efs_local_file_handler->handle_file_encryption($post_id);
+                    $this->log_message($log_file, 'File encryption completed for post ID: ' . $post_id);
                 }
 
                 /* Set flag meta when user selection is fully saved */
                 update_post_meta($post_id, '_efs_user_selection_saved', true);
+                $this->log_message($log_file, 'Meta updated for post ID: ' . $post_id);
             }
 
         } else {
+            $this->log_message($log_file, 'No users selected for post ID: ' . $post_id);
+
             /* If no users selected, delete from the database */
             $this->save_recipients_to_db($post_id, []);
 
             /* Remove the saved flag if no users are selected */
             delete_post_meta($post_id, '_efs_user_selection_saved');
+            $this->log_message($log_file, 'Meta deleted for post ID: ' . $post_id);
         }
+
+        /* Log end of function execution */
+        $this->log_message($log_file, 'Finished save_user_selection_meta_box_data for post ID: ' . $post_id);
     }
 
     /**
