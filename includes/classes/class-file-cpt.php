@@ -145,11 +145,15 @@ class EFS_File_CPT
         if (isset($_FILES['file']) && !empty($_FILES['file']['name'])) 
         {
             global $efs_local_file_handler;
-            $file_path = $efs_local_file_handler->upload_to_local($_FILES['file']);
 
-            if ($file_path) 
+            /* Handle the file upload and get the result */
+            $result = $efs_local_file_handler->process_file_upload();
+
+            if ($result && isset($result['encrypted_file'])) 
             {
-                update_post_meta($post_id, '_efs_file_url', $file_path);  /* Save the file path instead of media ID */
+                /* Save the encrypted file path */
+                $file_path = $result['encrypted_file'];
+                update_post_meta($post_id, '_efs_file_url', $file_path); /* Save the file path instead of media ID */
             }
         }
     }
