@@ -53,9 +53,9 @@ class EFS_File_Handler
      * Upload file to a secure location via the local file handler.
     */
 
-    private function upload_to_local($file)
+    private function handle_local_upload()
     {
-        return $this->efs_local_file_handler->upload_to_local($file);
+        return $this->efs_local_file_handler->handle_local_upload();
     }
 
     /**
@@ -163,7 +163,7 @@ class EFS_File_Handler
                 return $this->upload_to_dropbox($file);
             case 'local':
             default:
-                return $this->upload_to_local($file);
+                return $this->handle_local_upload();
         }
     }
 
@@ -271,10 +271,12 @@ class EFS_File_Handler
 
         /* Decrypt the file */
         $decrypted_data = $this->decrypt_file($file_path, $encryption_key);
+
         if ($decrypted_data === false) {
             $this->write_to_log('File decryption failed for file: ' . $file_name, $log_file);
             wp_send_json_error(array('message' => 'File decryption failed.'));
         }
+
         $this->write_to_log('File decrypted successfully for file: ' . $file_name, $log_file);
         $this->write_to_log('Decrypted file size: ' . strlen($decrypted_data) . ' bytes', $log_file);
     
