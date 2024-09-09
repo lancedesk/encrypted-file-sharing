@@ -109,17 +109,15 @@ class EFS_Local_File_Handler
                     $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
                 }
 
-                 /* Return success response with DEK and required data */
-                wp_send_json_success([
-                    'message' => 'File uploaded and encrypted successfully.',
+                /* Return success data */
+                return [
                     'file_id' => $file_id,
                     'post_id' => $post_id,
                     'data_encryption_key' => $data_encryption_key,
                     'expiration_date' => $expiration_date,
-                    'selected_users' => $selected_users
-                ]);
+                    'encrypted_file' => $encrypted_file,
+                ];
 
-                return $encrypted_file;
             } else {
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
                 return false;
