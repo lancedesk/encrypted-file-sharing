@@ -149,7 +149,7 @@ class EFS_Init
             id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             file_id INT(11) NOT NULL,
             post_id INT(11) NOT NULL,
-            data_encryption_key VARBINARY(255) NOT NULL,
+            data_encryption_key BLOB NOT NULL,
             expiration_date DATETIME NOT NULL,
             encrypted_file VARCHAR(255) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
