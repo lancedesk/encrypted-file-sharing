@@ -227,7 +227,7 @@ class EFS_Local_File_Handler
     public function efs_insert_encrypted_file_metadata($file_id, $post_id, $data_encryption_key, $expiration_date, $encrypted_file)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'encrypted_files';
+        $table_name = $wpdb->prefix . 'efs_encrypted_files';
 
         $result = $wpdb->insert(
             $table_name,
