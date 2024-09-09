@@ -259,7 +259,6 @@ class EFS_Local_File_Handler
         }
         else
         {
-            error_log('Error saving file metadata for post ID ' . $post_id);
             return [
                 'success' => false,
                 'file_id' => null
