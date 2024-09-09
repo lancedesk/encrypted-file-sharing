@@ -118,9 +118,6 @@ class EFS_Local_File_Handler
                     $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
                 }
 
-                /* Get and log sensitive data (avoid sending it as JSON) */
-                $this->get_upload_data();
-
                 /* Send encrypted file URL as JSON response */
                 wp_send_json_success(['file_url' => $encrypted_file]);
 
@@ -168,13 +165,19 @@ class EFS_Local_File_Handler
         $this->log_message($log_file, 'Expiration Date: ' . $this->expiration_date);
         $this->log_message($log_file, 'Encrypted File Path: ' . $this->encrypted_file);
 
-        return [
+        /* Ensure the data is stored in properties that are accessible across the class */
+        $data = [
             'file_id' => $this->file_id,
             'post_id' => $this->post_id,
             'data_encryption_key' => $this->data_encryption_key,
             'expiration_date' => $this->expiration_date,
             'encrypted_file' => $this->encrypted_file,
         ];
+
+        /* Log the retrieved data */
+        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Retrieved upload data: ' . print_r($data, true));
+
+        return $data;
     }
 
     /**
@@ -231,6 +234,43 @@ class EFS_Local_File_Handler
             $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users selected or invalid user selection for post ID: ' . $post_id);
         }
         
+    }
+
+    /**
+     * Insert metadata for an encrypted file into the database.
+     *
+     * @param int $file_id The ID of the file.
+     * @param int $post_id The ID of the post associated with the file.
+     * @param string $data_encryption_key The encryption key used for the file.
+     * @param string $expiration_date The expiration date of the file.
+     * @param string $encrypted_file The path or URL to the encrypted file.
+     * @return bool True on success, false on failure.
+    */
+
+    public function efs_insert_encrypted_file_metadata($file_id, $post_id, $data_encryption_key, $expiration_date, $encrypted_file)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'encrypted_files';
+
+        $result = $wpdb->insert(
+            $table_name,
+            [
+                'file_id' => $file_id,
+                'post_id' => $post_id,
+                'data_encryption_key' => $data_encryption_key,
+                'expiration_date' => $expiration_date,
+                'encrypted_file' => $encrypted_file
+            ],
+            [
+                '%d',   /* file_id */
+                '%d',   /* post_id */
+                '%s',   /* data_encryption_key */
+                '%s',   /* expiration_date (%s for DATETIME) */
+                '%s'    /* encrypted_file */
+            ]
+        );
+
+        return $result !== false;
     }
 
     /**
