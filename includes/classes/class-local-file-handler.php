@@ -2,6 +2,12 @@
 
 class EFS_Local_File_Handler
 {
+    private $file_id;
+    private $post_id;
+    private $data_encryption_key;
+    private $expiration_date;
+    private $encrypted_file;
+
     /**
      * Constructor to initialize actions and hooks.
     */
