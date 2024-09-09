@@ -152,7 +152,7 @@ class EFS_Local_File_Handler
             {
 
                 /* Store the file's metadata with the target file path */
-                $file_metadata = $this->save_file_metadata($file_name, $target_file);
+                $file_metadata = $this->save_file_metadata($post_id, $file_name, $target_file);
 
                 /* Log the file metadata result */
                 if ($file_metadata['success'])
@@ -164,7 +164,7 @@ class EFS_Local_File_Handler
                     $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
                 }
 
-                $response = $this->get_recipients_from_db($post->ID);
+                $response = $efs_user_selection->get_recipients_from_db($post_id);
                 $selected_users = $response['results'];
 
                 /* Log the database query and retrieved users */
@@ -173,10 +173,10 @@ class EFS_Local_File_Handler
 
                 if (empty($selected_users))
                 {
-                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users found in database for post ID: ' . $post->ID);
+                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users found in database for post ID: ' . $post_id);
 
                     /* Fallback to retrieving from post meta */
-                    $selected_users = get_post_meta($post->ID, '_efs_user_selection', true);
+                    $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
                     $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from post meta: ' . implode(',', $selected_users));
                 }
                 else
@@ -218,11 +218,12 @@ class EFS_Local_File_Handler
     /**
      * Save file metadata such as expiration date.
      *
+     * @param int $post_id The post ID of the post the file is uploaded.
      * @param string $file_name The name of the file.
      * @param string $file_path The path where the file is stored.
     */
 
-    private function save_file_metadata($file_name, $file_path)
+    private function save_file_metadata($post_id, $file_name, $file_path)
     {
         global $wpdb;
         
@@ -232,11 +233,13 @@ class EFS_Local_File_Handler
         $result = $wpdb->replace(
             $table_name,
             [
+                'post_id' => $post_id,
                 'file_name' => $file_name,
                 'file_path' => $file_path, /* Use the target file path  */
                 'upload_date' => current_time('mysql')
             ],
             [
+                '%d', /* post_id */
                 '%s', /* file_name */
                 '%s', /* file_path */
                 '%s'  /* upload_date */
