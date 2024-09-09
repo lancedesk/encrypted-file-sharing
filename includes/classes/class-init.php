@@ -85,42 +85,6 @@ class EFS_Init
     }
 
     /**
-     * Create a private folder outside the web root and log events
-    */
-
-    public function efs_create_private_folder() 
-    {
-
-        /* Path outside the web root */
-        $private_dir = ABSPATH . '../private_uploads/';
-
-        /* Log file path */
-        $log_file = WP_CONTENT_DIR . '/efs_folder_creation_log.txt';
-
-        /* Check if the folder already exists */
-        if (!file_exists($private_dir)) 
-        {
-            /* Try to create the folder */
-            if (mkdir($private_dir, 0755, true)) 
-            {
-                /* Log success with the absolute path */
-                $this->log_message($log_file, 'Private uploads folder created at: ' . realpath($private_dir));
-            } 
-            else 
-            {
-                /* Log failure */
-                $this->log_message($log_file, 'Failed to create private uploads folder at: ' . $private_dir);
-                wp_die('Failed to create private uploads folder. Please create it manually.');
-            }
-        } 
-        else 
-        {
-            /* Log that the folder already exists */
-            $this->log_message($log_file, 'Private uploads folder already exists at: ' . realpath($private_dir));
-        }
-    }
-
-    /**
      * Create the custom table for storing the master key.
     */
 
@@ -136,6 +100,33 @@ class EFS_Init
             id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             master_key BLOB NOT NULL,
             PRIMARY KEY (id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
+    /**
+     * Create the 'efs_recipients' table to store post-to-recipient relationships.
+     *
+     * @return void
+    */
+
+    public function efs_create_recipients_table()
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'efs_recipients';
+
+        /* SQL to create the table */
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE $table_name (
+            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            post_id BIGINT(20) UNSIGNED NOT NULL,
+            recipient_id BIGINT(20) UNSIGNED NOT NULL,
+            PRIMARY KEY (id),
+            KEY post_id (post_id),
+            KEY recipient_id (recipient_id)
         ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -181,31 +172,41 @@ class EFS_Init
         }
     }
 
+    
     /**
-     * Create the 'efs_recipients' table to store post-to-recipient relationships.
-     *
-     * @return void
+     * Create a private folder outside the web root and log events
     */
 
-    public function efs_create_recipients_table()
+    public function efs_create_private_folder() 
     {
-        global $wpdb;
 
-        $table_name = $wpdb->prefix . 'efs_recipients';
+        /* Path outside the web root */
+        $private_dir = ABSPATH . '../private_uploads/';
 
-        /* SQL to create the table */
-        $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE $table_name (
-            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            post_id BIGINT(20) UNSIGNED NOT NULL,
-            recipient_id BIGINT(20) UNSIGNED NOT NULL,
-            PRIMARY KEY (id),
-            KEY post_id (post_id),
-            KEY recipient_id (recipient_id)
-        ) $charset_collate;";
+        /* Log file path */
+        $log_file = WP_CONTENT_DIR . '/efs_folder_creation_log.txt';
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
+        /* Check if the folder already exists */
+        if (!file_exists($private_dir)) 
+        {
+            /* Try to create the folder */
+            if (mkdir($private_dir, 0755, true)) 
+            {
+                /* Log success with the absolute path */
+                $this->log_message($log_file, 'Private uploads folder created at: ' . realpath($private_dir));
+            } 
+            else 
+            {
+                /* Log failure */
+                $this->log_message($log_file, 'Failed to create private uploads folder at: ' . $private_dir);
+                wp_die('Failed to create private uploads folder. Please create it manually.');
+            }
+        } 
+        else 
+        {
+            /* Log that the folder already exists */
+            $this->log_message($log_file, 'Private uploads folder already exists at: ' . realpath($private_dir));
+        }
     }
 
     private function log_message($file, $message)
