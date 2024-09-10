@@ -123,7 +123,7 @@ class EFS_File_Display
                                     /* Modal content */
                                     $modal_content = $this->get_modal_content(get_the_ID(), $file_size);
                                     echo $modal_content;
-                                    
+
                                     /* Download button */
                                     echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-download"></i></a>';
 
@@ -167,10 +167,12 @@ class EFS_File_Display
 
     public function get_modal_content($file_id, $file_size)
     {
+        global $efs_admin_columns;
+
         /* Get the file details */
         $excerpt = get_the_excerpt($file_id);
         $description = get_post_field('post_content', $file_id);
-        $expiration = get_post_meta($file_id, '_efs_file_expiration', true);
+        $expiration = $efs_admin_columns->get_expiration_date_display($file_id);
         $upload_date = get_the_date('F j, Y \a\t g:i A', $file_id);
         
         /* Build the modal content with a unique ID */
@@ -178,7 +180,12 @@ class EFS_File_Display
         $modal_content .= '<div class="modal-content">';
         $modal_content .= '<span class="close" data-modal-id="fileDetailsModal-' . esc_attr($file_id) . '">&times;</span>';
         $modal_content .= '<p>File Size: ' . esc_html($file_size) . '</p>';
-        $modal_content .= '<p>Expiration: ' . esc_html($expiration) . '</p>';
+
+        if($expiration)
+        {
+            $modal_content .= '<p>Expiration: ' . esc_html($expiration) . '</p>';
+        }
+        
         $modal_content .= '<p>Description: ' . (!empty($excerpt) ? esc_html($excerpt) : wp_trim_words($description, 20)) . '</p>';
         $modal_content .= '<p>Uploaded: ' . esc_html($upload_date) . '</p>';
         $modal_content .= '</div></div>';
