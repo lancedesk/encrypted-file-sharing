@@ -70,7 +70,7 @@ class EFS_Admin_Columns
     }
 
     /**
-     * Get recipients for a post.
+     * Get recipients for a post from the custom recipients table.
      *
      * @param int $post_id The ID of the post.
      * @return string HTML string of recipients.
@@ -78,17 +78,31 @@ class EFS_Admin_Columns
 
     private function get_recipients($post_id)
     {
-        $recipients = get_post_meta($post_id, '_efs_user_selection', true);
-        if ($recipients) {
-            $user_links = array_map(function($user_id) {
+        global $wpdb;
+
+        /* Table name for recipients */
+        $table_name = $wpdb->prefix . 'efs_recipients';
+
+        /* Prepare and run the query to get recipient_ids using post_id */
+        $query = $wpdb->prepare("SELECT recipient_id FROM $table_name WHERE post_id = %d", $post_id);
+        $recipient_ids = $wpdb->get_col($query);
+
+        if ($recipient_ids)
+        {
+            /* Map recipient_ids to user links */
+            $user_links = array_map(function($user_id)
+            {
                 $user = get_user_by('ID', $user_id);
                 return $user ? '<a href="' . esc_url(get_edit_user_link($user_id)) . '">' . esc_html($user->display_name) . '</a>' : '';
-            }, $recipients);
+            }, $recipient_ids);
+            
+            /* Return the links as a comma-separated string */
             return implode(', ', $user_links);
         } else {
             return __('None', 'encrypted-file-sharing');
         }
     }
+
 
     /**
      * Get the download status for a post.
