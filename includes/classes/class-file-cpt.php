@@ -101,9 +101,9 @@ class EFS_File_CPT
         }
 
         echo '<p>';
-        echo '<label for="efs_file_url">' . __('File URL:', 'encrypted-file-sharing') . '</label>';
+        echo '<label for="efs_file_url">' . esc_html__('File URL:', 'encrypted-file-sharing') . '</label>';
         echo '<input type="text" id="efs_file_url" name="efs_file_url" value="' . esc_attr($file_url) . '" size="25" />';
-        echo '<button type="button" class="button" id="upload_file_button">' . __('Upload/Select File', 'encrypted-file-sharing') . '</button>';
+        echo '<button type="button" class="button" id="upload_file_button">' . esc_html__('Upload/Select File', 'encrypted-file-sharing') . '</button>';
         echo '</p>';
 
     }
@@ -220,13 +220,13 @@ class EFS_File_CPT
         
         /* Display the date and time fields */
         echo '<p>';
-        echo '<label for="efs_file_expiry_date">' . __('Expiry Date:', 'encrypted-file-sharing') . '</label>';
+        echo '<label for="efs_file_expiry_date">' . esc_html__('Expiry Date:', 'encrypted-file-sharing') . '</label>';
         echo '<input type="date" id="efs_file_expiry_date" name="efs_file_expiry_date" value="' . $expiry_date . '" />';
         echo '</p>';
 
         echo '<p>';
-        echo '<label for="efs_file_expiry_time">' . __('Expiry Time:', 'encrypted-file-sharing') . '</label>';
-        echo '<input type="time" id="efs_file_expiry_time" name="efs_file_expiry_time" value="' . $expiry_time . '" />';
+        echo '<label for="efs_file_expiry_time">' . esc_html__('Expiry Time:', 'encrypted-file-sharing') . '</label>';
+        echo '<input type="time" id="efs_file_expiry_time" name="efs_file_expiry_time" value="' . esc_html($expiry_time) . '" />';
         echo '</p>';
     }
 
