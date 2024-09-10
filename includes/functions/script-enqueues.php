@@ -4,6 +4,9 @@
 add_action('wp_enqueue_scripts', 'efs_enqueue_frontend_scripts');
 function efs_enqueue_frontend_scripts()
 {
+    /* Enqueue Font Awesome locally */
+    wp_enqueue_style('font-awesome-local', plugin_dir_url(__FILE__) . '../../assets/css/all.min.css', array(), '6.6.0');
+
     /* Enqueue frontend CSS */
     wp_enqueue_style('efs-frontend-css', plugin_dir_url(__FILE__) . '../../assets/css/frontend.css', array(), '1.0.0');
     
