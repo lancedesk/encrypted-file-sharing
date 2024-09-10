@@ -7,23 +7,24 @@ class EFS_File_Display
 	 * Constructor to initialize actions and hooks.
 	*/
 
-	public function __construct() {
+	public function __construct()
+    {
 		/* Register shortcode */
 		add_shortcode('efs_user_files', [$this, 'render_user_files_shortcode']);
-        add_action('wp_ajax_fetch_modal_content', [$this, 'fetch_modal_content']);
-        add_action('wp_ajax_nopriv_fetch_modal_content', [$this, 'fetch_modal_content']);
 	}
 
 	/**
 	 * Render the user files shortcode.
 	*/
 
-	public function render_user_files_shortcode($atts) {
+	public function render_user_files_shortcode($atts)
+    {
 		/* Start output buffering */
 		ob_start();
 
 		/* Ensure user is logged in */
-		if (is_user_logged_in()) {
+		if (is_user_logged_in())
+        {
 			$current_user_id = get_current_user_id();
 			
 			/* Query for post IDs where the current user is a recipient */
@@ -59,7 +60,8 @@ class EFS_File_Display
 						'hide_empty' => true
 					]);
 
-					foreach ($categories as $category) {
+					foreach ($categories as $category)
+                    {
 						echo '<h2>' . esc_html($category->name) . '</h2>';
 						echo '<ul>';
 
@@ -121,7 +123,9 @@ class EFS_File_Display
 
                                     /* Eye icon for more info (with modal or popup trigger) */
                                     echo '<a href="#" class="info-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-eye"></i></a>';
-
+                                    
+                                    $modal_content = $this->get_modal_content(get_the_ID());
+                                    echo $modal_content;
                                     /* Download button */
                                     echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-download"></i></a>';
 
@@ -171,35 +175,18 @@ class EFS_File_Display
         $expiration = get_post_meta($file_id, '_efs_file_expiration', true);
         $upload_date = get_the_date('F j, Y \a\t g:i A', $file_id);
         
-        /* Build the modal content */
-        $modal_content = '<div id="fileDetailsModal" class="modal">';
+        /* Build the modal content with a unique ID */
+        $modal_content = '<div id="fileDetailsModal-' . esc_attr($file_id) . '" class="modal" style="display: none;">';
         $modal_content .= '<div class="modal-content">';
-        $modal_content .= '<span class="close">&times;</span>';
+        $modal_content .= '<span class="close" data-modal-id="fileDetailsModal-' . esc_attr($file_id) . '">&times;</span>';
         $modal_content .= '<p>File Size: ' . esc_html($file_size) . '</p>';
         $modal_content .= '<p>Expiration: ' . esc_html($expiration) . '</p>';
         $modal_content .= '<p>Description: ' . (!empty($excerpt) ? esc_html($excerpt) : wp_trim_words($description, 20)) . '</p>';
         $modal_content .= '<p>Uploaded: ' . esc_html($upload_date) . '</p>';
         $modal_content .= '</div></div>';
-
+    
         return $modal_content;
-    }
-
-    /**
-     * Fetch the modal content via AJAX.
-    */
-
-    public function fetch_modal_content()
-    {
-        /* Check for file ID in request */
-        if (isset($_POST['file_id']) && !empty($_POST['file_id']))
-        {
-            $file_id = intval($_POST['file_id']);
-            /* Get the modal content */
-            $modal_content = $this->get_modal_content($file_id);
-            echo $modal_content;
-        }
-        wp_die(); /* Terminate AJAX call */
-    }
+    }    
 
 	/**
 	 * Format file size to a human-readable format.
