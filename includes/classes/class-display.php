@@ -63,7 +63,6 @@ class EFS_File_Display
 					foreach ($categories as $category)
                     {
 						echo '<h2>' . esc_html($category->name) . '</h2>';
-						echo '<ul>';
 
 						while ($query->have_posts()) {
 							$query->the_post();
@@ -131,7 +130,6 @@ class EFS_File_Display
 							}
 						}
 
-						echo '</ul>';
 					}
 
 					echo '</div>';
