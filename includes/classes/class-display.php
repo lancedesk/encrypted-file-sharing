@@ -26,15 +26,15 @@ class EFS_File_Display
 			
 			/* Query for post IDs where the current user is a recipient */
 			global $wpdb;
-			$table_name = $wpdb->prefix . 'efs_recipients';
+			$table_name = esc_sql($wpdb->prefix . 'efs_recipients');
 
-			/* Get all post IDs associated with the current user */
-			$post_ids = $wpdb->get_col(
-				$wpdb->prepare(
-					"SELECT post_id FROM $table_name WHERE recipient_id = %d",
-					$current_user_id
-				)
-			);
+            /* Get all post IDs associated with the current user */
+            $query = $wpdb->prepare(
+                "SELECT post_id FROM $table_name WHERE recipient_id = %d",
+                $current_user_id
+            );
+
+            $post_ids = $wpdb->get_col($query);
 
 			if (!empty($post_ids)) {
 				$args = [
