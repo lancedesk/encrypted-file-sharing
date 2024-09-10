@@ -1,112 +1,130 @@
+/* Theme Name: Encrypted File Sharing */
+:root
+{
+    --efs-primary-color: #0073aa;
+    --efs-secondary-color: #f9f9f9;
+    --efs-text-color: #000;
+    --efs-white-color: #fff;
+    --efs-black-color: #000;
+    --efs-link-color: #0073aa;
+    --efs-link-hover-color: #005f87;
+    --efs-border-color: #e1e1e1;
+    --efs-bg-color: #f9f9f9;
+    --efs-btn-bg-color: #0073aa;
+    --efs-btn-text-color: #fff;
+    --efs-btn-hover-bg-color: #005f87;
+    --efs-btn-hover-text-color: #fff;
+    --efs-btn-border-color: #0073aa;
+    --efs-btn-hover-border-color: #005f87;
+}
+
+*
+{
+    box-sizing: border-box;
+}
+
 /* Container for the user's files */
 .efs-user-files
 {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 15px;
 }
 
-/* Style for each file list */
-.efs-user-files ul
-{
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    margin-bottom: 20px;
-}
-
-/* Each individual file item */
-.efs-user-files li
+.efs-file-row
 {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
-    width: calc(50% - 10px); /* Two per row with space between */
-    box-sizing: border-box;
-    text-align: left;
-    margin-right: 10px; /* Add spacing between the items */
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ccc;
 }
 
-.efs-user-files li:nth-child(2n) 
+.efs-file-row .file-name p
 {
-    margin-right: 0; /* Remove the margin from every second item in the row */
+    color: var(--efs-primary-color);
+    font-weight: bold;
 }
 
-/* Flexbox layout for icon and file details */
 .file-icon
 {
-    font-size: 30px;
-    margin-bottom: 10px;
-}
-
-/* File details like title, size, and date */
-.efs-user-files li .file-title
-{
-    font-weight: bold;
-    color: #0073aa;
-    text-decoration: none;
-    margin-bottom: 5px;
-    font-size: 16px;
-}
-
-.efs-user-files li a:hover
-{
-    text-decoration: underline;
-}
-
-.file-date, .file-size
-{
-    font-size: 14px;
-    color: #666;
-    margin: 5px 0;
-}
-
-/* Description or excerpt of the file */
-.efs-user-files li p
-{
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-/* Download button */
-.download-btn
-{
-    padding: 10px 20px;
-    background-color: #0073aa;
-    color: #fff !important;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
+    width: 30px;
     text-align: center;
 }
 
-.download-btn:hover
+.file-name
 {
-    background-color: #005f87;
-    text-decoration: none !important;
+    flex-grow: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* Media Queries for responsiveness */
-@media (max-width: 768px)
+.file-date, .info-btn, .download-btn
 {
-    .efs-user-files li {
-        width: calc(48% - 10px); /* Two per row for smaller tablets */
-        margin-right: 10px;
-    }
+    margin-left: 20px;
+    text-align: center;
 }
 
-@media (max-width: 480px)
+.info-btn, .download-btn
 {
-    .efs-user-files li {
-        width: 100%; /* Single column for mobile */
-        margin-right: 0; /* Remove the margin for single column */
-    }
+    cursor: pointer;
+}
+
+.efs-no-files-found, .efs-login-first
+{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+    margin-bottom: 30px;
+    border: 1px solid var(--efs-border-color);
+}
+
+.efs-no-files-found p, .efs-login-first p
+{
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+/* Modal container */
+.modal
+{
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal content */
+.modal-content
+{
+    background-color: var(--efs-white-color);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+}
+
+/* Close button */
+.close
+{
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus
+{
+    color: var(--efs-black-color);
 }
