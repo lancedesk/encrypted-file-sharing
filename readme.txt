@@ -9,9 +9,11 @@ Requires PHP: 5.2.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
+Encrypted File Sharing** is a WordPress plugin that allows site administrators to securely send files to specific users via the WordPress admin panel.
+
 == Description ==
 
-Encrypted File Sharing** is a WordPress plugin that allows site administrators to securely send files to specific users via the WordPress admin panel. The plugin ensures that files are encrypted and only accessible to the intended recipient. Both admins and users are notified about file uploads and downloads, and strict security measures, such as two-factor authentication (2FA) and remote file storage, are implemented.
+The plugin ensures that files are encrypted and only accessible to the intended recipient. Both admins and users are notified about file uploads and downloads, and strict security measures, such as two-factor authentication (2FA) and remote file storage, are implemented.
 
 == Features ==
 
