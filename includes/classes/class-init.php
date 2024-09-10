@@ -150,7 +150,7 @@ class EFS_Init
             file_id INT(11) NOT NULL,
             post_id INT(11) NOT NULL,
             data_encryption_key BLOB NOT NULL,
-            expiration_date DATETIME NOT NULL,
+            expiration_date DATETIME NULL,
             encrypted_file VARCHAR(255) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) $charset_collate;";
