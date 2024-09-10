@@ -164,7 +164,7 @@ class EFS_Admin_Columns
     {
         $file_url = get_post_meta($post_id, '_efs_file_url', true);
         $file_name = $this->extract_file_name($file_url);
-        $expiry_date = $this->get_expiration_date($file_name);
+        $expiry_date = $this->get_expiration_date($post_id);
 
         if ($expiry_date) {
             return esc_html(date('Y/m/d \a\t g:i a', strtotime($expiry_date)));
