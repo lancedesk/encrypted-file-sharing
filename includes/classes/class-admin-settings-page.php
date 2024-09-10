@@ -132,33 +132,33 @@ class EFS_Admin_Settings_Page
         $users = get_users(array('role' => 'administrator'));
 
         echo '<div class="wrap">';
-        echo '<h1>' . __('EFS Settings', 'encrypted-file-sharing') . '</h1>';
+        echo '<h1>' . esc_html__('EFS Settings', 'encrypted-file-sharing') . '</h1>';
 
         /* AWS Settings Form */
         echo '<form method="post" action="">';
-        echo '<h2>' . __('Amazon S3 Settings', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Amazon S3 Settings', 'encrypted-file-sharing') . '</h2>';
         
         /* AWS Region */
-        echo '<label for="efs_aws_region">' . __('AWS Region', 'encrypted-file-sharing') . '</label>';
+        echo '<label for="efs_aws_region">' . esc_html__('AWS Region', 'encrypted-file-sharing') . '</label>';
         echo '<input type="text" id="efs_aws_region" name="efs_aws_region" value="' . esc_attr($aws_region) . '"><br>';
 
         /* AWS Access Key */
-        echo '<label for="efs_aws_access_key">' . __('AWS Access Key', 'encrypted-file-sharing') . '</label>';
+        echo '<label for="efs_aws_access_key">' . esc_html__('AWS Access Key', 'encrypted-file-sharing') . '</label>';
         echo '<input type="text" id="efs_aws_access_key" name="efs_aws_access_key" value="' . esc_attr($aws_access_key) . '"><br>';
 
         /* AWS Secret Key (Password field) */
-        echo '<label for="efs_aws_secret_key">' . __('AWS Secret Key', 'encrypted-file-sharing') . '</label>';
+        echo '<label for="efs_aws_secret_key">' . esc_html__('AWS Secret Key', 'encrypted-file-sharing') . '</label>';
         echo '<input type="password" id="efs_aws_secret_key" name="efs_aws_secret_key" value="' . esc_attr($aws_secret_key) . '"><br>';
 
         /* Bucket Creation and Fetch Section */
-        echo '<h3>' . __('Create New Bucket', 'encrypted-file-sharing') . '</h3>';
-        /* echo '<label for="efs_new_bucket">' . __('New Bucket Name', 'encrypted-file-sharing') . '</label>'; */
-        echo '<input type="text" id="efs_new_bucket" name="efs_new_bucket" placeholder="' . __('Enter bucket name', 'encrypted-file-sharing') . '">';
-        echo '<button id="efs_create_bucket" type="button">' . __('Create Bucket', 'encrypted-file-sharing') . '</button>';
+        echo '<h3>' . esc_html__('Create New Bucket', 'encrypted-file-sharing') . '</h3>';
+        /* echo '<label for="efs_new_bucket">' . esc_html__('New Bucket Name', 'encrypted-file-sharing') . '</label>'; */
+        echo '<input type="text" id="efs_new_bucket" name="efs_new_bucket" placeholder="' . esc_html__('Enter bucket name', 'encrypted-file-sharing') . '">';
+        echo '<button id="efs_create_bucket" type="button">' . esc_html__('Create Bucket', 'encrypted-file-sharing') . '</button>';
         echo '<div id="efs_create_bucket_message"></div>';
         
         /* S3 Bucket Checklist (will be populated by AJAX) */
-        echo '<h3>' . __('Select S3 Buckets', 'encrypted-file-sharing') . '</h3>';
+        echo '<h3>' . esc_html__('Select S3 Buckets', 'encrypted-file-sharing') . '</h3>';
         echo '<div id="efs_bucket_checklist">';
 
         if ($buckets) {
@@ -168,27 +168,27 @@ class EFS_Admin_Settings_Page
         }
 
         echo '</div>';
-        echo '<button id="efs_fetch_buckets" type="button">' . __('Fetch Buckets', 'encrypted-file-sharing') . '</button>';
+        echo '<button id="efs_fetch_buckets" type="button">' . esc_html__('Fetch Buckets', 'encrypted-file-sharing') . '</button>';
 
-        submit_button(__('Save AWS Settings', 'encrypted-file-sharing'), 'primary', 'save_aws_settings_button');
+        submit_button(esc_html__('Save AWS Settings', 'encrypted-file-sharing'), 'primary', 'save_aws_settings_button');
         echo '</form>';
 
         /* Storage Option Settings */
         echo '<form method="post" action="">';
         echo '<input type="hidden" name="efs_form_type" value="storage_option">';
-        echo '<h2>' . __('Select Storage Option', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Select Storage Option', 'encrypted-file-sharing') . '</h2>';
         echo '<select name="efs_storage_option">';
-        echo '<option value="local"' . selected($selected_storage, 'local', false) . '>' . __('Local Media', 'encrypted-file-sharing') . '</option>';
-        echo '<option value="amazon"' . selected($selected_storage, 'amazon', false) . '>' . __('Amazon S3', 'encrypted-file-sharing') . '</option>';
-        echo '<option value="google"' . selected($selected_storage, 'google', false) . '>' . __('Google Drive', 'encrypted-file-sharing') . '</option>';
-        echo '<option value="dropbox"' . selected($selected_storage, 'dropbox', false) . '>' . __('Dropbox', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="local"' . selected($selected_storage, 'local', false) . '>' . esc_html__('Local Media', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="amazon"' . selected($selected_storage, 'amazon', false) . '>' . esc_html__('Amazon S3', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="google"' . selected($selected_storage, 'google', false) . '>' . esc_html__('Google Drive', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="dropbox"' . selected($selected_storage, 'dropbox', false) . '>' . esc_html__('Dropbox', 'encrypted-file-sharing') . '</option>';
         echo '</select>';
-        submit_button(__('Save Storage Settings', 'encrypted-file-sharing'), 'primary', 'save_storage_settings_button');
+        submit_button(esc_html__('Save Storage Settings', 'encrypted-file-sharing'), 'primary', 'save_storage_settings_button');
         echo '</form>';
 
         /* Admin Email Settings */
         echo '<form method="post" action="">';
-        echo '<h2>' . __('Select Admin to Receive Notifications', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Select Admin to Receive Notifications', 'encrypted-file-sharing') . '</h2>';
         echo '<select name="efs_admin_email">';
         foreach ($users as $user) {
             echo '<option value="' . esc_attr($user->user_email) . '" ' . selected($selected_admin_email, $user->user_email, false) . '>';
@@ -198,54 +198,54 @@ class EFS_Admin_Settings_Page
         echo '</select>';
 
         /* Checkbox for sending notifications */
-        echo '<h2>' . __('Enable Notifications', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Enable Notifications', 'encrypted-file-sharing') . '</h2>';
         echo '<label for="efs_send_notifications">';
         echo '<input type="checkbox" id="efs_send_notifications" name="efs_send_notifications" value="1"' . checked(1, $send_notifications, false) . '>';
-        echo __('Send notifications to selected admin', 'encrypted-file-sharing');
+        echo esc_html__('Send notifications to selected admin', 'encrypted-file-sharing');
         echo '</label>';
 
         /* Checkbox for user notifications */
-        echo '<h2>' . __('Enable User Notifications on Post Upload', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Enable User Notifications on Post Upload', 'encrypted-file-sharing') . '</h2>';
         echo '<label for="efs_enable_user_notifications">';
         echo '<input type="checkbox" id="efs_enable_user_notifications" name="efs_enable_user_notifications" value="1"' . checked(1, get_option('efs_enable_user_notifications', 0), false) . '>';
-        echo __('Send notifications to users when a file is uploaded', 'encrypted-file-sharing');
+        echo esc_html__('Send notifications to users when a file is uploaded', 'encrypted-file-sharing');
         echo '</label>';
 
         /* Checkbox for enabling file expiry */
-        echo '<h2>' . __('Enable File Expiry', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Enable File Expiry', 'encrypted-file-sharing') . '</h2>';
         echo '<label for="efs_enable_expiry">';
         echo '<input type="checkbox" id="efs_enable_expiry" name="efs_enable_expiry" value="1"' . checked(1, $enable_expiry, false) . '>';
-        echo __('Enable expiration for downloaded files', 'encrypted-file-sharing');
+        echo esc_html__('Enable expiration for downloaded files', 'encrypted-file-sharing');
         echo '</label>';
 
         /* Expiry period and unit */
-        echo '<h2>' . __('Set File Expiry Period', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Set File Expiry Period', 'encrypted-file-sharing') . '</h2>';
         echo '<label for="efs_expiry_period">';
-        echo __('Expire files after', 'encrypted-file-sharing') . ' ';
+        echo esc_html__('Expire files after', 'encrypted-file-sharing') . ' ';
         echo '<input type="number" id="efs_expiry_period" name="efs_expiry_period" value="' . esc_attr($expiry_period) . '" min="1">';
         echo '</label>';
 
         echo '<select name="efs_expiry_unit">';
-        echo '<option value="minutes"' . selected($expiry_unit, 'minutes', false) . '>' . __('Minutes', 'encrypted-file-sharing') . '</option>';
-        echo '<option value="hours"' . selected($expiry_unit, 'hours', false) . '>' . __('Hours', 'encrypted-file-sharing') . '</option>';
-        echo '<option value="days"' . selected($expiry_unit, 'days', false) . '>' . __('Days', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="minutes"' . selected($expiry_unit, 'minutes', false) . '>' . esc_html__('Minutes', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="hours"' . selected($expiry_unit, 'hours', false) . '>' . esc_html__('Hours', 'encrypted-file-sharing') . '</option>';
+        echo '<option value="days"' . selected($expiry_unit, 'days', false) . '>' . esc_html__('Days', 'encrypted-file-sharing') . '</option>';
         echo '</select>';
 
         /* Checkbox for file privacy */
-        echo '<h2>' . __('Set File Privacy', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Set File Privacy', 'encrypted-file-sharing') . '</h2>';
         echo '<label for="efs_file_privacy">';
         echo '<input type="checkbox" id="efs_file_privacy" name="efs_file_privacy" value="1"' . checked(1, $file_privacy, false) . '>';
-        echo __('Set files as private', 'encrypted-file-sharing');
+        echo esc_html__('Set files as private', 'encrypted-file-sharing');
         echo '</label>';
 
         /* Checkbox for deleting files after encryption */
-        echo '<h2>' . __('Delete Files After Encryption', 'encrypted-file-sharing') . '</h2>';
+        echo '<h2>' . esc_html__('Delete Files After Encryption', 'encrypted-file-sharing') . '</h2>';
         echo '<label for="efs_delete_files">';
         echo '<input type="checkbox" id="efs_delete_files" name="efs_delete_files" value="1"' . checked(1, get_option('efs_delete_files', 0), false) . '>';
-        echo __('Delete files from media library after encryption', 'encrypted-file-sharing');
+        echo esc_html__('Delete files from media library after encryption', 'encrypted-file-sharing');
         echo '</label>';
 
-        submit_button(__('Save Settings', 'encrypted-file-sharing'), 'primary', 'save_settings_button');
+        submit_button(esc_html__('Save Settings', 'encrypted-file-sharing'), 'primary', 'save_settings_button');
         echo '</form>';
 
 
@@ -263,14 +263,14 @@ class EFS_Admin_Settings_Page
             {
                 /* Display error message if S3 is not connected */
                 echo '<div class="notice notice-error is-dismissible">';
-                echo '<p>' . __('S3 not connected. Please enter the correct API information to connect.', 'encrypted-file-sharing') . '</p>';
+                echo '<p>' . esc_html__('S3 not connected. Please enter the correct API information to connect.', 'encrypted-file-sharing') . '</p>';
                 echo '</div>';
             } 
             else 
             {
                 /* Display success message if S3 is connected */
                 echo '<div class="notice notice-success is-dismissible">';
-                echo '<p>' . __('S3 client initialized successfully.', 'encrypted-file-sharing') . '</p>';
+                echo '<p>' . esc_html__('S3 client initialized successfully.', 'encrypted-file-sharing') . '</p>';
                 echo '</div>';
             }
         }
@@ -279,13 +279,13 @@ class EFS_Admin_Settings_Page
         if ($folder_exists)
         {
             echo '<div class="notice notice-success is-dismissible">';
-            echo '<p>' . sprintf(__('The private folder is located at: %s', 'encrypted-file-sharing'), esc_html($private_dir)) . '</p>';
+            echo '<p>' . sprintf(esc_html__('The private folder is located at: %s', 'encrypted-file-sharing'), esc_html($private_dir)) . '</p>';
             echo '</div>';
         } 
         else
         {
             echo '<div class="notice notice-error is-dismissible">';
-            echo '<p>' . __('The private folder does not exist. Please create it manually.', 'encrypted-file-sharing') . '</p>';
+            echo '<p>' . esc_html__('The private folder does not exist. Please create it manually.', 'encrypted-file-sharing') . '</p>';
             echo '</div>';
         }
 
