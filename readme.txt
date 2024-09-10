@@ -4,7 +4,7 @@ Contributors: Robert June, Lance Desk
 Tags: file sharing, secure file share, encrypted file share
 Requires at least: 4.9
 Tested up to: 6.6
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 Requires PHP: 5.2.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
