@@ -1,15 +1,35 @@
 <?php
-/**
- * Plugin Name:     Encrypted File Sharing
- * Plugin URI:      https://github.com/lancedesk/encrypted-file-sharing
- * Description:     A plugin that allows site administrators to securely send files to specific users via the WordPress admin panel.
- * Author:          Robert June
- * Author URI:      https://profiles.wordpress.org/lancedesk/
- * Text Domain:     encrypted-file-sharing
- * Domain Path:     /languages
- * Version:         1.2.5
+/*
+ * Plugin Name: Encrypted File Sharing
+ * Plugin URI: https://github.com/lancedesk/encrypted-file-sharing
+ * Description: A plugin that allows site administrators to securely send files to specific users via the WordPress admin panel.
+ * Version: 1.2.5
+ * Author: Robert June
+ * Author URI: https://profiles.wordpress.org/lancedesk/
+ * Text Domain: encrypted-file-sharing
+ * Domain Path: /languages
+ * Requires at least: 4.7
+ * Tested up to: 6.5
+ * Requires PHP: 7.0
+ * Stable tag: 1.2.5
+ * Beta tag: 1.3.0
+ * License: GPLv3
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  *
- * @package         encrypted-file-sharing
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * @package encrypted-file-sharing
 */
 
 /* Ensure that WordPress functions are available */
