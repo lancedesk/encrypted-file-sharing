@@ -67,7 +67,7 @@ class EFS_File_Display
 								$file_url = get_post_meta(get_the_ID(), '_efs_file_url', true);
 
 								/* Extract the file path from the URL */
-								$file_path = parse_url($file_url, PHP_URL_PATH);  /* Extract just the path part */
+								$file_path = wp_parse_url($file_url, PHP_URL_PATH);  /* Extract just the path part */
 								$file_name = basename($file_path);  /* Get the file name, e.g., mom-pdf.pdf.enc */
 
 								/* Check and strip the .enc extension */
