@@ -180,12 +180,7 @@ class EFS_File_Display
         $modal_content .= '<div class="modal-content">';
         $modal_content .= '<span class="close" data-modal-id="fileDetailsModal-' . esc_attr($file_id) . '">&times;</span>';
         $modal_content .= '<p>File Size: ' . esc_html($file_size) . '</p>';
-
-        if($expiration)
-        {
-            $modal_content .= '<p>Expiration: ' . esc_html($expiration) . '</p>';
-        }
-        
+        $modal_content .= '<p>Expiration: ' . esc_html($expiration) . '</p>';
         $modal_content .= '<p>Description: ' . (!empty($excerpt) ? esc_html($excerpt) : wp_trim_words($description, 20)) . '</p>';
         $modal_content .= '<p>Uploaded: ' . esc_html($upload_date) . '</p>';
         $modal_content .= '</div></div>';
