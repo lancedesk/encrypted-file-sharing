@@ -103,10 +103,6 @@ class EFS_File_Display
 									$file_size = file_exists($file_path) ? $this->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
 								}
 
-								/* Excerpt and description logic */
-								$excerpt = get_the_excerpt();
-								$description = get_the_content();
-
 								/* Get upload date and format it to show time */
 								$upload_date = get_the_date('F j, Y \a\t g:i A');
 
