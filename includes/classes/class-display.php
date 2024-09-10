@@ -107,16 +107,16 @@ public function render_user_files_shortcode($atts) {
                             echo '<li>';
                             
                             /* Display file type icon */
-                            echo '<span class="file-icon">' . $icon . '</span>';
+                            echo '<span class="file-icon">' . esc_html($icon) . '</span>';
                             
                             /* Display title */
-                            echo '<p class="file-title">' . get_the_title() . '</p>';
+                            echo '<p class="file-title">' . esc_html(get_the_title()) . '</p>';
 
                             /* Display upload/creation date */
-                            echo '<p class="file-date">' . __('Uploaded on: ', 'encrypted-file-sharing') . esc_html($upload_date) . '</p>';
+                            echo '<p class="file-date">' . esc_html__('Uploaded on: ', 'encrypted-file-sharing') . esc_html($upload_date) . '</p>';
                             
                             /* Display file size */
-                            echo '<p class="file-size">' . __('File size: ', 'encrypted-file-sharing') . esc_html($file_size) . '</p>';
+                            echo '<p class="file-size">' . esc_html__('File size: ', 'encrypted-file-sharing') . esc_html($file_size) . '</p>';
                             
                             /* Show excerpt or description */
                             if (!empty($excerpt)) {
@@ -126,7 +126,7 @@ public function render_user_files_shortcode($atts) {
                             }
 
                             /* Download button */
-                            echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '">' . __('Download', 'encrypted-file-sharing') . '</a>';
+                            echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '">' . esc_html__('Download', 'encrypted-file-sharing') . '</a>';
                             echo '</li>';
                         }
                     }
@@ -136,15 +136,15 @@ public function render_user_files_shortcode($atts) {
 
                 echo '</div>';
             } else {
-                echo '<p>' . __('No files found for you.', 'encrypted-file-sharing') . '</p>';
+                echo '<p>' . esc_html__('No files found for you.', 'encrypted-file-sharing') . '</p>';
             }
 
             wp_reset_postdata();
         } else {
-            echo '<p>' . __('No files found for you.', 'encrypted-file-sharing') . '</p>';
+            echo '<p>' . esc_html__('No files found for you.', 'encrypted-file-sharing') . '</p>';
         }
     } else {
-        echo '<p>' . __('You need to be logged in to view your files.', 'encrypted-file-sharing') . '</p>';
+        echo '<p>' . esc_html__('You need to be logged in to view your files.', 'encrypted-file-sharing') . '</p>';
     }
 
     /* Return output buffer content */
