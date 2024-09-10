@@ -209,18 +209,24 @@ class EFS_Admin_Columns
     }
 
     /**
-     * Get and format the expiration date for a file from the custom table.
+     * Get and format the expiration date for a file from the encryption keys table.
      *
-     * @param string $file_name The name of the file.
+     * @param int $post_id The ID of the post.
      * @return string Formatted expiration date or a message if not set.
     */
 
-    public function get_expiration_date($file_name)
+    public function get_expiration_date($post_id)
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'efs_file_metadata';
-        $query = $wpdb->prepare("SELECT expiration_date FROM $table_name WHERE file_name = %s", $file_name);
+        /* Table name for encryption keys */
+        $table_name = $wpdb->prefix . 'efs_encryption_keys';
+        
+        /* Prepare and run the query to get the expiration_date using post_id */
+        $query = $wpdb->prepare("SELECT expiration_date FROM $table_name WHERE post_id = %d", $post_id);
+        
+        /* Get the expiration date */
         return $wpdb->get_var($query);
+
     }
 }
