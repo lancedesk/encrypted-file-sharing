@@ -10,6 +10,8 @@ class EFS_File_Display
 	public function __construct() {
 		/* Register shortcode */
 		add_shortcode('efs_user_files', [$this, 'render_user_files_shortcode']);
+        add_action('wp_ajax_fetch_modal_content', [$this, 'fetch_modal_content']);
+        add_action('wp_ajax_nopriv_fetch_modal_content', [$this, 'fetch_modal_content']);
 	}
 
 	/**
@@ -180,6 +182,23 @@ class EFS_File_Display
         $modal_content .= '</div></div>';
 
         return $modal_content;
+    }
+
+    /**
+     * Fetch the modal content via AJAX.
+    */
+
+    public function fetch_modal_content()
+    {
+        /* Check for file ID in request */
+        if (isset($_POST['file_id']) && !empty($_POST['file_id']))
+        {
+            $file_id = intval($_POST['file_id']);
+            /* Get the modal content */
+            $modal_content = $this->get_modal_content($file_id);
+            echo $modal_content;
+        }
+        wp_die(); /* Terminate AJAX call */
     }
 
 	/**
