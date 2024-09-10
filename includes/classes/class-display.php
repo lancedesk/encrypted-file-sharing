@@ -47,7 +47,8 @@ class EFS_File_Display
 
 				$query = new WP_Query($args);
 
-				if ($query->have_posts()) {
+				if ($query->have_posts())
+                {
 					echo '<div class="efs-user-files">';
 					
 					/* Display files categorized by their categories */
@@ -63,7 +64,8 @@ class EFS_File_Display
 						while ($query->have_posts()) {
 							$query->the_post();
 							
-							if (has_term($category->term_id, 'category')) {
+							if (has_term($category->term_id, 'category'))
+                            {
 								$file_url = get_post_meta(get_the_ID(), '_efs_file_url', true);
 
 								/* Extract the file path from the URL */
@@ -104,30 +106,24 @@ class EFS_File_Display
 								/* Get upload date and format it to show time */
 								$upload_date = get_the_date('F j, Y \a\t g:i A');
 
-								echo '<li>';
+                                echo '<div class="efs-file-row">';
 								
-								/* Display file type icon */
-								echo '<span class="file-icon">' . $icon . '</span>';
-								
-								/* Display title */
-								echo '<p class="file-title">' . esc_html(get_the_title()) . '</p>';
+                                    /* Display file type icon */
+                                    echo '<span class="file-icon">' . $icon . '</span>';
+                                    
+                                    /* Display file name */
+                                    echo '<div class="file-name"><p>' . esc_html(get_the_title()) . '</p></div>';
 
-								/* Display upload/creation date */
-								echo '<p class="file-date">' . esc_html__('Uploaded on: ', 'encrypted-file-sharing') . esc_html($upload_date) . '</p>';
-								
-								/* Display file size */
-								echo '<p class="file-size">' . esc_html__('File size: ', 'encrypted-file-sharing') . esc_html($file_size) . '</p>';
-								
-								/* Show excerpt or description */
-								if (!empty($excerpt)) {
-									echo '<p>' . esc_html($excerpt) . '</p>';
-								} elseif (!empty($description)) {
-									echo '<p>' . esc_html(wp_trim_words($description, 20)) . '</p>';
-								}
+                                    /* Display upload/creation date */
+                                    echo '<div class="file-date"><p>' . esc_html($upload_date) . '</p></div>';
 
-								/* Download button */
-								echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '">' . esc_html__('Download', 'encrypted-file-sharing') . '</a>';
-								echo '</li>';
+                                    /* Eye icon for more info (with modal or popup trigger) */
+                                    echo '<a href="#" class="info-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-eye"></i></a>';
+
+                                    /* Download button */
+                                    echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-download"></i></a>';
+
+                                echo '</div>';
 							}
 						}
 
@@ -136,15 +132,21 @@ class EFS_File_Display
 
 					echo '</div>';
 				} else {
-					echo '<p>' . esc_html__('No files found for you.', 'encrypted-file-sharing') . '</p>';
+                    echo "<div class='efs-no-files-found'>";
+                        echo '<p><i class="fas fa-folder-open"></i> ' . esc_html__('No files found for you.', 'encrypted-file-sharing') . '</p>';
+                    echo "<div>";
 				}
 
 				wp_reset_postdata();
 			} else {
-				echo '<p>' . esc_html__('No files found for you.', 'encrypted-file-sharing') . '</p>';
+				echo "<div class='efs-no-files-found'>";
+                    echo '<p><i class="fas fa-folder-open"></i> ' . esc_html__('No files found for you.', 'encrypted-file-sharing') . '</p>';
+                echo "<div>";
 			}
 		} else {
-			echo '<p>' . esc_html__('You need to be logged in to view your files.', 'encrypted-file-sharing') . '</p>';
+            echo "<div class='efs-login-first'>";
+                echo '<p><i class="fas fa-user-lock"></i> ' . esc_html__('You need to be logged in to view your files.', 'encrypted-file-sharing') . '</p>';
+            echo "<div>";
 		}
 
 		/* Return output buffer content */
