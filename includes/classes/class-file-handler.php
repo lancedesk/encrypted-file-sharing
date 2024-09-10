@@ -299,10 +299,13 @@ class EFS_File_Handler
         }
 
         /* Serve the decrypted file for download */
+        $file_name = sanitize_file_name($file_name); /* Sanitize the file name */
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="' . $file_name . '"');
         header('Content-Length: ' . strlen($decrypted_data));
+
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The file data is safe to output without escaping
         echo $decrypted_data;
         $this->write_to_log('File served for download: ' . $file_name, $log_file);
     
