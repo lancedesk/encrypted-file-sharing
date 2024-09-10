@@ -46,7 +46,7 @@ class EFS_User_Selection
         $all_users = get_users(['fields' => ['ID', 'display_name', 'user_email']]);
 
         echo '<p>';
-        echo '<label for="efs_user_selection">' . __('Select Users:', 'encrypted-file-sharing') . '</label>';
+        echo '<label for="efs_user_selection">' . esc_html__('Select Users:', 'encrypted-file-sharing') . '</label>';
         echo '<select id="efs_user_selection" name="efs_user_selection[]" multiple="multiple" style="width:100%;">';
         foreach ($all_users as $user) {
             echo '<option value="' . esc_attr($user->ID) . '" ' . (in_array($user->ID, (array) $selected_users) ? 'selected="selected"' : '') . '>' . esc_html($user->display_name) . ' - ' . esc_html($user->user_email) . '</option>';
@@ -61,7 +61,7 @@ class EFS_User_Selection
 
     public function save_user_selection_meta_box_data($post_id)
     {
-        $log_file = WP_CONTENT_DIR . '/efs_save_user_selection_log.txt'; // Path to the log file
+        $log_file = WP_CONTENT_DIR . '/efs_save_user_selection_log.txt';
 
         /* Log start of function execution */
         $this->log_message($log_file, 'Started save_user_selection_meta_box_data for post ID: ' . $post_id);
@@ -238,7 +238,5 @@ class EFS_User_Selection
         /* Append the message to the log file */
         file_put_contents($log_file, $formatted_message, FILE_APPEND);
     }
-
-
 
 }
