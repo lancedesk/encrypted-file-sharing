@@ -153,6 +153,35 @@ class EFS_File_Display
 		return ob_get_clean();
 	}
 
+    /**
+     * Get the modal content for the file details.
+     *
+     * @param int $file_id The file ID.
+     * @return string Modal content HTML.
+    */
+
+    public function get_modal_content($file_id)
+    {
+        /* Get the file details */
+        $file_size = get_post_meta($file_id, '_efs_file_size', true);
+        $excerpt = get_the_excerpt($file_id);
+        $description = get_post_field('post_content', $file_id);
+        $expiration = get_post_meta($file_id, '_efs_file_expiration', true);
+        $upload_date = get_the_date('F j, Y \a\t g:i A', $file_id);
+        
+        /* Build the modal content */
+        $modal_content = '<div id="fileDetailsModal" class="modal">';
+        $modal_content .= '<div class="modal-content">';
+        $modal_content .= '<span class="close">&times;</span>';
+        $modal_content .= '<p>File Size: ' . esc_html($file_size) . '</p>';
+        $modal_content .= '<p>Expiration: ' . esc_html($expiration) . '</p>';
+        $modal_content .= '<p>Description: ' . (!empty($excerpt) ? esc_html($excerpt) : wp_trim_words($description, 20)) . '</p>';
+        $modal_content .= '<p>Uploaded: ' . esc_html($upload_date) . '</p>';
+        $modal_content .= '</div></div>';
+
+        return $modal_content;
+    }
+
 	/**
 	 * Format file size to a human-readable format.
 	*/
