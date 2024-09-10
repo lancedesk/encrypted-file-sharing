@@ -120,8 +120,10 @@ class EFS_File_Display
                                     /* Eye icon for more info (with modal or popup trigger) */
                                     echo '<a href="#" class="info-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-eye"></i></a>';
                                     
-                                    $modal_content = $this->get_modal_content(get_the_ID());
+                                    /* Modal content */
+                                    $modal_content = $this->get_modal_content(get_the_ID(), $file_size);
                                     echo $modal_content;
+                                    
                                     /* Download button */
                                     echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-download"></i></a>';
 
@@ -159,13 +161,13 @@ class EFS_File_Display
      * Get the modal content for the file details.
      *
      * @param int $file_id The file ID.
+     * @param string $file_size The file size.
      * @return string Modal content HTML.
     */
 
-    public function get_modal_content($file_id)
+    public function get_modal_content($file_id, $file_size)
     {
         /* Get the file details */
-        $file_size = get_post_meta($file_id, '_efs_file_size', true);
         $excerpt = get_the_excerpt($file_id);
         $description = get_post_field('post_content', $file_id);
         $expiration = get_post_meta($file_id, '_efs_file_expiration', true);
