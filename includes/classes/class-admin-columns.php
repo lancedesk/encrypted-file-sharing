@@ -99,7 +99,7 @@ class EFS_Admin_Columns
             /* Return the links as a comma-separated string */
             return implode(', ', $user_links);
         } else {
-            return __('None', 'encrypted-file-sharing');
+            return esc_html__('None', 'encrypted-file-sharing');
         }
     }
 
@@ -114,7 +114,7 @@ class EFS_Admin_Columns
     private function get_download_status($post_id)
     {
         $status = get_post_meta($post_id, '_efs_download_status', true);
-        return $status ? __('Downloaded', 'encrypted-file-sharing') : __('Pending', 'encrypted-file-sharing');
+        return $status ? esc_html__('Downloaded', 'encrypted-file-sharing') : esc_html__('Pending', 'encrypted-file-sharing');
     }
 
     /**
@@ -128,7 +128,7 @@ class EFS_Admin_Columns
     private function get_formatted_date($post_id, $meta_key)
     {
         $date = get_post_meta($post_id, $meta_key, true);
-        return $date ? esc_html(date('Y/m/d \a\t g:i a', strtotime($date))) : __('N/A', 'encrypted-file-sharing');
+        return $date ? esc_html(date('Y/m/d \a\t g:i a', strtotime($date))) : esc_html__('N/A', 'encrypted-file-sharing');
     }
 
     /**
@@ -163,7 +163,7 @@ class EFS_Admin_Columns
             
             return esc_html($file_size);
         } else {
-            return __('No file available', 'encrypted-file-sharing');
+            return esc_html__('No file available', 'encrypted-file-sharing');
         }
     }
 
@@ -183,7 +183,7 @@ class EFS_Admin_Columns
         if ($expiry_date) {
             return esc_html(date('Y/m/d \a\t g:i a', strtotime($expiry_date)));
         } else {
-            return __('No expiry set', 'encrypted-file-sharing');
+            return esc_html__('No expiry set', 'encrypted-file-sharing');
         }
     }
 
@@ -198,13 +198,13 @@ class EFS_Admin_Columns
     {
         $file_url = get_post_meta($post_id, '_efs_file_url', true);
         $file_name = $this->extract_file_name($file_url);
-        $expiry_date = $this->get_expiration_date($file_name);
+        $expiry_date = $this->get_expiration_date($post_id);
 
         if ($expiry_date) {
             $current_date = date('Y-m-d');
-            return $expiry_date < $current_date ? __('Expired', 'encrypted-file-sharing') : __('Active', 'encrypted-file-sharing');
+            return $expiry_date < $current_date ? esc_html__('Expired', 'encrypted-file-sharing') : esc_html__('Active', 'encrypted-file-sharing');
         } else {
-            return __('No expiry set', 'encrypted-file-sharing');
+            return esc_html__('No expiry set', 'encrypted-file-sharing');
         }
     }
 
