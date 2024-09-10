@@ -44,27 +44,27 @@ class EFS_Admin_Columns
     {
         switch ($column) {
             case 'recipient':
-                echo $this->get_recipients($post_id);
+                echo wp_kses_post($this->get_recipients($post_id));
                 break;
 
             case 'downloaded':
-                echo $this->get_download_status($post_id);
+                echo esc_html($this->get_download_status($post_id));
                 break;
 
             case 'download_date':
-                echo $this->get_formatted_date($post_id, '_efs_download_date');
+                echo esc_html($this->get_formatted_date($post_id, '_efs_download_date'));
                 break;
 
             case 'file_size':
-                echo $this->get_file_size($post_id);
+                echo esc_html($this->get_file_size($post_id));
                 break;
 
             case 'expiry_date':
-                echo $this->get_expiration_date_display($post_id);
+                echo esc_html($this->get_expiration_date_display($post_id));
                 break;
 
             case 'status':
-                echo $this->get_file_status($post_id);
+                echo esc_html($this->get_file_status($post_id));
                 break;
         }
     }
