@@ -221,7 +221,7 @@ class EFS_File_CPT
         /* Display the date and time fields */
         echo '<p>';
         echo '<label for="efs_file_expiry_date">' . esc_html__('Expiry Date:', 'encrypted-file-sharing') . '</label>';
-        echo '<input type="date" id="efs_file_expiry_date" name="efs_file_expiry_date" value="' . $expiry_date . '" />';
+        echo '<input type="date" id="efs_file_expiry_date" name="efs_file_expiry_date" value="' . esc_attr($expiry_date) . '" />';
         echo '</p>';
 
         echo '<p>';
