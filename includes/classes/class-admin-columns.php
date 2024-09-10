@@ -174,7 +174,7 @@ class EFS_Admin_Columns
      * @return string Formatted expiration date or a message if not set.
     */
 
-    private function get_expiration_date_display($post_id)
+    public function get_expiration_date_display($post_id)
     {
         $file_url = get_post_meta($post_id, '_efs_file_url', true);
         $file_name = $this->extract_file_name($file_url);
