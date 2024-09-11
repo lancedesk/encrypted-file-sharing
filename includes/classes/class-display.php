@@ -216,7 +216,7 @@ class EFS_File_Display
     {
         /* Use dynamic base path to the icons folder */
         $base_path = plugin_dir_url(__FILE__) . '../../assets/images/';
-        $icon_dimension = 'width="32px" height="32px"'; /* Add width and height dimensions */
+        $icon_dimension = 'width="16px" height="16px"'; /* Add width and height dimensions */
 
         $allowed_html = array(
             'img' => array(
