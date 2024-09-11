@@ -194,7 +194,7 @@ class EFS_File_Handler
     /* Helper function to write to log */
     private function write_to_log($message, $log_file)
     {
-        $current_time = date('Y-m-d H:i:s');
+        $current_time = gmdate('Y-m-d H:i:s');
         file_put_contents($log_file, "[" . $current_time . "] " . $message . PHP_EOL, FILE_APPEND);
     }
 
@@ -247,7 +247,7 @@ class EFS_File_Handler
         $this->write_to_log('File URL: ' . $file_url, $log_file);
 
         /* Parse the file path */
-        $file_path = parse_url($file_url, PHP_URL_PATH);
+        $file_path = wp_parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
         $this->write_to_log('Parsed file path: ' . $file_path, $log_file);
         $this->write_to_log('Parsed file name: ' . $file_name, $log_file);
@@ -333,7 +333,7 @@ class EFS_File_Handler
     /* Function to log messages */
     private function log_message($message, $log_file)
     {
-        $current_time = date('Y-m-d H:i:s');
+        $current_time = gmdate('Y-m-d H:i:s');
         file_put_contents($log_file, "{$current_time} - {$message}\n", FILE_APPEND);
     }
 
