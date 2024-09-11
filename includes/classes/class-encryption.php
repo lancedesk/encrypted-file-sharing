@@ -166,40 +166,47 @@ class EFS_Encryption
 
     public function encrypt_file($file_path, $data_encryption_key)
     {
+        global $wp_filesystem;
+    
+        /* Initialize WP_Filesystem */
+        if (!function_exists('WP_Filesystem')) 
+        {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+    
+        WP_Filesystem(); /* Initialize WP_Filesystem */
+    
         $output_file = $file_path . '.enc';
         $iv = openssl_random_pseudo_bytes(16); /* Initialization vector for AES-256-CBC */
-
-        /* Open the file for reading */
-        $handle = fopen($file_path, 'rb');
-        if ($handle === false) 
+    
+        /* Check if file exists and get file content */
+        if (!$wp_filesystem->exists($file_path))
         {
             return false;
         }
-
-        /* Read the file content */
-        $file_data = fread($handle, filesize($file_path));
-        fclose($handle); /* Close the file handle */
-
+    
+        /* Read the file content using WP_Filesystem */
+        $file_data = $wp_filesystem->get_contents($file_path);
         if ($file_data === false) 
         {
             return false;
         }
-
+    
         /* Encrypt the file content using the DEK */
         $encrypted_data = openssl_encrypt($file_data, 'AES-256-CBC', $data_encryption_key, 0, $iv);
         if ($encrypted_data === false) 
         {
             return false;
         }
-
+    
         /* Write the IV and encrypted data to a new file using WP_Filesystem */
         $wp_filesystem->put_contents($output_file, $iv . $encrypted_data, FS_CHMOD_FILE);
-
+    
         /* Remove the original file for security using wp_delete_file() */
         wp_delete_file($file_path);
-
+    
         return $output_file;
-    }
+    }    
 
     /**
      * Retrieve the master key from the custom database table.
