@@ -94,6 +94,49 @@
     margin-block-end: 0;
 }
 
+/* Responsive Styles */
+@media (max-width: 768px)
+{
+    .efs-file-row
+    {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .file-icon
+    {
+        width: 25px;
+    }
+
+    .file-name
+    {
+        white-space: normal; /* Allow title to wrap */
+        width: 100%;
+    }
+
+    /* Stack date, info, and download buttons horizontally below the title */
+    .file-details
+    {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .file-date
+    {
+        margin-left: 0;
+        flex-grow: 1;
+    }
+
+    .info-btn, .download-btn
+    {
+        margin-left: 10px;
+    }
+}
+
 /* Modal container */
 .modal
 {
