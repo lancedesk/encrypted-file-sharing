@@ -192,8 +192,8 @@ class EFS_Encryption
             return false;
         }
 
-        /* Write the IV and encrypted data to a new file */
-        file_put_contents($output_file, $iv . $encrypted_data);
+        /* Write the IV and encrypted data to a new file using WP_Filesystem */
+        $wp_filesystem->put_contents($output_file, $iv . $encrypted_data, FS_CHMOD_FILE);
 
         /* Remove the original file for security */
         unlink($file_path); /* Remove the original file */
