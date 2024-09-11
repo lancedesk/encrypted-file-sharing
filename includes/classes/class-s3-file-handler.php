@@ -180,7 +180,9 @@ class EFS_S3_File_Handler
             wp_send_json_error(array('message' => 'Unauthorized user'));
         }
 
-        $bucket_name = sanitize_text_field($_POST['bucket_name']);
+        /* Check if 'bucket_name' is set and sanitize it */
+        $bucket_name = isset($_POST['bucket_name']) ? sanitize_text_field(wp_unslash($_POST['bucket_name'])) : '';
+
         $region = get_option('efs_aws_region');
         
         if (empty($bucket_name)) {
@@ -236,13 +238,13 @@ class EFS_S3_File_Handler
     private function log_error($message)
     {
         $log_file = WP_CONTENT_DIR . '/efs_error_log.txt';
-        error_log(date('Y-m-d H:i:s') . ' - ERROR: ' . $message . "\n", 3, $log_file);
+        error_log(gmdate('Y-m-d H:i:s') . ' - ERROR: ' . $message . "\n", 3, $log_file);
     }
 
     private function log_success($message)
     {
         $log_file = WP_CONTENT_DIR . '/efs_success_log.txt';
-        error_log(date('Y-m-d H:i:s') . ' - SUCCESS: ' . $message . "\n", 3, $log_file);
+        error_log(gmdate('Y-m-d H:i:s') . ' - SUCCESS: ' . $message . "\n", 3, $log_file);
     }
 
     /* AJAX handler to fetch S3 buckets */
@@ -315,10 +317,21 @@ class EFS_S3_File_Handler
 
     public function handle_s3_upload_ajax() 
     {
-        if (!isset($_FILES['file']) || empty($_FILES['file']['name'])) {
-            wp_send_json_error(['message' => 'No file uploaded.']);
+        /* Nonce verification for file uploads */
+        if (!isset($_POST['efs_upload_nonce']) || !wp_verify_nonce(wp_unslash($_POST['efs_upload_nonce']), 'efs_upload_nonce'))
+        {
+            wp_send_json_error(['message' => 'Nonce verification failed.']);
+            exit;
         }
 
+        /* Check if the file is set and not empty */
+        if (!isset($_FILES['file']) || empty($_FILES['file']['name']))
+        {
+            wp_send_json_error(['message' => 'No file uploaded.']);
+            exit;
+        }
+
+        /* Proceed with handling the file */
         $file = $_FILES['file'];
 
         /* Call the method to upload the file to S3 */
