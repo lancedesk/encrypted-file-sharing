@@ -242,7 +242,7 @@ class EFS_User_Selection
 
         WP_Filesystem(); /* Set up the WP_Filesystem */
 
-        $timestamp = date('Y-m-d H:i:s');
+        $timestamp = gmdate('Y-m-d H:i:s');
         $formatted_message = '[' . $timestamp . '] ' . $message . PHP_EOL;
 
         /* Get the current log file content */
