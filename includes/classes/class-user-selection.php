@@ -74,7 +74,7 @@ class EFS_User_Selection
         }
 
         /* Verify nonce */
-        if (!isset($_POST['efs_user_selection_meta_box_nonce']) || !wp_verify_nonce(wp_unslash($_POST['efs_user_selection_meta_box_nonce']), 'efs_user_selection_meta_box')) 
+        if (!isset($_POST['efs_user_selection_meta_box_nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['efs_user_selection_meta_box_nonce'])), 'efs_user_selection_meta_box')) 
         {
             $this->log_message($log_file, 'Nonce verification failed for post ID: ' . $post_id);
             return;
