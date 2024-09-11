@@ -25,21 +25,19 @@ class EFS_File_Display
 		/* Ensure user is logged in */
 		if (is_user_logged_in())
         {
+            global $wpdb;
 			$current_user_id = get_current_user_id();
-			
-			/* Query for post IDs where the current user is a recipient */
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'efs_recipients';
 
-            /* Get all post IDs associated with the current user */
-            $query = $wpdb->prepare(
-                "SELECT post_id FROM {$table_name} WHERE recipient_id = %d",
-                $current_user_id
+            /* Get all post IDs associated with the current user as a recipient */
+            $post_ids = $wpdb->get_col(
+                $wpdb->prepare(
+                    "SELECT post_id FROM {$wpdb->prefix}efs_recipients WHERE recipient_id = %d",
+                    $current_user_id
+                )
             );
 
-            $post_ids = $wpdb->get_col($query);
-
-			if (!empty($post_ids)) {
+			if (!empty($post_ids))
+            {
 				$args = [
 					'post_type'      => 'efs_file',
 					'posts_per_page' => -1,
