@@ -33,10 +33,7 @@
 */
 
 /* Ensure that WordPress functions are available */
-if (!defined('ABSPATH')) 
-{
-    exit; /* Exit if accessed directly */
-}
+defined( 'ABSPATH' ) || exit; /* Exit if accessed directly */
 
 /* Include Composer autoloader 
 require_once plugin_dir_path(__FILE__) . 'vendor/autoload.php'; */
