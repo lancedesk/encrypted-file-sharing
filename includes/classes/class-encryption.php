@@ -113,13 +113,13 @@ class EFS_Encryption
         $query = $wpdb->prepare(
             "
             SELECT ek.encryption_key, ek.user_kek
-            FROM %i ek
-            INNER JOIN %i fm
+            FROM {$encryption_keys_table} ek
+            INNER JOIN {$file_metadata_table} fm
             ON ek.file_id = fm.id
             WHERE ek.user_id = %d
             AND fm.file_name = %s
             ",
-            $encryption_keys_table, $file_metadata_table, $user_id, $file_name
+            $user_id, $file_name
         );
 
         $result = $wpdb->get_row($query);
