@@ -273,14 +273,12 @@ class EFS_Local_File_Handler
         global $wpdb;
         $table_name = $wpdb->prefix . 'efs_encrypted_files';
 
-        /* Prepare SQL query */
-        $sql = $wpdb->prepare(
-            "SELECT * FROM %i WHERE post_id = %d",
-            $table_name, $post_id
-        );
-
         /* Execute query and retrieve results */
-        $result = $wpdb->get_row($sql, ARRAY_A);
+        $result = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$table_name} WHERE post_id = %d",
+                $post_id
+            ), ARRAY_A);
 
         return $result;
     }
