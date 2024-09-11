@@ -210,13 +210,11 @@ class EFS_User_Selection
     {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'efs_recipients';
-
         /* Get all recipients for the post */
         $results = $wpdb->get_col(
             $wpdb->prepare(
-                "SELECT recipient_id FROM %i WHERE post_id = %d",
-                $table_name, $post_id
+                "SELECT recipient_id FROM {$wpdb->prefix}efs_recipients WHERE post_id = %d",
+                $post_id
             )
         );
 
