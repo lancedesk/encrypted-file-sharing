@@ -169,7 +169,7 @@ class EFS_Init
         $table_name = $wpdb->prefix . 'efs_master_key';
 
         /* Check if a master key already exists */
-        $existing_key = $wpdb->get_var("SELECT master_key FROM $table_name LIMIT 1");
+        $existing_key = $wpdb->get_var("SELECT master_key FROM %i LIMIT 1", $table_name);
 
         if ($existing_key !== null)
         {
@@ -240,12 +240,12 @@ class EFS_Init
         if (file_exists($file)) 
         {
             $current = file_get_contents($file);
-            $current .= "[" . date('Y-m-d H:i:s') . "] " . $message . "\n";
+            $current .= "[" . gmdate('Y-m-d H:i:s') . "] " . $message . "\n";
             file_put_contents($file, $current);
         } 
         else 
         {
-            $timestamp = date('Y-m-d H:i:s');
+            $timestamp = gmdate('Y-m-d H:i:s');
             $log_message = $timestamp . ' - ' . $message . PHP_EOL;
             file_put_contents($file, $log_message, FILE_APPEND);
         }
