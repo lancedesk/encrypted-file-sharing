@@ -40,6 +40,12 @@
     border: 1px solid #ccc;
 }
 
+.efs-file-row p
+{
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
 .efs-file-row .file-name p
 {
     color: var(--efs-primary-color);
