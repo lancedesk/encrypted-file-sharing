@@ -88,7 +88,19 @@ class EFS_Notification_Handler
 
         $file_name = get_the_title($file_id);
         $download_time = current_time('mysql');
-        $user_ip = $_SERVER['REMOTE_ADDR'];
+        
+        /* Check if $_SERVER['REMOTE_ADDR'] is set */
+        if (isset($_SERVER['REMOTE_ADDR']))
+        {
+            /* Retrieve, unslash, and validate the IP address */
+            $user_ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
+        }
+        else
+        {
+            /* Handle the case where the IP address is not set */
+            $user_ip = 'unknown';
+        }
+
         $headers = ['Content-Type: text/html; charset=UTF-8'];
 
         /* Email subject and message */
