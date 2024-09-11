@@ -67,7 +67,7 @@ class EFS_Encryption
                     'file_id' => $file_id,
                     'encryption_key' => $encrypted_dek, /* Store encrypted DEK */
                     'user_kek' => $encrypted_kek, /* Save encrypted KEK */
-                    'expiration_date' => $expiration_date,
+                    'expiration_date' => $expiration_date !== null ? $expiration_date : null, /* Null if no expiration */
                     'created_at' => current_time('mysql')
                 ],
                 [
@@ -76,7 +76,7 @@ class EFS_Encryption
                     '%d', /* file_id */
                     '%s', /* encrypted_dek */
                     '%s', /* user_kek */
-                    '%s', /* expiration_date */
+                    '%s', /* expiration_date %s for DATETIME */
                     '%s'  /* created_at */
                 ]
             );
@@ -94,7 +94,6 @@ class EFS_Encryption
         /* If everything succeeded, return true */
         return true;
     }
-
 
     /**
      * Retrieve and decrypt the Data Encryption Key (DEK) for a file.
