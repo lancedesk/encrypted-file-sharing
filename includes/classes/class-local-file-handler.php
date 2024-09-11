@@ -53,7 +53,8 @@ class EFS_Local_File_Handler
         $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
 
         /* Verify the nonce */
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'efs_upload_nonce')) {
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['nonce'])), 'efs_upload_nonce'))
+        {
             $this->log_message($log_file, 'Invalid nonce.');
             wp_send_json_error(['message' => 'Invalid nonce.']);
         }
@@ -271,12 +272,11 @@ class EFS_Local_File_Handler
     public function efs_get_encrypted_file_metadata_by_post_id($post_id)
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'efs_encrypted_files';
 
         /* Execute query and retrieve results */
         $result = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT * FROM {$table_name} WHERE post_id = %d",
+                "SELECT * FROM {$wpdb->prefix}efs_encrypted_files WHERE post_id = %d",
                 $post_id
             ), ARRAY_A);
 
