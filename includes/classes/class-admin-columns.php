@@ -80,12 +80,10 @@ class EFS_Admin_Columns
     {
         global $wpdb;
 
-        /* Table name for recipients */
-        $table_name = $wpdb->prefix . 'efs_recipients';
-
         /* Prepare and run the query to get recipient_ids using post_id */
-        $query = $wpdb->prepare("SELECT recipient_id FROM {$table_name} WHERE post_id = %d", $post_id);
-        $recipient_ids = $wpdb->get_col($query);
+        $recipient_ids = $wpdb->get_col(
+            $wpdb->prepare("SELECT recipient_id FROM {$wpdb->prefix}efs_recipients WHERE post_id = %d", $post_id)
+        );
 
         if ($recipient_ids)
         {
@@ -200,10 +198,13 @@ class EFS_Admin_Columns
         $file_name = $this->extract_file_name($file_url);
         $expiry_date = $this->get_expiration_date($post_id);
 
-        if ($expiry_date) {
+        if ($expiry_date)
+        {
             $current_date = gmdate('Y-m-d');
             return $expiry_date < $current_date ? esc_html__('Expired', 'encrypted-file-sharing') : esc_html__('Active', 'encrypted-file-sharing');
-        } else {
+        }
+        else
+        {
             return esc_html__('No expiry set', 'encrypted-file-sharing');
         }
     }
@@ -232,15 +233,13 @@ class EFS_Admin_Columns
     public function get_expiration_date($post_id)
     {
         global $wpdb;
-
-        /* Table name for encryption keys */
-        $table_name = $wpdb->prefix . 'efs_encryption_keys';
-        
-        /* Prepare and run the query to get the expiration_date using post_id */
-        $query = $wpdb->prepare("SELECT expiration_date FROM {$table_name} WHERE post_id = %d", $post_id);
         
         /* Get the expiration date */
-        return $wpdb->get_var($query);
 
+        $result = $wpdb->get_var(
+            $wpdb->prepare("SELECT expiration_date FROM {$wpdb->prefix}efs_encryption_keys WHERE post_id = %d", $post_id)
+        );
+
+        return $result;
     }
 }
