@@ -194,8 +194,37 @@ class EFS_File_Handler
     /* Helper function to write to log */
     private function write_to_log($message, $log_file)
     {
+        /*  Ensure WP_Filesystem is available */
+        if ( ! function_exists('get_filesystem_method') )
+        {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        global $wp_filesystem;
+
+        /* Initialize WP_Filesystem */
+        if ( empty( $wp_filesystem ) )
+        {
+            WP_Filesystem();
+        }
+
+        /* Get current time and prepare log message */
         $current_time = gmdate('Y-m-d H:i:s');
-        file_put_contents($log_file, "[" . $current_time . "] " . $message . PHP_EOL, FILE_APPEND);
+        $log_message = "[" . $current_time . "] " . $message . PHP_EOL;
+
+        /* Write log message to the file */
+        if ( $wp_filesystem->exists( $log_file ) )
+        {
+            /* Append if file exists */
+            $current_contents = $wp_filesystem->get_contents( $log_file );
+            $new_contents = $current_contents . $log_message;
+            $wp_filesystem->put_contents( $log_file, $new_contents );
+        }
+        else
+        {
+            /* Create new file if it doesn't exist */
+            $wp_filesystem->put_contents( $log_file, $log_message, FS_CHMOD_FILE );
+        }
     }
 
     /**
@@ -333,8 +362,37 @@ class EFS_File_Handler
     /* Function to log messages */
     private function log_message($message, $log_file)
     {
+        /* Ensure WP_Filesystem is available */
+        if ( ! function_exists('get_filesystem_method') )
+        {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        global $wp_filesystem;
+
+        /* Initialize WP_Filesystem */
+        if ( empty( $wp_filesystem ) )
+        {
+            WP_Filesystem();
+        }
+
+        /* Get current time and prepare log message */
         $current_time = gmdate('Y-m-d H:i:s');
-        file_put_contents($log_file, "{$current_time} - {$message}\n", FILE_APPEND);
+        $log_message = "{$current_time} - {$message}\n";
+
+        /* Check if file exists */
+        if ( $wp_filesystem->exists( $log_file ) )
+        {
+            /* Append if file exists */
+            $current_contents = $wp_filesystem->get_contents( $log_file );
+            $new_contents = $current_contents . $log_message;
+            $wp_filesystem->put_contents( $log_file, $new_contents, FS_CHMOD_FILE );
+        }
+        else
+        {
+            /* Create new file if it doesn't exist */
+            $wp_filesystem->put_contents( $log_file, $log_message, FS_CHMOD_FILE );
+        }
     }
 
 }
