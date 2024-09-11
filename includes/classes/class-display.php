@@ -116,16 +116,19 @@ class EFS_File_Display
                                     /* Display upload/creation date */
                                     echo '<div class="file-date"><p>' . esc_html($upload_date) . '</p></div>';
 
-                                    /* Eye icon for more info (with modal or popup trigger) */
-                                    echo '<a href="#" class="info-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-eye"></i></a>';
-                                    
+                                    /* Wrap file details (info, download) */
+                                    echo '<div class="file-details">';
+                                        /* Eye icon for more info (with modal or popup trigger) */
+                                        echo '<a href="#" class="info-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-eye"></i></a>';
+
+                                        /* Download button */
+                                        echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-download"></i></a>';
+                                    echo '</div>'; /* Close file-details div */
+
                                     /* Modal content */
                                     $modal_content = $this->get_modal_content(get_the_ID(), $file_size);
                                     echo $modal_content;
-
-                                    /* Download button */
-                                    echo '<a href="#" class="download-btn" data-file-id="' . esc_attr(get_the_ID()) . '"><i class="fas fa-download"></i></a>';
-
+                                    
                                 echo '</div>';
 							}
 						}
