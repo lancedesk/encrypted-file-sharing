@@ -275,8 +275,8 @@ class EFS_Local_File_Handler
 
         /* Prepare SQL query */
         $sql = $wpdb->prepare(
-            "SELECT * FROM $table_name WHERE post_id = %d",
-            $post_id
+            "SELECT * FROM %i WHERE post_id = %d",
+            $table_name, $post_id
         );
 
         /* Execute query and retrieve results */
@@ -348,12 +348,12 @@ class EFS_Local_File_Handler
         if (file_exists($file)) 
         {
             $current = file_get_contents($file);
-            $current .= "[" . date('Y-m-d H:i:s') . "] " . $message . "\n";
+            $current .= "[" . gmdate('Y-m-d H:i:s') . "] " . $message . "\n";
             file_put_contents($file, $current);
         } 
         else 
         {
-            $timestamp = date('Y-m-d H:i:s');
+            $timestamp = gmdate('Y-m-d H:i:s');
             $log_message = $timestamp . ' - ' . $message . PHP_EOL;
             file_put_contents($file, $log_message, FILE_APPEND);
         }
@@ -409,7 +409,7 @@ class EFS_Local_File_Handler
         }
 
         /* Return the expiration date in 'Y-m-d H:i:s' format */
-        return date('Y-m-d H:i:s', $expiration_time);
+        return gmdate('Y-m-d H:i:s', $expiration_time);
     }
 
 }
