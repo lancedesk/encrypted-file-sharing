@@ -111,12 +111,14 @@ class EFS_Encryption
 
         /* Query to get the encrypted DEK and KEK for the specific user and file */
         $query = $wpdb->prepare(
-            "SELECT ek.encryption_key, ek.user_kek
-            FROM $encryption_keys_table ek
-            INNER JOIN $file_metadata_table fm
+            "
+            SELECT ek.encryption_key, ek.user_kek
+            FROM {$encryption_keys_table} ek
+            INNER JOIN {$file_metadata_table} fm
             ON ek.file_id = fm.id
             WHERE ek.user_id = %d
-            AND fm.file_name = %s",
+            AND fm.file_name = %s
+            ",
             $user_id, $file_name
         );
 
