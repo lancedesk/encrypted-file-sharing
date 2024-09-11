@@ -81,23 +81,27 @@ class EFS_User_Selection
         }
 
         /* Check autosave */
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+        {
             $this->log_message($log_file, 'Incorrect post type. Exiting.');
             return;
         }
 
         /* Check permissions */
-        if ('efs_file' !== $_POST['post_type']) {
+        if (!isset($_POST['post_type']) || 'efs_file' !== $_POST['post_type']) 
+        {
             $this->log_message($log_file, 'User does not have permission to edit post ID: ' . $post_id);
             return;
         }
 
-        if (!current_user_can('edit_post', $post_id)) {
+        if (!current_user_can('edit_post', $post_id))
+        {
             return;
         }
 
         /* Sanitize and save user selection */
-        if (isset($_POST['efs_user_selection']) && is_array($_POST['efs_user_selection'])) {
+        if (isset($_POST['efs_user_selection']) && is_array($_POST['efs_user_selection']))
+        {
             $selected_users = array_map('intval', $_POST['efs_user_selection']);
 
             $this->log_message($log_file, 'Selected users: ' . implode(', ', $selected_users));
@@ -105,7 +109,8 @@ class EFS_User_Selection
             /* Save selected recipients to the database */
             $result = $this->save_recipients_to_db($post_id, $selected_users);
 
-            if ($result === false) {
+            if ($result === false)
+            {
                 $this->log_message($log_file, 'Failed to save recipients to the database for post ID: ' . $post_id);
                 return;
             }
