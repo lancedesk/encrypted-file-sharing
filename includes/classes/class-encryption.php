@@ -218,10 +218,9 @@ class EFS_Encryption
     private function get_master_key()
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'efs_master_key';
 
         /* Query to get the master key */
-        $master_key = $wpdb->get_var("SELECT master_key FROM %i LIMIT 1", $table_name);
+        $master_key = $wpdb->get_var("SELECT master_key FROM {$wpdb->prefix}efs_master_key LIMIT 1");
 
         if ($master_key === null)
         {
