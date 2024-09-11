@@ -169,16 +169,26 @@ class EFS_Encryption
         $output_file = $file_path . '.enc';
         $iv = openssl_random_pseudo_bytes(16); /* Initialization vector for AES-256-CBC */
 
-        /* Read the file content */
-        $file_data = file_get_contents($file_path);
+        /* Open the file for reading */
+        $handle = fopen($file_path, 'rb');
+        if ($handle === false) 
+        {
+            return false;
+        }
 
-        if ($file_data === false) {
+        /* Read the file content */
+        $file_data = fread($handle, filesize($file_path));
+        fclose($handle); /* Close the file handle */
+
+        if ($file_data === false) 
+        {
             return false;
         }
 
         /* Encrypt the file content using the DEK */
         $encrypted_data = openssl_encrypt($file_data, 'AES-256-CBC', $data_encryption_key, 0, $iv);
-        if ($encrypted_data === false) {
+        if ($encrypted_data === false) 
+        {
             return false;
         }
 
