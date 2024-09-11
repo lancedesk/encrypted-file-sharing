@@ -33,8 +33,8 @@ class EFS_File_Display
 
             /* Get all post IDs associated with the current user */
             $query = $wpdb->prepare(
-                "SELECT post_id FROM %i WHERE recipient_id = %d",
-                $table_name, $current_user_id
+                "SELECT post_id FROM {$table_name} WHERE recipient_id = %d",
+                $current_user_id
             );
 
             $post_ids = $wpdb->get_col($query);
