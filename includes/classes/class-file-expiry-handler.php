@@ -66,7 +66,7 @@ class EFS_File_Expiry_Handler
             $args = [
                 'post_type'    => 'efs_file',
                 'meta_key'     => '_efs_file_expiry_date',
-                'meta_value'   => date('Y-m-d'),
+                'meta_value'   => gmdate('Y-m-d'),
                 'meta_compare' => '<=',
                 'post_status'  => 'publish',
                 'fields'       => 'ids',
