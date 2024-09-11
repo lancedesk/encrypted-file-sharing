@@ -241,10 +241,21 @@ class EFS_Encryption
 
     public function decrypt_file($encrypted_file_path, $decrypted_dek)
     {
-        /* Read the encrypted file data */
-        $encrypted_data = file_get_contents($encrypted_file_path);
+        global $wp_filesystem;
 
-        if ($encrypted_data === false) {
+        /* Initialize the WP_Filesystem */
+        if (!function_exists('WP_Filesystem')) 
+        {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+
+        WP_Filesystem(); /* Set up the WP_Filesystem */
+
+        /* Read the encrypted file data using WP_Filesystem */
+        $encrypted_data = $wp_filesystem->get_contents($encrypted_file_path);
+
+        if ($encrypted_data === false) 
+        {
             $this->log_message("Error: Unable to read encrypted file.");
             return false;
         }
