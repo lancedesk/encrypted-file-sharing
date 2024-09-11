@@ -374,7 +374,7 @@ class EFS_Encryption
         WP_Filesystem(); /* Set up the WP_Filesystem */
 
         $log_file = WP_CONTENT_DIR . '/efs_encryption_log.txt';
-        $timestamp = date('Y-m-d H:i:s');
+        $timestamp = gmdate('Y-m-d H:i:s'); /* Use gmdate() for timezone-independent time */
         $log_entry = "[$timestamp] $message\n";
 
         /* Check if file exists and read the existing content */
