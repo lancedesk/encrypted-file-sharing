@@ -343,17 +343,36 @@ class EFS_Local_File_Handler
 
     public function log_message($file, $message)
     {
-        if (file_exists($file)) 
+        /* Ensure WP_Filesystem is available */
+        if ( ! function_exists('get_filesystem_method') )
         {
-            $current = file_get_contents($file);
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        global $wp_filesystem;
+
+        /* Initialize WP_Filesystem */
+        if ( empty( $wp_filesystem ) )
+        {
+            WP_Filesystem();
+        }
+
+        /* Check if the file exists */
+        if ( $wp_filesystem->exists( $file ) )
+        {
+            /* Read current contents */
+            $current = $wp_filesystem->get_contents( $file );
+            /* Append new message */
             $current .= "[" . gmdate('Y-m-d H:i:s') . "] " . $message . "\n";
-            file_put_contents($file, $current);
-        } 
-        else 
+            /* Write updated contents */
+            $wp_filesystem->put_contents( $file, $current );
+        } else
         {
+            /* Prepare log message */
             $timestamp = gmdate('Y-m-d H:i:s');
             $log_message = $timestamp . ' - ' . $message . PHP_EOL;
-            file_put_contents($file, $log_message, FILE_APPEND);
+            /* Create new file with the log message */
+            $wp_filesystem->put_contents( $file, $log_message, FS_CHMOD_FILE );
         }
     }
 
