@@ -47,14 +47,15 @@ class EFS_S3_File_Handler
         $access_key = get_option('efs_aws_access_key', '');
         $secret_key = get_option('efs_aws_secret_key', '');
 
-        if (!$region || !$access_key || !$secret_key) {
+        if (!$region || !$access_key || !$secret_key)
+        {
             error_log('AWS credentials or region not configured properly.');
             return false;
         }
 
         /* Initialize the S3 client */
         $this->s3_client = new S3Client([
-            'region'  => $region, // e.g., 'us-east-1'
+            'region'  => $region, /* e.g., 'us-east-1' */
             'version' => 'latest',
             'credentials' => [
                 'key'    => $access_key,
@@ -84,12 +85,14 @@ class EFS_S3_File_Handler
 
     public function fetch_and_store_s3_buckets()
     {
-        if (!$this->s3_client) {
+        if (!$this->s3_client)
+        {
             error_log('S3 client is not initialized.');
             return false;
         }
 
-        try {
+        try
+        {
             /* List Buckets */
             $result = $this->s3_client->listBuckets();
 
@@ -133,7 +136,8 @@ class EFS_S3_File_Handler
      * @return array Returns an array of stored bucket names. If no buckets are stored, returns an empty array.
     */
 
-    public function get_stored_s3_buckets() {
+    public function get_stored_s3_buckets()
+    {
         /* Retrieve stored buckets from WordPress options table */
         return get_option('efs_s3_buckets', array());
     }
@@ -155,7 +159,8 @@ class EFS_S3_File_Handler
             $result = $this->s3_client->listBuckets();
 
             /* Extract and return bucket names */
-            $buckets = array_map(function($bucket) {
+            $buckets = array_map(function($bucket)
+            {
                 return $bucket['Name'];
             }, $result['Buckets']);
 
@@ -317,8 +322,11 @@ class EFS_S3_File_Handler
 
     public function handle_s3_upload_ajax() 
     {
+        /* Load WordPress file handling functions */
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+
         /* Nonce verification for file uploads */
-        if (!isset($_POST['efs_upload_nonce']) || !wp_verify_nonce(wp_unslash($_POST['efs_upload_nonce']), 'efs_upload_nonce'))
+        if (!isset($_POST['efs_upload_nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['efs_upload_nonce'])), 'efs_upload_nonce'))
         {
             wp_send_json_error(['message' => 'Nonce verification failed.']);
             exit;
@@ -331,8 +339,21 @@ class EFS_S3_File_Handler
             exit;
         }
 
-        /* Proceed with handling the file */
-        $file = $_FILES['file'];
+        /* Set up file upload options */
+        $upload_overrides = [
+            'test_form' => false,
+            'test_size' => true
+        ];
+
+        /* Handle the file upload */
+        $file = wp_handle_upload($_FILES['file'], $upload_overrides);
+
+        /* Check for upload errors */
+        if (isset($file['error']))
+        {
+            wp_send_json_error(['message' => $file['error']]);
+            exit;
+        }
 
         /* Call the method to upload the file to S3 */
         $file_key = $this->upload_to_amazon_s3($file);
