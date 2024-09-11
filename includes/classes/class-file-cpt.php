@@ -115,8 +115,9 @@ class EFS_File_CPT
     public function save_file_meta_box_data($post_id)
     {
         /* Check nonce and permissions */
-        if (!isset($_POST['efs_file_meta_box_nonce']) || !wp_verify_nonce($_POST['efs_file_meta_box_nonce'], 'efs_file_meta_box')) {
-            return;
+        if (!isset($_POST['efs_file_meta_box_nonce']) || !wp_verify_nonce(wp_unslash($_POST['efs_file_meta_box_nonce']), 'efs_file_meta_box')) 
+        {
+        return;
         }
 
         /* Check if this is an autosave. */
@@ -213,9 +214,10 @@ class EFS_File_CPT
 
         /* Split expiry date and time */
         $expiry_date = $expiry_time = '';
-        if ($expiry_datetime) {
-            $expiry_date = esc_attr(date('Y-m-d', strtotime($expiry_datetime)));
-            $expiry_time = esc_attr(date('H:i', strtotime($expiry_datetime)));
+        if ($expiry_datetime)
+        {
+            $expiry_date = esc_attr(gmdate('Y-m-d', strtotime($expiry_datetime)));
+            $expiry_time = esc_attr(gmdate('H:i', strtotime($expiry_datetime)));
         }
         
         /* Display the date and time fields */
@@ -239,29 +241,27 @@ class EFS_File_CPT
         /* An instance of the admin columns class */
         global $efs_admin_columns;
 
-        /* Check if our nonce is set. */
-        if (!isset($_POST['efs_expiry_meta_box_nonce'])) {
-            return;
-        }
-
-        /* Verify that the nonce is valid. */
-        if (!wp_verify_nonce($_POST['efs_expiry_meta_box_nonce'], 'efs_expiry_meta_box')) {
+        /* Check if our nonce is set & verify that the nonce is valid. */
+        if (!isset($_POST['efs_expiry_meta_box_nonce']) || !wp_verify_nonce(wp_unslash($_POST['efs_expiry_meta_box_nonce']), 'efs_expiry_meta_box'))
+        {
             return;
         }
 
         /* Check if this is an autosave. */
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+        {
             return;
         }
 
         /* Check the user's permissions. */
-        if (!current_user_can('edit_post', $post_id)) {
+        if (!current_user_can('edit_post', $post_id))
+        {
             return;
         }
 
         /* Sanitize and prepare date and time inputs */
-        $expiry_date = isset($_POST['efs_file_expiry_date']) ? sanitize_text_field($_POST['efs_file_expiry_date']) : '';
-        $expiry_time = isset($_POST['efs_file_expiry_time']) ? sanitize_text_field($_POST['efs_file_expiry_time']) : '';
+        $expiry_date = isset($_POST['efs_file_expiry_date']) ? sanitize_text_field(wp_unslash($_POST['efs_file_expiry_date'])) : '';
+        $expiry_time = isset($_POST['efs_file_expiry_time']) ? sanitize_text_field(wp_unslash($_POST['efs_file_expiry_time'])) : '';
 
         /* Combine date and time */
         $expiry_datetime = $expiry_date . ' ' . $expiry_time;
