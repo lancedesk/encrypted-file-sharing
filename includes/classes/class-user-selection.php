@@ -215,7 +215,7 @@ class EFS_User_Selection
         /* Get all recipients for the post */
         $results = $wpdb->get_col(
             $wpdb->prepare(
-                "SELECT recipient_id FROM $table_name WHERE post_id = %d",
+                "SELECT recipient_id FROM {$table_name} WHERE post_id = %d",
                 $post_id
             )
         );
