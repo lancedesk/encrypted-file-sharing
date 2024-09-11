@@ -22,14 +22,25 @@ class EFS_Local_File_Handler
 
     public function handle_local_upload()
     {
-        global $efs_file_handler, $efs_file_encryption;
+        global $wp_filesystem, $efs_file_handler, $efs_file_encryption;
         $upload_dir = ABSPATH . '../private_uploads/';
 
-        /* Check if upload directory exists, create it if not */
-        if (!file_exists($upload_dir)) {
-            if (mkdir($upload_dir, 0755, true)) {
+        /* Initialize WP_Filesystem */
+        if (!function_exists('WP_Filesystem')) 
+        {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+
+        WP_Filesystem(); /* Set up WP_Filesystem */
+
+        if (!$wp_filesystem->is_dir($upload_dir)) 
+        {
+            if ($wp_filesystem->mkdir($upload_dir, FS_CHMOD_DIR)) 
+            {
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Created directory: ' . $upload_dir);
-            } else {
+            } 
+            else 
+            {
                 $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to create directory: ' . $upload_dir);
                 return false;
             }
