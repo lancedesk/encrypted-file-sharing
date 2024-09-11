@@ -84,7 +84,7 @@ class EFS_Admin_Columns
         $table_name = $wpdb->prefix . 'efs_recipients';
 
         /* Prepare and run the query to get recipient_ids using post_id */
-        $query = $wpdb->prepare("SELECT recipient_id FROM %i WHERE post_id = %d", $table_name, $post_id);
+        $query = $wpdb->prepare("SELECT recipient_id FROM {$table_name} WHERE post_id = %d", $post_id);
         $recipient_ids = $wpdb->get_col($query);
 
         if ($recipient_ids)
@@ -237,7 +237,7 @@ class EFS_Admin_Columns
         $table_name = $wpdb->prefix . 'efs_encryption_keys';
         
         /* Prepare and run the query to get the expiration_date using post_id */
-        $query = $wpdb->prepare("SELECT expiration_date FROM %i WHERE post_id = %d", $table_name, $post_id);
+        $query = $wpdb->prepare("SELECT expiration_date FROM {$table_name} WHERE post_id = %d", $post_id);
         
         /* Get the expiration date */
         return $wpdb->get_var($query);
