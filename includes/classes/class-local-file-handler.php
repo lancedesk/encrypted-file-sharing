@@ -366,6 +366,15 @@ class EFS_Local_File_Handler
 
     private function calculate_expiration_date()
     {
+        /* Check if the admin has enabled expiry */
+        $enable_expiry = get_option('efs_enable_expiry', 0); /* Default to 0 (disabled) if not set */
+
+        /* If expiry is not enabled, return null */
+        if (!$enable_expiry) 
+        {
+            return null;
+        }
+
         /* Get the expiration period and unit from the admin settings */
         $expiry_period = get_option('efs_expiry_period', 1); /* Default to 1 if not set */
         $expiry_unit = get_option('efs_expiry_unit', 'days'); /* Default to 'days' if not set */
