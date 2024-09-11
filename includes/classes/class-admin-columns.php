@@ -84,7 +84,7 @@ class EFS_Admin_Columns
         $table_name = $wpdb->prefix . 'efs_recipients';
 
         /* Prepare and run the query to get recipient_ids using post_id */
-        $query = $wpdb->prepare("SELECT recipient_id FROM $table_name WHERE post_id = %d", $post_id);
+        $query = $wpdb->prepare("SELECT recipient_id FROM %i WHERE post_id = %d", $table_name, $post_id);
         $recipient_ids = $wpdb->get_col($query);
 
         if ($recipient_ids)
@@ -128,7 +128,7 @@ class EFS_Admin_Columns
     private function get_formatted_date($post_id, $meta_key)
     {
         $date = get_post_meta($post_id, $meta_key, true);
-        return $date ? esc_html(date('Y/m/d \a\t g:i a', strtotime($date))) : esc_html__('N/A', 'encrypted-file-sharing');
+        return $date ? esc_html(gmdate('Y/m/d \a\t g:i a', strtotime($date))) : esc_html__('N/A', 'encrypted-file-sharing');
     }
 
     /**
@@ -181,7 +181,7 @@ class EFS_Admin_Columns
         $expiry_date = $this->get_expiration_date($post_id);
 
         if ($expiry_date) {
-            return esc_html(date('Y/m/d \a\t g:i a', strtotime($expiry_date)));
+            return esc_html(gmdate('Y/m/d \a\t g:i a', strtotime($expiry_date)));
         } else {
             return esc_html__('No expiry set', 'encrypted-file-sharing');
         }
@@ -201,7 +201,7 @@ class EFS_Admin_Columns
         $expiry_date = $this->get_expiration_date($post_id);
 
         if ($expiry_date) {
-            $current_date = date('Y-m-d');
+            $current_date = gmdate('Y-m-d');
             return $expiry_date < $current_date ? esc_html__('Expired', 'encrypted-file-sharing') : esc_html__('Active', 'encrypted-file-sharing');
         } else {
             return esc_html__('No expiry set', 'encrypted-file-sharing');
@@ -217,7 +217,7 @@ class EFS_Admin_Columns
 
     public function extract_file_name($file_url)
     {
-        $file_path = parse_url($file_url, PHP_URL_PATH);
+        $file_path = wp_parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
         return substr($file_name, -4) === '.enc' ? substr($file_name, 0, -4) : $file_name;
     }
@@ -237,7 +237,7 @@ class EFS_Admin_Columns
         $table_name = $wpdb->prefix . 'efs_encryption_keys';
         
         /* Prepare and run the query to get the expiration_date using post_id */
-        $query = $wpdb->prepare("SELECT expiration_date FROM $table_name WHERE post_id = %d", $post_id);
+        $query = $wpdb->prepare("SELECT expiration_date FROM %i WHERE post_id = %d", $table_name, $post_id);
         
         /* Get the expiration date */
         return $wpdb->get_var($query);
