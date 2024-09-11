@@ -235,14 +235,14 @@ class EFS_Local_File_Handler
                 'file_id' => $file_id,
                 'post_id' => $post_id,
                 'data_encryption_key' => $data_encryption_key,
-                'expiration_date' => $expiration_date, /* Can be NULL if expiry is not enabled */
+                'expiration_date' => $expiration_date !== null ? $expiration_date : null, /* Null if no expiration */
                 'encrypted_file' => $encrypted_file
             ],
             [
                 '%d',   /* file_id */
                 '%d',   /* post_id */
                 '%s',   /* data_encryption_key */
-                $expiration_date !== null ? '%s' : 'NULL',   /* expiration_date: %s for DATETIME, or NULL */
+                '%s',   /* expiration_date %s for DATETIME */
                 '%s'    /* encrypted_file */
             ]
         );
