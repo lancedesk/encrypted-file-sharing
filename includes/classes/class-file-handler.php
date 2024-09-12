@@ -203,33 +203,33 @@ class EFS_File_Handler
 
         /* Check nonce for security */
         check_ajax_referer('efs_download_nonce', 'security');
-        $this->write_to_log('Nonce checked successfully.', $log_file);
+        $this->efs_init->log_message($log_file, 'Nonce checked successfully.');
     
         /* Validate user */
         if (!is_user_logged_in())
         {
-            $this->write_to_log('User not logged in.', $log_file);
+            $this->efs_init->log_message($log_file, 'User not logged in.');
             wp_send_json_error(array('message' => 'User not logged in.'));
         }
 
         /* Get current user ID */
         $current_user = wp_get_current_user();
         $user_id = $current_user->ID; /* Retrieve user ID from current user */
-        $this->write_to_log('Current user ID: ' . $user_id, $log_file);
+        $this->efs_init->log_message($log_file, 'Current user ID: ' . $user_id);
     
         /* Check if file ID is set */
         if (!isset($_POST['file_id'])) {
-            $this->write_to_log('File ID is missing.', $log_file);
+            $this->efs_init->log_message($log_file, 'File ID is missing.');
             wp_send_json_error(array('message' => 'File ID missing.'));
         }
     
         $file_id = intval($_POST['file_id']);
-        $this->write_to_log('Received file ID: ' . $file_id, $log_file);
+        $this->efs_init->log_message($log_file, 'Received file ID: ' . $file_id);
     
         /* Validate file ID */
         if (get_post_type($file_id) !== 'efs_file')
         {
-            $this->write_to_log('Invalid file ID: ' . $file_id, $log_file);
+            $this->efs_init->log_message($log_file, 'Invalid file ID: ' . $file_id);
             wp_send_json_error(array('message' => 'Invalid file ID.'));
         }
     
@@ -238,23 +238,23 @@ class EFS_File_Handler
     
         if (empty($file_url))
         {
-            $this->write_to_log('File URL not found for file ID: ' . $file_id, $log_file);
+            $this->efs_init->log_message($log_file, 'File URL not found for file ID: ' . $file_id);
             wp_send_json_error(array('message' => 'File URL not found.'));
         }
 
-        $this->write_to_log('File URL: ' . $file_url, $log_file);
+        $this->efs_init->log_message($log_file, 'File URL: ' . $file_url);
 
         /* Parse the file path */
         $file_path = wp_parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
-        $this->write_to_log('Parsed file path: ' . $file_path, $log_file);
-        $this->write_to_log('Parsed file name: ' . $file_name, $log_file);
+        $this->efs_init->log_message($log_file, 'Parsed file path: ' . $file_path);
+        $this->efs_init->log_message($log_file, 'Parsed file name: ' . $file_name);
 
         /* Strip the .enc extension if present */
         if (substr($file_name, -4) === '.enc')
         {
             $file_name = substr($file_name, 0, -4);
-            $this->write_to_log('Stripped .enc extension. Final file name: ' . $file_name, $log_file);
+            $this->efs_init->log_message($log_file, 'Stripped .enc extension. Final file name: ' . $file_name);
         }
 
         /* Retrieve the encryption key from the database */
@@ -263,40 +263,41 @@ class EFS_File_Handler
         /* Check if the key was retrieved */
         if ($encryption_key === false)
         {
-            $this->write_to_log('Encryption key not found for file: ' . $file_name, $log_file);
+            $this->efs_init->log_message($log_file, 'Encryption key not found for file: ' . $file_name);
             wp_send_json_error(array('message' => 'Encryption key not found for file: ' . $file_name));
         }
 
-        $this->write_to_log('Encryption key retrieved for file: ' . $file_name, $log_file);
+        $this->efs_init->log_message($log_file, 'Encryption key retrieved for file: ' . $file_name);
 
         /* Decrypt the file */
         $decrypted_data = $this->decrypt_file($file_path, $encryption_key);
 
         if ($decrypted_data === false)
         {
-            $this->write_to_log('File decryption failed for file: ' . $file_name, $log_file);
+            $this->efs_init->log_message($log_file, 'File decryption failed for file: ' . $file_name);
             wp_send_json_error(array('message' => 'File decryption failed.'));
         }
 
-        $this->write_to_log('File decrypted successfully for file: ' . $file_name, $log_file);
-        $this->write_to_log('Decrypted file size: ' . strlen($decrypted_data) . ' bytes', $log_file);
+        $this->efs_init->log_message($log_file, 'File decrypted successfully for file: ' . $file_name);
+        $this->efs_init->log_message($log_file, 'Decrypted file size: ' . strlen($decrypted_data) . ' bytes');
     
         /* Update download status and date */
         $current_time = current_time('mysql');
         update_post_meta($file_id, '_efs_download_status', '1'); /* Mark as downloaded */
         /* Set download date as MySQL timestamp */
         update_post_meta($file_id, '_efs_download_date', $current_time);
-        $this->write_to_log('Download status updated for file ID: ' . $file_id, $log_file);
+        $this->efs_init->log_message($log_file, 'Download status updated for file ID: ' . $file_id);
     
         /* Retrieve the admin notification setting */
         $send_notifications = get_option('efs_send_notifications', 0); /* Default to 0 (disabled) */
-        $this->write_to_log('Admin notifications setting: ' . ($send_notifications ? 'Enabled' : 'Disabled'), $log_file);
+        $this->efs_init->log_message($log_file, 'Admin notifications setting: ' . ($send_notifications ? 'Enabled' : 'Disabled'));
 
         /* Send notification to admin if notifications are enabled */
-        if ($send_notifications) {
+        if ($send_notifications)
+        {
             $current_user = wp_get_current_user();
             $this->efs_notification_handler->send_download_notification_to_admin($file_id, $current_user);
-            $this->write_to_log('Admin notified of file download for file ID: ' . $file_id, $log_file);
+            $this->efs_init->log_message($log_file, 'Admin notified of file download for file ID: ' . $file_id);
         }
 
         /* Serve the decrypted file for download */
@@ -308,7 +309,7 @@ class EFS_File_Handler
 
         // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The file data is safe to output without escaping
         echo $decrypted_data;
-        $this->write_to_log('File served for download: ' . $file_name, $log_file);
+        $this->efs_init->log_message($log_file, 'File served for download: ' . $file_name);
     
         /* Terminate script execution */
         exit;
