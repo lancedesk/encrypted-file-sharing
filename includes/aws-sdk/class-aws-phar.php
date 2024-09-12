@@ -20,8 +20,8 @@ class EFS_Aws_Phar
             WP_Filesystem();
         }
 
+        /* Call the download_and_extract_phar method during construction */
         $this->download_and_extract_phar();
-        $this->include_autoloader();
     }
 
     /**
@@ -61,6 +61,9 @@ class EFS_Aws_Phar
         /* Extract the PHAR file */
         $phar = new Phar($phar_file);
         $phar->extractTo($local_extracted_dir);
+
+        /* Include the autoloader after extraction */
+        $this->include_autoloader();
     }
 
     /* Include the autoloader */
