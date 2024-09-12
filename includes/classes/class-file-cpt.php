@@ -115,27 +115,30 @@ class EFS_File_CPT
     public function save_file_meta_box_data($post_id)
     {
         /* Check nonce and permissions */
-        if (!isset($_POST['efs_file_meta_box_nonce']) || !wp_verify_nonce(wp_unslash($_POST['efs_file_meta_box_nonce']), 'efs_file_meta_box')) 
+        if (!isset($_POST['efs_file_meta_box_nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['efs_file_meta_box_nonce'])), 'efs_file_meta_box')) 
         {
         return;
         }
 
         /* Check if this is an autosave. */
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+        {
             return;
         }
 
         /* Check the user's permissions. */
-        if ('efs_file' !== $_POST['post_type']) {
+        if (isset($_POST['post_type']) && 'efs_file' !== $_POST['post_type'])
+        {
             return;
         }
 
-        if (!current_user_can('edit_post', $post_id)) {
+        if (!current_user_can('edit_post', $post_id))
+        {
             return;
         }
 
         /* Sanitize and save the manually entered file URL */
-        $file_url = isset($_POST['efs_file_url']) ? sanitize_text_field($_POST['efs_file_url']) : '';
+        $file_url = isset($_POST['efs_file_url']) ? sanitize_text_field(wp_unslash($_POST['efs_file_url'])) : '';
 
         if (!empty($file_url)) 
         {
@@ -242,7 +245,7 @@ class EFS_File_CPT
         global $efs_admin_columns;
 
         /* Check if our nonce is set & verify that the nonce is valid. */
-        if (!isset($_POST['efs_expiry_meta_box_nonce']) || !wp_verify_nonce(wp_unslash($_POST['efs_expiry_meta_box_nonce']), 'efs_expiry_meta_box'))
+        if (!isset($_POST['efs_expiry_meta_box_nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['efs_expiry_meta_box_nonce'])), 'efs_expiry_meta_box'))
         {
             return;
         }
