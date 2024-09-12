@@ -117,7 +117,13 @@ class EFS_Local_File_Handler
                     if ($success) {
                         /* Metadata was successfully inserted */
                         $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
-                    } else {
+
+                        /* Set the encryption meta */
+                        update_post_meta($post_id, '_efs_encrypted', '1');
+                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption meta set to 1 for post ID: ' . $post_id);
+                    }
+                    else
+                    {
                         /* Handle insertion failure */
                         $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
                     }
