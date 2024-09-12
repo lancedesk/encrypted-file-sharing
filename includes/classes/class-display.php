@@ -93,10 +93,13 @@ class EFS_File_Display
 								$is_secure = strpos($file_path, 'private_uploads') !== false;
 
 								/* Get file size */
-								if ($is_secure) {
+								if ($is_secure)
+                                {
 									/* Handle secure file path */
 									$file_size = file_exists($relative_path) ? $this->format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
-								} else {
+								}
+                                else
+                                {
 									/* Handle WordPress uploads file path */
 									$file_size = file_exists($file_path) ? $this->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
 								}
@@ -107,6 +110,7 @@ class EFS_File_Display
                                 echo '<div class="efs-file-row">';
 								
                                     /* Display file type icon */
+                                    /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $icon is safely escaped */
                                     echo '<span class="file-icon">' . $icon . '</span>';
                                     
                                     /* Display file name */
@@ -126,6 +130,7 @@ class EFS_File_Display
 
                                     /* Modal content */
                                     $modal_content = $this->get_modal_content(get_the_ID(), $file_size);
+                                    /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $modal_content content are safely escaped */
                                     echo $modal_content;
                                     
                                 echo '</div>';
@@ -171,7 +176,7 @@ class EFS_File_Display
 
         /* Get the file details */
         $excerpt = get_the_excerpt($file_id);
-        $description = get_post_field('post_content', $file_id);
+        $description = esc_html(get_post_field('post_content', $file_id));
         $expiration = $efs_admin_columns->get_expiration_date_display($file_id);
         $upload_date = get_the_date('F j, Y \a\t g:i A', $file_id);
         
