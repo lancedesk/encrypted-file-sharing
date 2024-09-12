@@ -39,8 +39,17 @@ class EFS_S3_File_Handler
     /* private function initialize_s3_client() */
     public function initialize_s3_client()
     {
-        /* Include the AWS SDK */
-        require_once plugin_dir_path(__FILE__) . '../aws-sdk/aws.phar';
+        /* Define the path to the PHAR file */
+        $phar_file = plugin_dir_path(__FILE__) . '../aws-sdk/aws.phar';
+
+         /* Check if the PHAR file exists */
+        if (!file_exists($phar_file)) {
+            error_log('AWS PHAR file not found: ' . $phar_file);
+            return false;
+        }
+
+        /* Include the AWS SDK PHAR file */
+        require_once $phar_file;
 
          /* Fetch settings from the stored options */
         $region = get_option('efs_aws_region', '');
