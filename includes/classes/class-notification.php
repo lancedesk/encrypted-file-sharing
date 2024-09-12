@@ -24,7 +24,7 @@ class EFS_Notification_Handler
             WP_Filesystem();
         }
 
-        /* Define the log file path
+        /* Define the log file path */
         $log_file = WP_CONTENT_DIR . '/efs_notification_log.txt';
 
         /* Get current time and prepare log message */
@@ -64,7 +64,8 @@ class EFS_Notification_Handler
         /* Log the dump of selected users */
         $this->log_debug_info("Selected users dump: " . $selected_users_dump);
 
-        if (!empty($selected_users) && is_array($selected_users)) {
+        if (!empty($selected_users) && is_array($selected_users['results']))
+        {
             $file_name = get_the_title($post_id);
             $upload_time = current_time('mysql');
             $download_link = wp_login_url() . '?redirect_to=' . urlencode(get_permalink($post_id));
@@ -72,9 +73,14 @@ class EFS_Notification_Handler
 
             $this->log_debug_info("Starting notification process for post ID: {$post_id}");
 
-            foreach ($selected_users as $user_id) {
+            foreach ($selected_users as $user_id_string)
+            {
+                /* Ensure the user ID is an integer */
+                $user_id = intval($user_id_string);
                 $user_info = get_userdata($user_id);
-                if ($user_info) {
+
+                if ($user_info)
+                {
                     $user_email = $user_info->user_email;
 
                     /* Email subject and message */
@@ -96,10 +102,13 @@ class EFS_Notification_Handler
                 }
             }
 
-            if (empty($selected_users)) {
+            if (empty($selected_users))
+            {
                 $this->log_debug_info("No valid users found for notifications.");
             }
-        } else {
+        }
+        else
+        {
             $this->log_debug_info("No users selected for notifications.");
         }
     }
