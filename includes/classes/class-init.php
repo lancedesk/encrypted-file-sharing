@@ -200,11 +200,19 @@ class EFS_Init
 
     
     /**
-     * Create a private folder outside the web root and log events
+     * Create a private folder outside the web root.
     */
 
     public function efs_create_private_folder() 
     {
+        /* Load the WP_Filesystem API */
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+
+        /* Initialize the WP_Filesystem object */
+        global $wp_filesystem;
+        if (empty($wp_filesystem)) {
+            WP_Filesystem();
+        }
 
         /* Path outside the web root */
         $private_dir = ABSPATH . '../private_uploads/';
@@ -213,10 +221,10 @@ class EFS_Init
         $log_file = WP_CONTENT_DIR . '/efs_folder_creation_log.txt';
 
         /* Check if the folder already exists */
-        if (!file_exists($private_dir)) 
+        if (!$wp_filesystem->is_dir($private_dir)) 
         {
             /* Try to create the folder */
-            if (mkdir($private_dir, 0755, true)) 
+            if ($wp_filesystem->mkdir($private_dir, 0755)) 
             {
                 /* Log success with the absolute path */
                 $this->log_message($log_file, 'Private uploads folder created at: ' . realpath($private_dir));
@@ -235,19 +243,43 @@ class EFS_Init
         }
     }
 
-    private function log_message($file, $message)
+    /**
+     *  Function to log messages
+     * @param string $log_file
+     * @param string $message
+    */
+    private function log_message($log_file, $message)
     {
-        if (file_exists($file)) 
+        /* Ensure WP_Filesystem is available */
+        if ( ! function_exists('get_filesystem_method') )
         {
-            $current = file_get_contents($file);
-            $current .= "[" . gmdate('Y-m-d H:i:s') . "] " . $message . "\n";
-            file_put_contents($file, $current);
-        } 
-        else 
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+    
+        global $wp_filesystem;
+    
+        /* Initialize WP_Filesystem */
+        if ( empty( $wp_filesystem ) )
         {
-            $timestamp = gmdate('Y-m-d H:i:s');
-            $log_message = $timestamp . ' - ' . $message . PHP_EOL;
-            file_put_contents($file, $log_message, FILE_APPEND);
+            WP_Filesystem();
+        }
+    
+        /* Get current time and prepare log message */
+        $current_time = gmdate('Y-m-d H:i:s');
+        $log_message = "{$current_time} - {$message}\n";
+    
+        /* Check if file exists */
+        if ( $wp_filesystem->exists( $log_file ) )
+        {
+            /* Append if file exists */
+            $current_contents = $wp_filesystem->get_contents( $log_file );
+            $new_contents = $current_contents . $log_message;
+            $wp_filesystem->put_contents( $log_file, $new_contents, FS_CHMOD_FILE );
+        }
+        else
+        {
+            /* Create new file if it doesn't exist */
+            $wp_filesystem->put_contents( $log_file, $log_message, FS_CHMOD_FILE );
         }
     }
 }
