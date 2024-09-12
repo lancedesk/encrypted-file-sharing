@@ -94,6 +94,7 @@ class EFS_File_Handler
 
     public function handle_file_upload_notifications($post_id)
     {
+        global $efs_init;
         /* Define the log file path */
         $log_file = WP_CONTENT_DIR . '/efs_file_upload_notifications_log.txt';
 
@@ -116,9 +117,9 @@ class EFS_File_Handler
             $notify_users = trim(get_option('efs_enable_user_notifications', 0));
 
             /* Log the post details */
-            $this->log_message("Post ID: $post_id", $log_file);
-            $this->log_message("Post Status: {$post->post_status}", $log_file);
-            $this->log_message("First Published Meta: $first_published", $log_file);
+            $efs_init->log_message("Post ID: $post_id", $log_file);
+            $efs_init->log_message("Post Status: {$post->post_status}", $log_file);
+            $efs_init->log_message("First Published Meta: $first_published", $log_file);
 
             if ($post->post_status === 'publish' &&
                 $first_published === '' &&
@@ -128,18 +129,18 @@ class EFS_File_Handler
                 /* Send the notification */
                 $this->efs_notification_handler->send_upload_notifications($post_id, $selected_users);
                 
-                $this->log_message("File upload notifications sent for post ID: $post_id", $log_file);
+                $efs_init->log_message("File upload notifications sent for post ID: $post_id", $log_file);
                 /* Mark this post as published for the first time */
                 update_post_meta($post_id, '_efs_first_published', 1);
             }
             else 
             {
-                $this->log_message("Post not published or already marked as first published.", $log_file);
+                $efs_init->log_message("Post not published or already marked as first published.", $log_file);
             }
         }
         else 
         {
-            $this->log_message("Post type is not 'efs_file'.", $log_file);
+            $efs_init->log_message("Post type is not 'efs_file'.", $log_file);
         }
     }
 
@@ -240,7 +241,8 @@ class EFS_File_Handler
         $this->write_to_log('Nonce checked successfully.', $log_file);
     
         /* Validate user */
-        if (!is_user_logged_in()) {
+        if (!is_user_logged_in())
+        {
             $this->write_to_log('User not logged in.', $log_file);
             wp_send_json_error(array('message' => 'User not logged in.'));
         }
@@ -260,7 +262,8 @@ class EFS_File_Handler
         $this->write_to_log('Received file ID: ' . $file_id, $log_file);
     
         /* Validate file ID */
-        if (get_post_type($file_id) !== 'efs_file') {
+        if (get_post_type($file_id) !== 'efs_file')
+        {
             $this->write_to_log('Invalid file ID: ' . $file_id, $log_file);
             wp_send_json_error(array('message' => 'Invalid file ID.'));
         }
@@ -268,7 +271,8 @@ class EFS_File_Handler
         /* Retrieve the file URL */
         $file_url = get_post_meta($file_id, '_efs_file_url', true);
     
-        if (empty($file_url)) {
+        if (empty($file_url))
+        {
             $this->write_to_log('File URL not found for file ID: ' . $file_id, $log_file);
             wp_send_json_error(array('message' => 'File URL not found.'));
         }
@@ -282,7 +286,8 @@ class EFS_File_Handler
         $this->write_to_log('Parsed file name: ' . $file_name, $log_file);
 
         /* Strip the .enc extension if present */
-        if (substr($file_name, -4) === '.enc') {
+        if (substr($file_name, -4) === '.enc')
+        {
             $file_name = substr($file_name, 0, -4);
             $this->write_to_log('Stripped .enc extension. Final file name: ' . $file_name, $log_file);
         }
@@ -291,7 +296,8 @@ class EFS_File_Handler
         $encryption_key = $this->get_encryption_key($user_id, $file_name);  /* File name & id are used to store the key */
 
         /* Check if the key was retrieved */
-        if ($encryption_key === false) {
+        if ($encryption_key === false)
+        {
             $this->write_to_log('Encryption key not found for file: ' . $file_name, $log_file);
             wp_send_json_error(array('message' => 'Encryption key not found for file: ' . $file_name));
         }
@@ -301,7 +307,8 @@ class EFS_File_Handler
         /* Decrypt the file */
         $decrypted_data = $this->decrypt_file($file_path, $encryption_key);
 
-        if ($decrypted_data === false) {
+        if ($decrypted_data === false)
+        {
             $this->write_to_log('File decryption failed for file: ' . $file_name, $log_file);
             wp_send_json_error(array('message' => 'File decryption failed.'));
         }
@@ -358,41 +365,4 @@ class EFS_File_Handler
         }
         return false; /* Return false if attachment ID was not found */
     }
-
-    /* Function to log messages */
-    private function log_message($message, $log_file)
-    {
-        /* Ensure WP_Filesystem is available */
-        if ( ! function_exists('get_filesystem_method') )
-        {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
-        }
-
-        global $wp_filesystem;
-
-        /* Initialize WP_Filesystem */
-        if ( empty( $wp_filesystem ) )
-        {
-            WP_Filesystem();
-        }
-
-        /* Get current time and prepare log message */
-        $current_time = gmdate('Y-m-d H:i:s');
-        $log_message = "{$current_time} - {$message}\n";
-
-        /* Check if file exists */
-        if ( $wp_filesystem->exists( $log_file ) )
-        {
-            /* Append if file exists */
-            $current_contents = $wp_filesystem->get_contents( $log_file );
-            $new_contents = $current_contents . $log_message;
-            $wp_filesystem->put_contents( $log_file, $new_contents, FS_CHMOD_FILE );
-        }
-        else
-        {
-            /* Create new file if it doesn't exist */
-            $wp_filesystem->put_contents( $log_file, $log_message, FS_CHMOD_FILE );
-        }
-    }
-
 }
