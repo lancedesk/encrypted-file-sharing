@@ -47,7 +47,7 @@ class EFS_Admin_Settings_Page
             if (!isset($_POST['efs_settings_nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['efs_settings_nonce'])), 'efs_settings_save')) 
             {
                 /* Invalid nonce, handle the error */
-                wp_die(__('Nonce verification failed.', 'encrypted-file-sharing'));
+                wp_die(esc_html__('Nonce verification failed.', 'encrypted-file-sharing'));
             }
 
             /* Handle the storage option form */
