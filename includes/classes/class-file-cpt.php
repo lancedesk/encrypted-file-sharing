@@ -278,6 +278,7 @@ class EFS_File_CPT
         $table_name = $wpdb->prefix . 'efs_file_metadata';
 
         /* Insert or update expiration date in the custom table */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->replace(
             $table_name,
             array(
