@@ -11,7 +11,7 @@ class EFS_Aws_Phar
     function __construct()
     {
         $this->aws_phar_url = 'https://lancedesk.tech/aws-sdk/aws.phar';
-        $this->local_directory = __DIR__ . '/aws-sdk';
+        $this->local_directory = dirname(__DIR__, 2) . '/aws-sdk';
 
         /* Ensure WP_Filesystem is available */
         if ( ! function_exists('get_filesystem_method') || ! get_filesystem_method() )
