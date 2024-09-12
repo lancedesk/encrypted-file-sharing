@@ -164,6 +164,7 @@ class EFS_User_Selection
         $table_name = $wpdb->prefix . 'efs_recipients';
 
         /* Delete existing recipients for this post */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table query, caching not applicable */
         $delete_result = $wpdb->delete($table_name, ['post_id' => $post_id]);
 
         /* Check if delete operation failed */
@@ -175,6 +176,7 @@ class EFS_User_Selection
         /* Insert each recipient */
         foreach ($recipients as $recipient_id)
         {
+            /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table insert operation required */
             $insert_result = $wpdb->insert(
                 $table_name,
                 [
@@ -211,6 +213,7 @@ class EFS_User_Selection
         global $wpdb;
 
         /* Get all recipients for the post */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $results = $wpdb->get_col(
             $wpdb->prepare(
                 "SELECT recipient_id FROM {$wpdb->prefix}efs_recipients WHERE post_id = %d",
