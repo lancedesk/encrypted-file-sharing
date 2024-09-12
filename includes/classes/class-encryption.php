@@ -383,6 +383,53 @@ class EFS_Encryption
         return $user_kek;
     }
 
+    
+    /**
+     * Search for the DEK based on the file name.
+     * 
+     * @param string $file_name The name of the file to search for.
+     * 
+     * @return array An array containing 'found' as a boolean and 'dek' as the DEK if found.
+    */
+
+    public function efs_get_dek_by_file_name($file_name)
+    {
+        global $wpdb;
+
+        /* Table names */
+        $metadata_table = $wpdb->prefix . 'efs_file_metadata';
+        $encrypted_files_table = $wpdb->prefix . 'efs_encrypted_files';
+
+        /* Search for the file name in the metadata table */
+        $file_metadata = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT id FROM $metadata_table WHERE file_name = %s",
+                $file_name
+            )
+        );
+
+        /* Check if the file name exists in the metadata table */
+        if ($file_metadata !== null)
+        {
+            /* Use the file id to search in the encrypted files table */
+            $encrypted_file = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT data_encryption_key FROM $encrypted_files_table WHERE file_id = %d",
+                    $file_metadata->id
+                )
+            );
+
+            /* If the encrypted file is found, return the DEK */
+            if ($encrypted_file !== null)
+            {
+                return ['found' => true, 'dek' => $encrypted_file->data_encryption_key];
+            }
+        }
+
+        /* If no DEK is found, return false */
+        return ['found' => false, 'dek' => null];
+    }
+
     /**
      * Logs messages to a file.
      *
