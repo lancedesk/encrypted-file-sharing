@@ -94,8 +94,18 @@ class EFS_Local_File_Handler
         {
             $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
         
-            /* Generate a random DEK (256-bit key for AES encryption) */
-            $data_encryption_key = openssl_random_pseudo_bytes(32);
+            $result = $efs_file_encryption->efs_get_dek_by_file_name($file_name);
+
+            if ($result['found'])
+            {
+                /* Use the DEK as needed */
+                $data_encryption_key = $result['dek'];
+            }
+            else
+            {
+                /* Generate a random DEK (256-bit key for AES encryption) */
+                $data_encryption_key = openssl_random_pseudo_bytes(32);
+            }
         
             /* Encrypt the file using the EFS_Encryption class */
             $encrypted_file = $efs_file_encryption->encrypt_file($target_file, $data_encryption_key);
