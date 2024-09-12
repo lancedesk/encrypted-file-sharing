@@ -96,11 +96,12 @@ class EFS_File_Handler
 
     public function handle_file_upload_notifications($post_id)
     {
+        global $efs_user_selection;
         /* Define the log file path */
         $log_file = WP_CONTENT_DIR . '/efs_file_upload_notifications_log.txt';
 
         /* Get the selected users */
-        $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
+        $selected_users = $efs_user_selection->get_recipients_from_db($post_id);
 
         /* Ensure this only runs for the `efs_file` post type */
         if (get_post_type($post_id) === 'efs_file') 
@@ -118,9 +119,9 @@ class EFS_File_Handler
             $notify_users = trim(get_option('efs_enable_user_notifications', 0));
 
             /* Log the post details */
-            $this->efs_init->log_message("Post ID: $post_id", $log_file);
-            $this->efs_init->log_message("Post Status: {$post->post_status}", $log_file);
-            $this->efs_init->log_message("First Published Meta: $first_published", $log_file);
+            $this->efs_init->log_message($log_file, "Post ID: $post_id");
+            $this->efs_init->log_message($log_file, "Post Status: {$post->post_status}");
+            $this->efs_init->log_message($log_file, "First Published Meta: $first_published");
 
             if ($post->post_status === 'publish' &&
                 $first_published === '' &&
@@ -130,18 +131,18 @@ class EFS_File_Handler
                 /* Send the notification */
                 $this->efs_notification_handler->send_upload_notifications($post_id, $selected_users);
                 
-                $this->efs_init->log_message("File upload notifications sent for post ID: $post_id", $log_file);
+                $this->efs_init->log_message($log_file, "File upload notifications sent for post ID: $post_id");
                 /* Mark this post as published for the first time */
                 update_post_meta($post_id, '_efs_first_published', 1);
             }
             else 
             {
-                $this->efs_init->log_message("Post not published or already marked as first published.", $log_file);
+                $this->efs_init->log_message($log_file, "Post not published or already marked as first published.");
             }
         }
         else 
         {
-            $this->efs_init->log_message("Post type is not 'efs_file'.", $log_file);
+            $this->efs_init->log_message($log_file, "Post type is not 'efs_file'.");
         }
     }
 
@@ -307,7 +308,7 @@ class EFS_File_Handler
         header('Content-Disposition: attachment; filename="' . $file_name . '"');
         header('Content-Length: ' . strlen($decrypted_data));
 
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The file data is safe to output without escaping
+        /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The file data is safe to output without escaping */
         echo $decrypted_data;
         $this->efs_init->log_message($log_file, 'File served for download: ' . $file_name);
     
