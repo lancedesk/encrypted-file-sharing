@@ -61,7 +61,7 @@ class EFS_Admin_Settings_Page
 
             /* Save AWS access key */
             if (isset($_POST['efs_aws_access_key'])) {
-                update_option('efs_aws_access_key', sanitize_text_field(wp_unslash(wp_unslash($_POST['efs_aws_access_key']))));
+                update_option('efs_aws_access_key', sanitize_text_field(wp_unslash(sanitize_key($_POST['efs_aws_access_key']))));
             }
 
             /* Save AWS secret key */
@@ -95,12 +95,14 @@ class EFS_Admin_Settings_Page
             update_option('efs_enable_expiry', $efs_enable_expiry);
 
             /* Handle file expiry period and unit */
-            if (isset($_POST['efs_expiry_period'])) {
+            if (isset($_POST['efs_expiry_period']))
+            {
                 update_option('efs_expiry_period', intval($_POST['efs_expiry_period']));
             }
 
-            if (isset($_POST['efs_expiry_unit'])) {
-                update_option('efs_expiry_unit', sanitize_text_field($_POST['efs_expiry_unit']));
+            if (isset($_POST['efs_expiry_unit']))
+            {
+                update_option('efs_expiry_unit', sanitize_text_field(wp_unslash($_POST['efs_expiry_unit'])));
             }
 
             /* Handle file privacy option */
