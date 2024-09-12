@@ -59,6 +59,7 @@ class EFS_Encryption
             }
 
             /* Save the encrypted DEK and KEK */
+            /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Reason for direct query: Custom table insertion required */
             $result = $wpdb->insert(
                 $table_name,
                 [
@@ -107,8 +108,17 @@ class EFS_Encryption
     {
         global $wpdb;
 
-        /* Query to get the encrypted DEK and KEK for the specific user and file */
+        /* Attempt to get the cached result */
+        $cache_key = 'encryption_key_' . $user_id . '_' . md5($file_name);
+        $cached_result = wp_cache_get($cache_key, 'efs_encryption_keys');
 
+        if ($cached_result !== false) {
+            /* Return the cached result */
+            return $cached_result;
+        }
+
+        /* Query to get the encrypted DEK and KEK for the specific user and file */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Reason: Custom table query required */
         $result = $wpdb->get_row(
             $wpdb->prepare(
                 "
@@ -123,7 +133,8 @@ class EFS_Encryption
             )
         );
 
-        if (!$result) {
+        if (!$result)
+        {
             /* No key found for the specified user and file */
             $this->log_message("No key found for user ID $user_id and file name $file_name.");
             return false;
@@ -153,6 +164,9 @@ class EFS_Encryption
             $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
             return false;
         }
+
+        /* Cache the result */
+        wp_cache_set($cache_key, $decrypted_dek, 'efs_encryption_keys', 3600); /* Cache for 1 hour */
 
         return $decrypted_dek; /* Return the decrypted DEK */
     }
@@ -219,7 +233,18 @@ class EFS_Encryption
     {
         global $wpdb;
 
+        /* Attempt to get the cached master key */
+        $cache_key = 'master_key';
+        $cached_master_key = wp_cache_get($cache_key, 'efs_master_key');
+
+        if ($cached_master_key !== false)
+        {
+            /* Return the cached master key */
+            return $cached_master_key;
+        }
+
         /* Query to get the master key */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Reason: Custom table query required */
         $master_key = $wpdb->get_var("SELECT master_key FROM {$wpdb->prefix}efs_master_key LIMIT 1");
 
         if ($master_key === null)
@@ -234,6 +259,9 @@ class EFS_Encryption
             error_log('Error: Invalid length of retrieved master key.');
             return false;
         }
+
+        /* Cache the master key for future requests */
+        wp_cache_set($cache_key, $master_key, 'efs_master_key', 3600); /* Cache for 1 hour */
 
         return $master_key;
     }
