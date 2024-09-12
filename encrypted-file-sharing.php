@@ -3,7 +3,7 @@
  * Plugin Name: Encrypted File Sharing
  * Plugin URI: https://github.com/lancedesk/encrypted-file-sharing
  * Description: A plugin that allows site administrators to securely send files to specific users via the WordPress admin panel.
- * Version: 1.2.5
+ * Version: 1.2.6
  * Author: Robert June
  * Author URI: https://profiles.wordpress.org/lancedesk/
  * Text Domain: encrypted-file-sharing
@@ -55,6 +55,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/classes/class-2fa-auth.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-cpt.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-display.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-init.php';
+require_once plugin_dir_path(__FILE__) . 'includes/aws-sdk/class-aws-phar.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/script-enqueues.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/user-permissions.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/install-dependencies.php';
@@ -71,6 +72,7 @@ $efs_file_handler =  new EFS_File_Handler(
     $efs_file_encryption
 );
 
+$efs_aws_phar = new EFS_AWS_Phar();
 new EFS_File_Expiry_Handler();
 new EFS_Admin_Settings_Page();
 $efs_init = new EFS_Init();
@@ -81,6 +83,7 @@ new EFS_File_CPT();
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_encryption_keys_table']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_encrypted_files_table']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_file_metadata_table']);
+register_activation_hook(__FILE__, [$efs_aws_phar, 'download_and_extract_phar']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_master_key_table']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_recipients_table']);
 register_activation_hook(__FILE__, [$efs_init, 'efs_create_private_folder']);
