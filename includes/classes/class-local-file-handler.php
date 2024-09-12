@@ -22,7 +22,7 @@ class EFS_Local_File_Handler
 
     public function handle_local_upload()
     {
-        global $wp_filesystem, $efs_file_handler, $efs_file_encryption;
+        global $wp_filesystem, $efs_file_handler, $efs_file_encryption, $efs_init;
         $upload_dir = ABSPATH . '../private_uploads/';
 
         /* Initialize WP_Filesystem */
@@ -37,11 +37,11 @@ class EFS_Local_File_Handler
         {
             if ($wp_filesystem->mkdir($upload_dir, FS_CHMOD_DIR)) 
             {
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Created directory: ' . $upload_dir);
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Created directory: ' . $upload_dir);
             } 
             else 
             {
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to create directory: ' . $upload_dir);
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to create directory: ' . $upload_dir);
                 return false;
             }
         }
@@ -55,7 +55,7 @@ class EFS_Local_File_Handler
         /* Verify the nonce */
         if (!isset($_POST['nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['nonce'])), 'efs_upload_nonce'))
         {
-            $this->log_message($log_file, 'Invalid nonce.');
+            $efs_init->log_message($log_file, 'Invalid nonce.');
             wp_send_json_error(['message' => 'Invalid nonce.']);
         }
 
@@ -82,12 +82,12 @@ class EFS_Local_File_Handler
         }
 
         /* Log the received file and expiration date */
-        $this->log_message($log_file, 'Received file path: ' . $file_path);
-        $this->log_message($log_file, 'Expiration date: ' . $expiration_date);
+        $efs_init->log_message($log_file, 'Received file path: ' . $file_path);
+        $efs_init->log_message($log_file, 'Expiration date: ' . $expiration_date);
 
         /* Copy the file to the secure directory */
         if (copy($file_path, $target_file)) {
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
         
             /* Generate a random DEK (256-bit key for AES encryption) */
             $data_encryption_key = openssl_random_pseudo_bytes(32);
@@ -116,20 +116,20 @@ class EFS_Local_File_Handler
 
                     if ($success) {
                         /* Metadata was successfully inserted */
-                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
+                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
                     } else {
                         /* Handle insertion failure */
-                        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
+                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
                     }
 
                 }
                 else
                 {
-                    $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
+                    $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
                 }
         
                 /* Log the successful encryption and upload */
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
 
                 /* Optionally delete the original file after saving metadata */
                 $delete_after_encryption = get_option('efs_delete_files', 0);
@@ -141,7 +141,7 @@ class EFS_Local_File_Handler
                 wp_send_json_success(['file_url' => $encrypted_file]);
 
             } else {
-                $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
                 wp_send_json_error(['message' => 'File upload failed.']);
                 return false;
             }
@@ -149,7 +149,7 @@ class EFS_Local_File_Handler
         else
         {
             /* Log an error if file copy fails */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to copy file to: ' . $target_file);
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to copy file to: ' . $target_file);
             return false;
         }
     
@@ -177,19 +177,19 @@ class EFS_Local_File_Handler
 
     public function handle_file_encryption($post_id)
     {
-        global $efs_user_selection, $efs_file_encryption;
+        global $efs_user_selection, $efs_file_encryption, $efs_init;
 
         $upload_data = $this->efs_get_encrypted_file_metadata_by_post_id($post_id);
 
         if ($upload_data)
         {
             /* Metadata found */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Metadata found for post ID: ' . $post_id . $upload_data['file_id'] . $upload_data['expiration_date']);
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Metadata found for post ID: ' . $post_id . $upload_data['file_id'] . $upload_data['expiration_date']);
         }
         else
         {
             /* No metadata found for the given post ID */
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No data found for the specified post ID: ' . $post_id);
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No data found for the specified post ID: ' . $post_id);
         }
 
         $selected_users = $efs_user_selection->get_recipients_from_db($post_id)['results'];
@@ -197,30 +197,30 @@ class EFS_Local_File_Handler
 
         if (empty($selected_users))
         {
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users found in database for post ID: ' . $post_id);
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users found in database for post ID: ' . $post_id);
 
             /* Fallback to retrieving from post meta */
             $selected_users = get_post_meta($post_id, '_efs_user_selection', true);
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from post meta: ' . implode(',', $selected_users));
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from post meta: ' . implode(',', $selected_users));
         }
         else
         {
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from database: ' . implode(',', $selected_users));
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from database: ' . implode(',', $selected_users));
         }
 
         /* Log the database query and retrieved users */
-        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Database query executed: ' . $response);
-        $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from database: ' . implode(',', $selected_users));
+        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Database query executed: ' . $response);
+        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Selected users retrieved from database: ' . implode(',', $selected_users));
 
         if (!empty($selected_users) && is_array($selected_users))
         {
             /* Save the encryption key securely for all selected users in the database */
             $efs_file_encryption->save_encrypted_key($upload_data['post_id'], $selected_users, $upload_data['file_id'], $upload_data['data_encryption_key'], $upload_data['expiration_date']);
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
         }
         else
         {
-            $this->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users selected or invalid user selection for post ID: ' . $post_id);
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No users selected or invalid user selection for post ID: ' . $post_id);
         }
         
     }
@@ -335,55 +335,14 @@ class EFS_Local_File_Handler
     }
 
     /**
-     * Log messages to a file
-     *
-     * @param string $file Log file path
-     * @param string $message The message to log
-    */
-
-    public function log_message($file, $message)
-    {
-        /* Ensure WP_Filesystem is available */
-        if ( ! function_exists('get_filesystem_method') )
-        {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
-        }
-
-        global $wp_filesystem;
-
-        /* Initialize WP_Filesystem */
-        if ( empty( $wp_filesystem ) )
-        {
-            WP_Filesystem();
-        }
-
-        /* Check if the file exists */
-        if ( $wp_filesystem->exists( $file ) )
-        {
-            /* Read current contents */
-            $current = $wp_filesystem->get_contents( $file );
-            /* Append new message */
-            $current .= "[" . gmdate('Y-m-d H:i:s') . "] " . $message . "\n";
-            /* Write updated contents */
-            $wp_filesystem->put_contents( $file, $current );
-        } else
-        {
-            /* Prepare log message */
-            $timestamp = gmdate('Y-m-d H:i:s');
-            $log_message = $timestamp . ' - ' . $message . PHP_EOL;
-            /* Create new file with the log message */
-            $wp_filesystem->put_contents( $file, $log_message, FS_CHMOD_FILE );
-        }
-    }
-
-        /**
      * Write a log message to a file.
     */
 
     public function write_log()
     {
+        global $efs_init;
         $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
-        $this->log_message($log_file, 'Ajax method called.');
+        $efs_init->log_message($log_file, 'Ajax method called.');
     }
 
     /**
