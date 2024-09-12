@@ -60,12 +60,14 @@ class EFS_Local_File_Handler
         }
 
         /* Ensure file ID is provided */
-        if (!isset($_POST['file_id'])) {
+        if (!isset($_POST['file_id']))
+        {
             wp_send_json_error(['message' => 'File ID is missing.']);
         }
 
         /* Ensure post ID is provided */
-        if (!isset($_POST['post_id'])) {
+        if (!isset($_POST['post_id']))
+        {
             wp_send_json_error(['message' => 'Post ID is missing.']);
         }
 
@@ -77,16 +79,19 @@ class EFS_Local_File_Handler
         $file_name = basename($file_path);
         $target_file = $upload_dir . $file_name;
         
-        if (!$file_path || !file_exists($file_path)) {
+        if (!$file_path || !file_exists($file_path))
+        {
             wp_send_json_error(['message' => 'File does not exist.']);
         }
 
         /* Log the received file and expiration date */
         $efs_init->log_message($log_file, 'Received file path: ' . $file_path);
+        $efs_init->log_message($log_file, 'Received file name: ' . $file_name);
         $efs_init->log_message($log_file, 'Expiration date: ' . $expiration_date);
 
         /* Copy the file to the secure directory */
-        if (copy($file_path, $target_file)) {
+        if (copy($file_path, $target_file))
+        {
             $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
         
             /* Generate a random DEK (256-bit key for AES encryption) */
@@ -180,6 +185,57 @@ class EFS_Local_File_Handler
             wp_send_json_success($result);
         }
     }
+
+    /**
+     * Search for the DEK based on the file name.
+     * 
+     * @param string $file_name The name of the file to search for.
+     * 
+     * @return array An array containing 'found' as a boolean and 'dek' as the DEK if found.
+    */
+
+    public function efs_get_dek_by_file_name($file_name)
+    {
+        global $wpdb;
+
+        /* Table names */
+        $metadata_table = $wpdb->prefix . 'efs_file_metadata';
+        $encrypted_files_table = $wpdb->prefix . 'efs_encrypted_files';
+
+        /* Search for the file name in the metadata table */
+        $file_metadata = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT id FROM $metadata_table WHERE file_name = %s",
+                $file_name
+            )
+        );
+
+        /* Check if the file name exists in the metadata table */
+        if ($file_metadata !== null)
+        {
+            /* Use the file id to search in the encrypted files table */
+            $encrypted_file = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT data_encryption_key FROM $encrypted_files_table WHERE file_id = %d",
+                    $file_metadata->id
+                )
+            );
+
+            /* If the encrypted file is found, return the DEK */
+            if ($encrypted_file !== null)
+            {
+                return ['found' => true, 'dek' => $encrypted_file->data_encryption_key];
+            }
+        }
+
+        /* If no DEK is found, return false */
+        return ['found' => false, 'dek' => null];
+    }
+
+    /**
+     * Handle file encryption for a given post ID.
+     * @param int $post_id The post ID to handle file encryption for.
+    */
 
     public function handle_file_encryption($post_id)
     {

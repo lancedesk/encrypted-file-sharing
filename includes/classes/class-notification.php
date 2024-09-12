@@ -73,7 +73,7 @@ class EFS_Notification_Handler
 
             $this->log_debug_info("Starting notification process for post ID: {$post_id}");
 
-            foreach ($selected_users as $user_id_string)
+            foreach ($selected_users['results'] as $user_id_string)
             {
                 /* Ensure the user ID is an integer */
                 $user_id = intval($user_id_string);
