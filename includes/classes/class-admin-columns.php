@@ -81,6 +81,7 @@ class EFS_Admin_Columns
         global $wpdb;
 
         /* Prepare and run the query to get recipient_ids using post_id */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $recipient_ids = $wpdb->get_col(
             $wpdb->prepare("SELECT recipient_id FROM {$wpdb->prefix}efs_recipients WHERE post_id = %d", $post_id)
         );
@@ -235,7 +236,7 @@ class EFS_Admin_Columns
         global $wpdb;
         
         /* Get the expiration date */
-
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $result = $wpdb->get_var(
             $wpdb->prepare("SELECT expiration_date FROM {$wpdb->prefix}efs_encryption_keys WHERE post_id = %d", $post_id)
         );
