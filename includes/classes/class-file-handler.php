@@ -123,6 +123,42 @@ class EFS_File_Handler
             $this->efs_init->log_message($log_file, "Post Status: {$post->post_status}");
             $this->efs_init->log_message($log_file, "First Published Meta: $first_published");
 
+            if ($post->post_status === 'publish')
+            {
+                $this->efs_init->log_message($log_file, "Post is published.");
+            }
+            else
+            {
+                $this->efs_init->log_message($log_file, "Post is not published.");
+            }
+
+            if ($first_published === '')
+            {
+                $this->efs_init->log_message($log_file, "First published meta is empty.");
+            }
+            else
+            {
+                $this->efs_init->log_message($log_file, "First published meta is not empty.");
+            }
+
+            if ($is_encrypted === '1')
+            {
+                $this->efs_init->log_message($log_file, "Post is encrypted.");
+            }
+            else
+            {
+                $this->efs_init->log_message($log_file, "Post is not encrypted.");
+            }
+
+            if ($notify_users === '1')
+            {
+                $this->efs_init->log_message($log_file, "User notifications are enabled.");
+            }
+            else
+            {
+                $this->efs_init->log_message($log_file, "User notifications are disabled.");
+            }
+
             if ($post->post_status === 'publish' &&
                 $first_published === '' &&
                 $is_encrypted === '1' && $notify_users === '1'
