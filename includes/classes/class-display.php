@@ -29,6 +29,7 @@ class EFS_File_Display
 			$current_user_id = get_current_user_id();
 
             /* Get all post IDs associated with the current user as a recipient */
+            /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
             $post_ids = $wpdb->get_col(
                 $wpdb->prepare(
                     "SELECT post_id FROM {$wpdb->prefix}efs_recipients WHERE recipient_id = %d",
