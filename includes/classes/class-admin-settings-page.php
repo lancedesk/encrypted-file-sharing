@@ -44,14 +44,14 @@ class EFS_Admin_Settings_Page
         if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST')
         {
             /* Verify nonce */
-            if (!isset($_POST['efs_settings_nonce']) || !wp_verify_nonce($_POST['efs_settings_nonce'], 'efs_settings_save')) 
+            if (!isset($_POST['efs_settings_nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['efs_settings_nonce'])), 'efs_settings_save')) 
             {
                 /* Invalid nonce, handle the error */
                 wp_die(__('Nonce verification failed.', 'encrypted-file-sharing'));
             }
 
             /* Handle the storage option form */
-            $form_type = isset($_POST['efs_form_type']) ? sanitize_text_field(wp_unslash($_POST['efs_form_type'])) : '';
+            $form_type = isset($_POST['efs_form_type']) ? sanitize_text_field(wp_unslash(sanitize_key($_POST['efs_form_type']))) : '';
 
             if ($form_type === 'storage_option') 
             {
@@ -62,30 +62,36 @@ class EFS_Admin_Settings_Page
             }
 
             /* Save AWS region */
-            if (isset($_POST['efs_aws_region'])) {
+            if (isset($_POST['efs_aws_region']))
+            {
                 update_option('efs_aws_region', sanitize_text_field(wp_unslash($_POST['efs_aws_region'])));
             }
 
             /* Save AWS access key */
-            if (isset($_POST['efs_aws_access_key'])) {
+            if (isset($_POST['efs_aws_access_key']))
+            {
                 update_option('efs_aws_access_key', sanitize_text_field(wp_unslash(sanitize_key($_POST['efs_aws_access_key']))));
             }
 
             /* Save AWS secret key */
-            if (isset($_POST['efs_aws_secret_key'])) {
+            if (isset($_POST['efs_aws_secret_key']))
+            {
                 update_option('efs_aws_secret_key', sanitize_text_field(wp_unslash($_POST['efs_aws_secret_key'])));
             }
 
             /* Save selected S3 bucket */
-            if (isset($_POST['efs_aws_bucket'])) {
+            if (isset($_POST['efs_aws_bucket']))
+            {
                 update_option('efs_aws_bucket', sanitize_text_field(wp_unslash($_POST['efs_aws_bucket'])));
             }
 
-            if (isset($_POST['efs_storage_option'])) {
+            if (isset($_POST['efs_storage_option']))
+            {
                 update_option('efs_storage_option', sanitize_text_field(wp_unslash($_POST['efs_storage_option'])));
             }
 
-            if (isset($_POST['efs_admin_email'])) {
+            if (isset($_POST['efs_admin_email']))
+            {
                 update_option('efs_admin_email', sanitize_email(wp_unslash($_POST['efs_admin_email'])));
             }
 
