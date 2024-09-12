@@ -100,11 +100,13 @@ class EFS_Local_File_Handler
             {
                 /* Use the DEK as needed */
                 $data_encryption_key = $result['dek'];
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key found for file : ' . $file_name);
             }
             else
             {
                 /* Generate a random DEK (256-bit key for AES encryption) */
                 $data_encryption_key = openssl_random_pseudo_bytes(32);
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key not found. Genetated for file : ' . $file_name);
             }
         
             /* Encrypt the file using the EFS_Encryption class */
