@@ -1,7 +1,7 @@
 <?php
 /**
  * Download and extract the AWS PHAR file
-*/
+ */
 
 class EFS_Aws_Phar
 {
@@ -11,7 +11,8 @@ class EFS_Aws_Phar
     function __construct()
     {
         $this->aws_phar_url = 'https://lancedesk.tech/aws-sdk/aws.phar';
-        $this->local_directory = dirname(__DIR__, 2) . '/aws-sdk';
+        /* Correct the path calculation */
+        $this->local_directory = dirname(__DIR__) . '/aws-sdk';
 
         /* Ensure WP_Filesystem is available */
         if ( ! function_exists('get_filesystem_method') || ! get_filesystem_method() )
@@ -19,6 +20,11 @@ class EFS_Aws_Phar
             require_once ABSPATH . 'wp-admin/includes/file.php';
             WP_Filesystem();
         }
+
+        /* Log file path for debugging */
+        $efs_init = new EFS_Init();
+        $log_file = WP_CONTENT_DIR . '/efs_phar_log.txt';
+        $efs_init->log_message($log_file, 'Local Directory: ' . $this->local_directory);
 
         /* Call the download_and_extract_phar method during construction */
         $this->download_and_extract_phar();
@@ -51,7 +57,8 @@ class EFS_Aws_Phar
             }
 
             $phar_content = wp_remote_retrieve_body($response);
-            if ( $phar_content === false ) {
+            if ( $phar_content === false )
+            {
                 throw new Exception('Failed to retrieve PHAR content.');
             }
 
@@ -59,8 +66,18 @@ class EFS_Aws_Phar
         }
 
         /* Extract the PHAR file */
-        $phar = new Phar($phar_file);
-        $phar->extractTo($local_extracted_dir);
+        try
+        {
+            $phar = new Phar($phar_file);
+            $phar->extractTo($local_extracted_dir);
+
+            /* Delete the original PHAR file */
+            $wp_filesystem->delete($phar_file);
+        }
+        catch (Exception $e)
+        {
+            throw new Exception('Failed to extract PHAR file: ' . $e->getMessage());
+        }
 
         /* Include the autoloader after extraction */
         $this->include_autoloader();
