@@ -6,6 +6,7 @@ class EFS_File_Handler
     private $efs_s3_file_handler;
     private $efs_local_file_handler;
     private $efs_file_encryption;
+    private $efs_init;
 
     /**
      * Constructor to initialize dependencies and actions.
@@ -21,13 +22,14 @@ class EFS_File_Handler
         $this->efs_s3_file_handler = $efs_s3_file_handler;
         $this->efs_local_file_handler = $efs_local_file_handler;
         $this->efs_file_encryption = $efs_file_encryption;
+        $this->efs_init = new EFS_Init();
 
         /* Register AJAX actions */
         add_action('wp_ajax_efs_handle_download', [$this, 'handle_download_request']);
         add_action('wp_ajax_nopriv_efs_handle_download', [$this, 'handle_download_request']); /* Allow non-logged-in users */
 
         /* Hook after file is uploaded */
-        add_action('save_post', [$this, 'handle_file_upload_notifications'], 20);
+        add_action('save_post', [$this, 'handle_file_upload_notifications']);
 
     }
 
@@ -94,7 +96,6 @@ class EFS_File_Handler
 
     public function handle_file_upload_notifications($post_id)
     {
-        global $efs_init;
         /* Define the log file path */
         $log_file = WP_CONTENT_DIR . '/efs_file_upload_notifications_log.txt';
 
@@ -117,9 +118,9 @@ class EFS_File_Handler
             $notify_users = trim(get_option('efs_enable_user_notifications', 0));
 
             /* Log the post details */
-            $efs_init->log_message("Post ID: $post_id", $log_file);
-            $efs_init->log_message("Post Status: {$post->post_status}", $log_file);
-            $efs_init->log_message("First Published Meta: $first_published", $log_file);
+            $this->efs_init->log_message("Post ID: $post_id", $log_file);
+            $this->efs_init->log_message("Post Status: {$post->post_status}", $log_file);
+            $this->efs_init->log_message("First Published Meta: $first_published", $log_file);
 
             if ($post->post_status === 'publish' &&
                 $first_published === '' &&
@@ -129,18 +130,18 @@ class EFS_File_Handler
                 /* Send the notification */
                 $this->efs_notification_handler->send_upload_notifications($post_id, $selected_users);
                 
-                $efs_init->log_message("File upload notifications sent for post ID: $post_id", $log_file);
+                $this->efs_init->log_message("File upload notifications sent for post ID: $post_id", $log_file);
                 /* Mark this post as published for the first time */
                 update_post_meta($post_id, '_efs_first_published', 1);
             }
             else 
             {
-                $efs_init->log_message("Post not published or already marked as first published.", $log_file);
+                $this->efs_init->log_message("Post not published or already marked as first published.", $log_file);
             }
         }
         else 
         {
-            $efs_init->log_message("Post type is not 'efs_file'.", $log_file);
+            $this->efs_init->log_message("Post type is not 'efs_file'.", $log_file);
         }
     }
 
