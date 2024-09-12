@@ -166,10 +166,26 @@ class EFS_Init
     public function efs_generate_master_key()
     {
         global $wpdb;
+        $cache_key = 'efs_master_key_cache';
         $table_name = $wpdb->prefix . 'efs_master_key';
 
-        /* Check if a master key already exists */
-        $existing_key = $wpdb->get_var("SELECT master_key FROM %i LIMIT 1", $table_name);
+        /* Attempt to retrieve master key from cache */
+        $existing_key = wp_cache_get($cache_key);
+
+        if ($existing_key === false)
+        {
+            /* Cache miss, retrieve from database */
+            /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
+            $existing_key = $wpdb->get_var(
+                $wpdb->prepare("SELECT master_key FROM {$table_name} LIMIT 1")
+            );
+
+            /* Store the key in cache for future use, if found */
+            if ($existing_key !== null)
+            {
+                wp_cache_set($cache_key, $existing_key, '', DAY_IN_SECONDS);
+            }
+        }
 
         if ($existing_key !== null)
         {
@@ -182,6 +198,7 @@ class EFS_Init
         $master_key = openssl_random_pseudo_bytes(32);
 
         /* Save the new master key */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $inserted = $wpdb->insert(
             $table_name,
             array('master_key' => $master_key),
@@ -194,6 +211,8 @@ class EFS_Init
         }
         else
         {
+            /* Store the new key in cache */
+            wp_cache_set($cache_key, $master_key, '', DAY_IN_SECONDS);
             error_log('New master key saved successfully.');
         }
     }
@@ -248,6 +267,7 @@ class EFS_Init
      * @param string $log_file
      * @param string $message
     */
+
     private function log_message($log_file, $message)
     {
         /* Ensure WP_Filesystem is available */
