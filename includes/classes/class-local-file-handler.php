@@ -241,6 +241,7 @@ class EFS_Local_File_Handler
         global $wpdb;
         $table_name = $wpdb->prefix . 'efs_encrypted_files';
 
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $result = $wpdb->insert(
             $table_name,
             [
@@ -274,6 +275,7 @@ class EFS_Local_File_Handler
         global $wpdb;
 
         /* Execute query and retrieve results */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $result = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}efs_encrypted_files WHERE post_id = %d",
@@ -298,6 +300,7 @@ class EFS_Local_File_Handler
         $table_name = $wpdb->prefix . 'efs_file_metadata';
 
         /* Insert or update the file metadata */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $result = $wpdb->replace(
             $table_name,
             [
