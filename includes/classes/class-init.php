@@ -177,7 +177,7 @@ class EFS_Init
             /* Cache miss, retrieve from database */
             /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
             $existing_key = $wpdb->get_var(
-                $wpdb->prepare("SELECT master_key FROM {$table_name} LIMIT 1")
+                $wpdb->prepare("SELECT master_key FROM {$wpdb->prefix}efs_master_key LIMIT 1")
             );
 
             /* Store the key in cache for future use, if found */
@@ -268,7 +268,7 @@ class EFS_Init
      * @param string $message
     */
 
-    private function log_message($log_file, $message)
+    public function log_message($log_file, $message)
     {
         /* Ensure WP_Filesystem is available */
         if ( ! function_exists('get_filesystem_method') )
