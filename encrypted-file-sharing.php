@@ -53,9 +53,9 @@ require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-users.php
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-encryption.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-2fa-auth.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-cpt.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-aws-phar.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-display.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-init.php';
-require_once plugin_dir_path(__FILE__) . 'includes/aws-sdk/class-aws-phar.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/script-enqueues.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/user-permissions.php';
 require_once plugin_dir_path(__FILE__) . 'includes/functions/install-dependencies.php';
@@ -80,13 +80,6 @@ new EFS_File_Display();
 new EFS_File_CPT();
 
 /* EFS activation hooks */
-register_activation_hook(__FILE__, [$efs_init, 'efs_create_encryption_keys_table']);
-register_activation_hook(__FILE__, [$efs_init, 'efs_create_encrypted_files_table']);
-register_activation_hook(__FILE__, [$efs_init, 'efs_create_file_metadata_table']);
 register_activation_hook(__FILE__, [$efs_aws_phar, 'download_and_extract_phar']);
-register_activation_hook(__FILE__, [$efs_init, 'efs_create_master_key_table']);
-register_activation_hook(__FILE__, [$efs_init, 'efs_create_recipients_table']);
-register_activation_hook(__FILE__, [$efs_init, 'efs_create_private_folder']);
-register_activation_hook(__FILE__, [$efs_init, 'efs_generate_master_key']);
-register_activation_hook(__FILE__, [$efs_init, 'efs_create_admin_table']);
+register_activation_hook(__FILE__, ['EFS_Init', 'efs_activate']);
 /* register_activation_hook(__FILE__, 'efs_install_dependencies'); */
