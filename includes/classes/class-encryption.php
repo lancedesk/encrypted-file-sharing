@@ -416,20 +416,28 @@ class EFS_Encryption
             /* Use the file ID to search in the encrypted files table */
             $encrypted_file = $wpdb->get_row(
                 $wpdb->prepare(
-                    "SELECT data_encryption_key FROM $encrypted_files_table WHERE file_id = %d",
+                    "SELECT data_encryption_key, encrypted_file FROM $encrypted_files_table WHERE file_id = %d",
                     $file->id
                 )
             );
 
-            /* If the encrypted file is found, return the DEK */
+            /* If the encrypted file is found, return the DEK and path to the encrypted file */
             if ($encrypted_file !== null)
             {
-                return ['found' => true, 'dek' => $encrypted_file->data_encryption_key];
+                return [
+                    'found' => true,
+                    'dek' => $encrypted_file->data_encryption_key,
+                    'encrypted_file_path' => $encrypted_file->encrypted_file
+                ];
             }
         }
 
-        /* If no DEK is found, return false */
-        return ['found' => false, 'dek' => null];
+        /* If no DEK or file path is found, return false */
+        return [
+            'found' => false,
+            'dek' => null,
+            'encrypted_file_path' => null
+        ];
     }
 
     /**
