@@ -4,7 +4,26 @@ class EFS_Init
 {
     public function __construct()
     {
-        /* Empty constructor */
+        /* Register the activation hook */
+        $this->efs_init();
+    }
+
+    public function efs_init()
+    {
+        /* Create the database tables */
+        $this->efs_create_files_table();
+        $this->efs_create_file_metadata_table();
+        $this->efs_create_encryption_keys_table();
+        $this->efs_create_master_key_table();
+        $this->efs_create_encrypted_files_table();
+        $this->efs_create_recipients_table();
+        $this->efs_create_admin_table();
+
+        /* Generate and save the master key */
+        $this->efs_generate_master_key();
+
+        /* Create the private folder outside the web root */
+        $this->efs_create_private_folder();
     }
 
     /**
