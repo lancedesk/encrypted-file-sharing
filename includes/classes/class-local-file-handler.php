@@ -96,6 +96,8 @@ class EFS_Local_File_Handler
         
             $result = $efs_file_encryption->efs_get_dek_by_file_name($file_name);
 
+            $this->efs_insert_file($file_name, $target_file);
+
             if ($result['found'])
             {
                 /* Use the DEK as needed */
@@ -289,7 +291,7 @@ class EFS_Local_File_Handler
         /* Retrieve the ID of the last inserted file */
         $last_inserted_id = $wpdb->insert_id;
 
-        return array('success' => true, 'file_id' => $last_inserted_id);
+        return ['success' => true, 'file_id' => $last_inserted_id];
     }
 
 
