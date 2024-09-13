@@ -98,7 +98,7 @@ class EFS_Local_File_Handler
                 $post_id, 
                 $result['dek'], 
                 $expiration_date, 
-                $result['encrypted_file']
+                $result['encrypted_file_path']
             );
             
             if ($success)
@@ -114,7 +114,7 @@ class EFS_Local_File_Handler
                 }
                 
                 /* Send encrypted file URL as JSON response */
-                wp_send_json_success(['file_url' => $result['encrypted_file']]);
+                wp_send_json_success(['file_url' => $result['encrypted_file_path']]);
             }
             else
             {
