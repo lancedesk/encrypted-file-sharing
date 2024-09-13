@@ -96,12 +96,28 @@ class EFS_Local_File_Handler
         
             $result = $efs_file_encryption->efs_get_dek_by_file_name($file_name);
 
+            /* Check the result and handle each case */
             $creation_result = $this->efs_insert_file($file_name, $target_file);
 
-            if (!$creation_result['success'])
+            if ($creation_result['success'])
             {
+                /* File was successfully inserted */
                 $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to insert file into database.');
-                return false;
+            }
+            else
+            {
+                /* File insertion failed or file already exists */
+                if ($creation_result['file_id'] !== null)
+                {
+                    /* File already exists */
+                    $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File already exists with ID: ' . $creation_result['file_id']);
+                }
+                else
+                {
+                    /* File insertion failed */
+                    $error_message = $creation_result['message'];
+                    $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to insert file into database: ' . $error_message);
+                }
             }
 
             if ($result['found'])
@@ -211,7 +227,7 @@ class EFS_Local_File_Handler
      * @param int $post_id The post ID to handle file encryption for.
     */
 
-    public function handle_file_encryption($post_id)
+    public function efs_handle_file_encryption($post_id)
     {
         global $efs_user_selection, $efs_file_encryption, $efs_init;
 
