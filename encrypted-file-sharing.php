@@ -3,7 +3,7 @@
  * Plugin Name: Encrypted File Sharing
  * Plugin URI: https://github.com/lancedesk/encrypted-file-sharing
  * Description: A plugin that allows site administrators to securely send files to specific users via the WordPress admin panel.
- * Version: 1.2.6
+ * Version: 1.2.7
  * Author: Robert June
  * Author URI: https://profiles.wordpress.org/lancedesk/
  * Text Domain: encrypted-file-sharing
@@ -11,7 +11,7 @@
  * Requires at least: 4.7
  * Tested up to: 6.5
  * Requires PHP: 7.0
- * Stable tag: 1.2.6
+ * Stable tag: 1.2.7
  * Beta tag: 1.3.0
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
