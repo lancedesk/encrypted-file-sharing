@@ -427,7 +427,8 @@ class EFS_Encryption
                 return [
                     'found' => true,
                     'dek' => $encrypted_file->data_encryption_key,
-                    'encrypted_file_path' => $encrypted_file->encrypted_file
+                    'encrypted_file_path' => $encrypted_file->encrypted_file,
+                    'file_id' => $file->id
                 ];
             }
         }
@@ -436,7 +437,8 @@ class EFS_Encryption
         return [
             'found' => false,
             'dek' => null,
-            'encrypted_file_path' => null
+            'encrypted_file_path' => null,
+            'file_id' => null
         ];
     }
 
