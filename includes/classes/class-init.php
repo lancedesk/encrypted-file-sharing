@@ -4,8 +4,17 @@ class EFS_Init
 {
     public function __construct()
     {
-        /* Register the activation hook */
-        $this->efs_init();
+        /* Empty constructor */
+    }
+
+    /* Static activation method for register_activation_hook() */
+    public static function efs_activate()
+    {
+        /* Instantiate the class to call non-static methods */
+        $instance = new self();
+         
+        /* Call the init method to create tables, etc. */
+        $instance->efs_init();
     }
 
     public function efs_init()
