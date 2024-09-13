@@ -124,7 +124,7 @@ class EFS_Local_File_Handler
             {
         
                 /* Store the file's metadata with the target file path */
-                $file_metadata = $this->save_file_metadata($post_id, $file_id);
+                $file_metadata = $this->save_file_metadata($post_id, $creation_result['post_id']);
         
                 /* Log the file metadata result */
                 if ($file_metadata['success'])
@@ -272,8 +272,22 @@ class EFS_Local_File_Handler
     public function efs_insert_file($file_name, $encrypted_file_path)
     {
         global $wpdb;
-        
+
         $table_name = $wpdb->prefix . 'efs_files';
+
+        /* First, check if the file already exists by file_name */
+        $existing_file = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT id FROM $table_name WHERE file_name = %s",
+                $file_name
+            )
+        );
+
+        /* If the file already exists, return the file_id and success flag */
+        if ($existing_file !== null)
+        {
+            return array('success' => false, 'file_id' => $existing_file->id, 'message' => 'File already exists');
+        }
 
         /* Insert the file record into the database */
         $inserted = $wpdb->insert(
@@ -291,7 +305,7 @@ class EFS_Local_File_Handler
         /* Check if the insert was successful */
         if ($inserted === false)
         {
-            return array('success' => false, 'file_id' => null);
+            return array('success' => false, 'file_id' => null, 'message' => 'Insert failed');
         }
 
         /* Retrieve the ID of the last inserted file */
@@ -299,7 +313,6 @@ class EFS_Local_File_Handler
 
         return ['success' => true, 'file_id' => $last_inserted_id];
     }
-
 
     /**
      * Insert metadata for an encrypted file into the database.
