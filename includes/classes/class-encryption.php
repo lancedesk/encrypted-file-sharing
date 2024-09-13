@@ -119,6 +119,25 @@ class EFS_Encryption
             return $cached_result;
         }
 
+        /* Query to get the file ID from the efs_files table */
+        $file_id = $wpdb->get_var(
+            $wpdb->prepare(
+                "
+                SELECT id
+                FROM {$wpdb->prefix}efs_files
+                WHERE file_name = %s
+                ",
+                $file_name
+            )
+        );
+
+        if (!$file_id)
+        {
+            /* No file found with the specified name */
+            $this->log_message("No file found with file name $file_name.");
+            return false;
+        }
+
         /* Query to get the encrypted DEK and KEK for the specific user and file */
         /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Reason: Custom table query required */
         $result = $wpdb->get_row(
@@ -126,10 +145,8 @@ class EFS_Encryption
                 "
                 SELECT ek.encryption_key, ek.user_kek
                 FROM {$wpdb->prefix}efs_encryption_keys ek
-                INNER JOIN {$wpdb->prefix}efs_file_metadata fm
-                ON ek.file_id = fm.id
                 WHERE ek.user_id = %d
-                AND fm.file_name = %s
+                AND ek.file_id = %d
                 ",
                 $user_id, $file_name
             )
