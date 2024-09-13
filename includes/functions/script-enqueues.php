@@ -32,7 +32,7 @@ function efs_enqueue_admin_scripts($hook_suffix)
          $hook_suffix === 'post.php' || 
          $hook_suffix === 'edit.php' ||
          (isset($_GET['page']) && $_GET['page'] === 'efs-settings')) && 
-         ($post_type === 'efs_file' || $_GET['page'] === 'efs-settings')
+         ($post_type === 'efs_file' || (isset($_GET['page']) && $_GET['page'] === 'efs-settings'))
         )
     {
         /* Enqueue admin CSS */
