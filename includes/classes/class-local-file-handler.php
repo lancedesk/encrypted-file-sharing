@@ -254,6 +254,46 @@ class EFS_Local_File_Handler
     }
 
     /**
+     * Insert a file record into the database.
+     *
+     * @param string $file_name The name of the file.
+     * @param string $encrypted_file_path The path to the encrypted file.
+     * @return array An associative array containing the success status and file ID.
+    */
+
+    public function efs_insert_file($file_name, $encrypted_file_path)
+    {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'efs_files';
+
+        /* Insert the file record into the database */
+        $inserted = $wpdb->insert(
+            $table_name,
+            array(
+                'file_name' => $file_name,
+                'encrypted_file_path' => $encrypted_file_path
+            ),
+            array(
+                '%s', /* file_name as a string */
+                '%s'  /* encrypted_file_path as a string */
+            )
+        );
+
+        /* Check if the insert was successful */
+        if ($inserted === false)
+        {
+            return array('success' => false, 'file_id' => null);
+        }
+
+        /* Retrieve the ID of the last inserted file */
+        $last_inserted_id = $wpdb->insert_id;
+
+        return array('success' => true, 'file_id' => $last_inserted_id);
+    }
+
+
+    /**
      * Insert metadata for an encrypted file into the database.
      *
      * @param int $file_id The ID of the file.
