@@ -60,16 +60,10 @@ class EFS_Local_File_Handler
             wp_send_json_error(['message' => 'Invalid nonce.']);
         }
 
-        /* Ensure file ID is provided */
-        if (!isset($_POST['file_id']))
+        /* Ensure file ID and post ID are provided */
+        if (!isset($_POST['file_id']) || !isset($_POST['post_id']))
         {
-            wp_send_json_error(['message' => 'File ID is missing.']);
-        }
-
-        /* Ensure post ID is provided */
-        if (!isset($_POST['post_id']))
-        {
-            wp_send_json_error(['message' => 'Post ID is missing.']);
+            wp_send_json_error(['message' => 'File ID or Post ID is missing.']);
         }
 
         $file_id = intval($_POST['file_id']);
@@ -94,40 +88,33 @@ class EFS_Local_File_Handler
 
         if ($result['found'])
         {
-            /* Use the DEK as needed */
-            $encrypted_file_id = $result['file_id'];
-            $data_encryption_key = $result['dek'];
-            $encrypted_file = $result['encrypted_file'];
+            /* Use the DEK and encrypted file details */
             $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key found for file : ' . $file_name);
 
             /* Log the successful metadata save */
             $success = $this->efs_insert_encrypted_file_metadata
             (
-                $encrypted_file_id, 
+                $result['file_id'], 
                 $post_id, 
-                $data_encryption_key, 
+                $result['dek'], 
                 $expiration_date, 
-                $encrypted_file
+                $result['encrypted_file']
             );
             
             if ($success)
             {
-                /* Metadata was successfully inserted */
-                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
-            
                 /* Set the encryption meta */
                 update_post_meta($post_id, '_efs_encrypted', '1');
                 $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption meta set to 1 for post ID: ' . $post_id);
 
-                /* Optionally delete the original file after saving metadata */
-                            
+                /* Optionally delete the original file after saving metadata */       
                 if ($delete_after_encryption)
                 {
                     $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
                 }
                 
                 /* Send encrypted file URL as JSON response */
-                wp_send_json_success(['file_url' => $encrypted_file]);
+                wp_send_json_success(['file_url' => $result['encrypted_file']]);
             }
             else
             {
@@ -199,23 +186,20 @@ class EFS_Local_File_Handler
                             {
                                 /* Handle insertion failure */
                                 $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
+                                wp_send_json_error(['message' => 'File metadata save failed.']);
                             }
 
                         }
                         else
                         {
                             $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
+                            wp_send_json_error(['message' => 'File metadata save failed.']);
                         }
-                
-                        /* Log the successful encryption and upload */
-                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
-
                     }
                     else
                     {
                         $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
                         wp_send_json_error(['message' => 'File upload failed.']);
-                        return false;
                     }
                 }
                 else
@@ -225,12 +209,14 @@ class EFS_Local_File_Handler
                     {
                         /* File already exists */
                         $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File already exists with ID: ' . $creation_result['file_id']);
+                        wp_send_json_error(['message' => 'File already exists.']);
                     }
                     else
                     {
                         /* File insertion failed */
                         $error_message = $creation_result['message'];
                         $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to insert file into database: ' . $error_message);
+                        wp_send_json_error(['message' => 'Failed to insert file into database.']);
                     }
                 }
             }
@@ -238,11 +224,8 @@ class EFS_Local_File_Handler
             {
                 /* Log an error if file copy fails */
                 $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to copy file to: ' . $target_file);
-                return false;
+                wp_send_json_error(['message' => 'Failed to copy file.']);
             }
-        
-            /* Return success response */
-            wp_send_json_success(['message' => 'File uploaded successfully.', 'file_id' => $file_id, 'post_id' => $post_id]);
         }
     }
 
