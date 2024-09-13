@@ -143,19 +143,19 @@ class EFS_Encryption
         $result = $wpdb->get_row(
             $wpdb->prepare(
                 "
-                SELECT ek.encryption_key, ek.user_kek
+                SELECT encryption_key, user_kek
                 FROM {$wpdb->prefix}efs_encryption_keys ek
-                WHERE ek.user_id = %d
-                AND ek.file_id = %d
+                WHERE user_id = %d
+                AND file_id = %d
                 ",
-                $user_id, $file_name
+                $user_id, $file_id
             )
         );
 
         if (!$result)
         {
             /* No key found for the specified user and file */
-            $this->log_message("No key found for user ID $user_id and file name $file_name.");
+            $this->log_message("No key found for user ID $user_id and file name $file_name of id $file_id.");
             return false;
         }
 
