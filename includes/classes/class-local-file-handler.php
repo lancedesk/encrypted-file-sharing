@@ -24,6 +24,7 @@ class EFS_Local_File_Handler
     {
         global $wp_filesystem, $efs_file_handler, $efs_file_encryption, $efs_init;
         $upload_dir = ABSPATH . '../private_uploads/';
+        $delete_after_encryption = get_option('efs_delete_files', 0);
 
         /* Initialize WP_Filesystem */
         if (!function_exists('WP_Filesystem')) 
@@ -89,119 +90,160 @@ class EFS_Local_File_Handler
         $efs_init->log_message($log_file, 'Received file name: ' . $file_name);
         $efs_init->log_message($log_file, 'Expiration date: ' . $expiration_date);
 
-        /* Copy the file to the secure directory */
-        if (copy($file_path, $target_file))
+        $result = $efs_file_encryption->efs_get_dek_by_file_name($file_name);
+
+        if ($result['found'])
         {
-            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
-        
-            $result = $efs_file_encryption->efs_get_dek_by_file_name($file_name);
+            /* Use the DEK as needed */
+            $encrypted_file_id = $result['file_id'];
+            $data_encryption_key = $result['dek'];
+            $encrypted_file = $result['encrypted_file'];
+            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key found for file : ' . $file_name);
 
-            /* Check the result and handle each case */
-            $creation_result = $this->efs_insert_file($file_name, $target_file);
-
-            if ($creation_result['success'])
+            /* Log the successful metadata save */
+            $success = $this->efs_insert_encrypted_file_metadata
+            (
+                $encrypted_file_id, 
+                $post_id, 
+                $data_encryption_key, 
+                $expiration_date, 
+                $encrypted_file
+            );
+            
+            if ($success)
             {
-                /* File was successfully inserted */
-                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to insert file into database.');
-            }
-            else
-            {
-                /* File insertion failed or file already exists */
-                if ($creation_result['file_id'] !== null)
-                {
-                    /* File already exists */
-                    $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File already exists with ID: ' . $creation_result['file_id']);
-                }
-                else
-                {
-                    /* File insertion failed */
-                    $error_message = $creation_result['message'];
-                    $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to insert file into database: ' . $error_message);
-                }
-            }
-
-            if ($result['found'])
-            {
-                /* Use the DEK as needed */
-                $data_encryption_key = $result['dek'];
-                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key found for file : ' . $file_name);
-            }
-            else
-            {
-                /* Generate a random DEK (256-bit key for AES encryption) */
-                $data_encryption_key = openssl_random_pseudo_bytes(32);
-                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key not found. Genetated for file : ' . $file_name);
-            }
-        
-            /* Encrypt the file using the EFS_Encryption class */
-            $encrypted_file = $efs_file_encryption->encrypt_file($target_file, $data_encryption_key);
-        
-            if ($encrypted_file)
-            {
-        
-                /* Store the file's metadata with the target file path */
-                $file_metadata = $this->save_file_metadata($post_id, $creation_result['post_id']);
-        
-                /* Log the file metadata result */
-                if ($file_metadata['success'])
-                {
-                    /* Log the successful metadata save */
-                    $success = $this->efs_insert_encrypted_file_metadata
-                    (
-                        $file_metadata['file_id'], 
-                        $post_id, 
-                        $data_encryption_key, 
-                        $expiration_date, 
-                        $encrypted_file
-                    );
-
-                    if ($success) {
-                        /* Metadata was successfully inserted */
-                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
-
-                        /* Set the encryption meta */
-                        update_post_meta($post_id, '_efs_encrypted', '1');
-                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption meta set to 1 for post ID: ' . $post_id);
-                    }
-                    else
-                    {
-                        /* Handle insertion failure */
-                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
-                    }
-
-                }
-                else
-                {
-                    $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
-                }
-        
-                /* Log the successful encryption and upload */
-                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
+                /* Metadata was successfully inserted */
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
+            
+                /* Set the encryption meta */
+                update_post_meta($post_id, '_efs_encrypted', '1');
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption meta set to 1 for post ID: ' . $post_id);
 
                 /* Optionally delete the original file after saving metadata */
-                $delete_after_encryption = get_option('efs_delete_files', 0);
-                if ($delete_after_encryption) {
+                            
+                if ($delete_after_encryption)
+                {
                     $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
                 }
-
+                
                 /* Send encrypted file URL as JSON response */
                 wp_send_json_success(['file_url' => $encrypted_file]);
-
-            } else {
-                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
-                wp_send_json_error(['message' => 'File upload failed.']);
-                return false;
+            }
+            else
+            {
+                wp_send_json_error(['message' => 'File metadata save failed.']);
+                /* Handle insertion failure */
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
             }
         }
         else
         {
-            /* Log an error if file copy fails */
-            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to copy file to: ' . $target_file);
-            return false;
+            /* Copy the file to the secure directory */
+            if (copy($file_path, $target_file))
+            {
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File copied to: ' . $target_file);
+
+                /* Check the result and handle each case */
+                $creation_result = $this->efs_insert_file($file_name, $target_file);
+
+                if ($creation_result['success'])
+                {
+                    /* File was successfully inserted */
+                    $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File inserted into database with ID: ' . $creation_result['file_id']);
+                    
+                    /* Generate a random DEK (256-bit key for AES encryption) */
+                    $data_encryption_key = openssl_random_pseudo_bytes(32);
+
+                    /* Encrypt the file using the EFS_Encryption class */
+                    $encrypted_file = $efs_file_encryption->encrypt_file($target_file, $data_encryption_key);
+                
+                    if ($encrypted_file)
+                    {
+                
+                        /* Store the file's metadata with the target file path */
+                        $file_metadata = $this->save_file_metadata($post_id, $creation_result['post_id']);
+                
+                        /* Log the file metadata result */
+                        if ($file_metadata['success'])
+                        {
+                            /* Log the successful metadata save */
+                            $success = $this->efs_insert_encrypted_file_metadata
+                            (
+                                $file_metadata['file_id'], 
+                                $post_id, 
+                                $data_encryption_key, 
+                                $expiration_date, 
+                                $encrypted_file
+                            );
+
+                            if ($success)
+                            {
+                                /* Metadata was successfully inserted */
+                                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata saved successfully. File ID: ' . $file_metadata['file_id']);
+
+                                /* Set the encryption meta */
+                                update_post_meta($post_id, '_efs_encrypted', '1');
+                                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption meta set to 1 for post ID: ' . $post_id);
+
+                                /* Optionally delete the original file after saving metadata */
+                            
+                                if ($delete_after_encryption)
+                                {
+                                    $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
+                                }
+                                
+                                /* Send encrypted file URL as JSON response */
+                                wp_send_json_success(['file_url' => $encrypted_file]);
+                            }
+                            else
+                            {
+                                /* Handle insertion failure */
+                                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
+                            }
+
+                        }
+                        else
+                        {
+                            $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File metadata save failed.');
+                        }
+                
+                        /* Log the successful encryption and upload */
+                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encrypted and uploaded: ' . $encrypted_file);
+
+                    }
+                    else
+                    {
+                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File encryption failed for: ' . $target_file);
+                        wp_send_json_error(['message' => 'File upload failed.']);
+                        return false;
+                    }
+                }
+                else
+                {
+                    /* File insertion failed or file already exists */
+                    if ($creation_result['file_id'] !== null)
+                    {
+                        /* File already exists */
+                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'File already exists with ID: ' . $creation_result['file_id']);
+                    }
+                    else
+                    {
+                        /* File insertion failed */
+                        $error_message = $creation_result['message'];
+                        $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to insert file into database: ' . $error_message);
+                    }
+                }
+            }
+            else
+            {
+                /* Log an error if file copy fails */
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to copy file to: ' . $target_file);
+                return false;
+            }
+        
+            /* Return success response */
+            wp_send_json_success(['message' => 'File uploaded successfully.', 'file_id' => $file_id, 'post_id' => $post_id]);
         }
-    
-        /* Return success response */
-        wp_send_json_success(['message' => 'File uploaded successfully.', 'file_id' => $file_id, 'post_id' => $post_id]);
     }
 
     /**
@@ -215,7 +257,8 @@ class EFS_Local_File_Handler
 
         $result = $this->efs_handle_local_upload();
 
-        if (isset($result['error'])) {
+        if (isset($result['error']))
+        {
             wp_send_json_error(['message' => $result['error']]);
         } else {
             wp_send_json_success($result);
