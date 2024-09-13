@@ -75,7 +75,6 @@ class EFS_Init
             post_id INT NOT NULL,
             upload_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
-            UNIQUE KEY file_name (file_name)
         ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
