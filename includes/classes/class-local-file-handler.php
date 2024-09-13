@@ -96,7 +96,13 @@ class EFS_Local_File_Handler
         
             $result = $efs_file_encryption->efs_get_dek_by_file_name($file_name);
 
-            $this->efs_insert_file($file_name, $target_file);
+            $creation_result = $this->efs_insert_file($file_name, $target_file);
+
+            if (!$creation_result['success'])
+            {
+                $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Failed to insert file into database.');
+                return false;
+            }
 
             if ($result['found'])
             {
@@ -356,14 +362,13 @@ class EFS_Local_File_Handler
     }
 
     /**
-     * Save file metadata such as expiration date.
+     * Save file metadata such as the upload date.
      *
-     * @param int $post_id The post ID of the post the file is uploaded.
-     * @param string $file_name The name of the file.
-     * @param string $file_path The path where the file is stored.
+     * @param int $post_id The post ID associated with the file.
+     * @param int $file_id The ID of the file in the `efs_files` table.
     */
 
-    private function save_file_metadata($post_id, $file_name, $file_path)
+    private function save_file_metadata($post_id, $file_id)
     {
         global $wpdb;
         
@@ -374,21 +379,16 @@ class EFS_Local_File_Handler
         $result = $wpdb->replace(
             $table_name,
             [
-                'post_id' => $post_id,
-                'file_name' => $file_name,
-                'file_path' => $file_path, /* Use the target file path  */
-                'upload_date' => current_time('mysql')
+                'file_id' => $file_id, /* Reference to file in `efs_files` table */
+                'post_id' => $post_id, /* Associated post ID */
+                'upload_date' => current_time('mysql') /* Set the upload date */
             ],
             [
+                '%d', /* file_id */
                 '%d', /* post_id */
-                '%s', /* file_name */
-                '%s', /* file_path */
                 '%s'  /* upload_date */
             ]
         );
-
-        /* Retrieve the file ID of the inserted/updated row */
-        $file_id = $wpdb->insert_id;
 
         /* Return an array containing the success status and file_id */
         if ($result !== false)
