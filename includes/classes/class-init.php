@@ -177,7 +177,7 @@ class EFS_Init
             /* Cache miss, retrieve from database */
             /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
             $existing_key = $wpdb->get_var(
-                $wpdb->prepare("SELECT master_key FROM {$wpdb->prefix}efs_master_key LIMIT 1")
+                "SELECT master_key FROM {$wpdb->prefix}efs_master_key LIMIT 1"
             );
 
             /* Store the key in cache for future use, if found */
