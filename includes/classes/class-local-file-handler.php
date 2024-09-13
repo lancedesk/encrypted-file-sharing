@@ -10,8 +10,8 @@ class EFS_Local_File_Handler
     public function __construct()
     {
         /* Initialize the EFS encryption class. */
-        add_action('wp_ajax_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
-        add_action('wp_ajax_nopriv_efs_upload_to_local', [$this, 'handle_local_upload_ajax']);
+        add_action('wp_ajax_efs_upload_to_local', [$this, 'efs_handle_local_upload_ajax']);
+        add_action('wp_ajax_nopriv_efs_upload_to_local', [$this, 'efs_handle_local_upload_ajax']);
         add_action('wp_ajax_efs_write_log', [$this, 'write_log']);
         add_action('wp_ajax_nopriv_efs_write_log', [$this, 'write_log']);
     }
@@ -20,7 +20,7 @@ class EFS_Local_File_Handler
      * Handle the local file upload.
     */
 
-    public function handle_local_upload()
+    public function efs_handle_local_upload()
     {
         global $wp_filesystem, $efs_file_handler, $efs_file_encryption, $efs_init;
         $upload_dir = ABSPATH . '../private_uploads/';
@@ -184,12 +184,12 @@ class EFS_Local_File_Handler
      * Handles the AJAX request for file upload.
     */
 
-    public function handle_local_upload_ajax()
+    public function efs_handle_local_upload_ajax()
     {
         /* Log a message to the error log to confirm the hook was fired */
-        error_log('The handle_local_upload_ajax hook was fired!');
+        error_log('The efs_handle_local_upload_ajax hook was fired!');
 
-        $result = $this->handle_local_upload();
+        $result = $this->efs_handle_local_upload();
 
         if (isset($result['error'])) {
             wp_send_json_error(['message' => $result['error']]);
