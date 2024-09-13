@@ -124,7 +124,7 @@ class EFS_User_Selection
                 if (isset($efs_local_file_handler) && is_object($efs_local_file_handler)) 
                 {
                     $this->log_message($log_file, 'Starting file encryption for post ID: ' . $post_id);
-                    $efs_local_file_handler->handle_file_encryption($post_id);
+                    $efs_local_file_handler->efs_handle_file_encryption($post_id);
                     $this->log_message($log_file, 'File encryption completed for post ID: ' . $post_id);
                 }
 
