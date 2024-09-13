@@ -2,8 +2,32 @@
 
 class EFS_Init
 {
-    public function __construct() {
+    public function __construct()
+    {
         /* Empty constructor */
+    }
+
+    /**
+     * Create the `efs_files` table in the database.
+    */
+
+    public function efs_create_files_table()
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'efs_files';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id INT NOT NULL AUTO_INCREMENT,
+            file_name VARCHAR(255) NOT NULL,
+            encrypted_file_path VARCHAR(255) NOT NULL,
+            PRIMARY KEY (id),
+            UNIQUE KEY file_name (file_name)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql); /* Ensures the table is created or updated if it already exists */
     }
 
     /**
@@ -62,29 +86,6 @@ class EFS_Init
     }
 
     /**
-     * Create the database table for storing admin user information.
-    */
-
-    public function efs_create_admin_table()
-    {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'efs_admin_users';
-        $charset_collate = $wpdb->get_charset_collate();
-
-        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            username varchar(60) NOT NULL,
-            password varchar(255) NOT NULL,
-            email varchar(100) NOT NULL,
-            two_factor_code varchar(255),
-            PRIMARY KEY  (id)
-        ) $charset_collate;";
-
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql); /* Ensures the table is created or updated if it already exists */
-    }
-
-    /**
      * Create the custom table for storing the master key.
     */
 
@@ -100,33 +101,6 @@ class EFS_Init
             id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             master_key BLOB NOT NULL,
             PRIMARY KEY (id)
-        ) $charset_collate;";
-
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
-
-    /**
-     * Create the 'efs_recipients' table to store post-to-recipient relationships.
-     *
-     * @return void
-    */
-
-    public function efs_create_recipients_table()
-    {
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'efs_recipients';
-
-        /* SQL to create the table */
-        $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE $table_name (
-            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            post_id BIGINT(20) UNSIGNED NOT NULL,
-            recipient_id BIGINT(20) UNSIGNED NOT NULL,
-            PRIMARY KEY (id),
-            KEY post_id (post_id),
-            KEY recipient_id (recipient_id)
         ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -217,6 +191,55 @@ class EFS_Init
         }
     }
 
+    /**
+     * Create the 'efs_recipients' table to store post-to-recipient relationships.
+     *
+     * @return void
+    */
+
+    public function efs_create_recipients_table()
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'efs_recipients';
+
+        /* SQL to create the table */
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE $table_name (
+            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            post_id BIGINT(20) UNSIGNED NOT NULL,
+            recipient_id BIGINT(20) UNSIGNED NOT NULL,
+            PRIMARY KEY (id),
+            KEY post_id (post_id),
+            KEY recipient_id (recipient_id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
+    /**
+     * Create the database table for storing admin user information.
+    */
+
+    public function efs_create_admin_table()
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'efs_admin_users';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            username varchar(60) NOT NULL,
+            password varchar(255) NOT NULL,
+            email varchar(100) NOT NULL,
+            two_factor_code varchar(255),
+            PRIMARY KEY  (id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql); /* Ensures the table is created or updated if it already exists */
+    }
     
     /**
      * Create a private folder outside the web root.
