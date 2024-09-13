@@ -82,7 +82,8 @@ class EFS_Encryption
                 ]
             );
 
-            if ($result === false) {
+            if ($result === false)
+            {
                 /* Log insertion failure */
                 $this->log_message("Error: Failed to insert data into database for user ID: $user_id.");
                 return false;  /* Return false immediately if database insertion fails */
@@ -112,7 +113,8 @@ class EFS_Encryption
         $cache_key = 'encryption_key_' . $user_id . '_' . md5($file_name);
         $cached_result = wp_cache_get($cache_key, 'efs_encryption_keys');
 
-        if ($cached_result !== false) {
+        if ($cached_result !== false)
+        {
             /* Return the cached result */
             return $cached_result;
         }
@@ -397,25 +399,25 @@ class EFS_Encryption
         global $wpdb;
 
         /* Table names */
-        $metadata_table = $wpdb->prefix . 'efs_file_metadata';
+        $files_table = $wpdb->prefix . 'efs_files';
         $encrypted_files_table = $wpdb->prefix . 'efs_encrypted_files';
 
-        /* Search for the file name in the metadata table */
-        $file_metadata = $wpdb->get_row(
+        /* Search for the file by name in the files table */
+        $file = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT id FROM $metadata_table WHERE file_name = %s",
+                "SELECT id FROM $files_table WHERE file_name = %s",
                 $file_name
             )
         );
 
-        /* Check if the file name exists in the metadata table */
-        if ($file_metadata !== null)
+        /* Check if the file exists in the files table */
+        if ($file !== null)
         {
-            /* Use the file id to search in the encrypted files table */
+            /* Use the file ID to search in the encrypted files table */
             $encrypted_file = $wpdb->get_row(
                 $wpdb->prepare(
                     "SELECT data_encryption_key FROM $encrypted_files_table WHERE file_id = %d",
-                    $file_metadata->id
+                    $file->id
                 )
             );
 
