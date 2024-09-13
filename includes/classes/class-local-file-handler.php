@@ -148,7 +148,7 @@ class EFS_Local_File_Handler
                     {
                 
                         /* Store the file's metadata with the target file path */
-                        $file_metadata = $this->save_file_metadata($post_id, $creation_result['post_id']);
+                        $file_metadata = $this->save_file_metadata($post_id, $creation_result['file_id']);
                 
                         /* Log the file metadata result */
                         if ($file_metadata['success'])
