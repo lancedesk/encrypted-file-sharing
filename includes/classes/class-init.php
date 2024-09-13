@@ -43,9 +43,8 @@ class EFS_Init
 
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id INT NOT NULL AUTO_INCREMENT,
+            file_id INT NOT NULL,  -- Reference to the file in `efs_files`
             post_id INT NOT NULL,
-            file_name VARCHAR(255) NOT NULL,
-            file_path VARCHAR(255) NOT NULL,
             upload_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY file_name (file_name)
