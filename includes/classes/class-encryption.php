@@ -321,7 +321,8 @@ class EFS_Encryption
         /* Decrypt the file content using the DEK */
         $decrypted_data = openssl_decrypt($ciphertext, 'AES-256-CBC', $decrypted_dek, 0, $iv);
 
-        if ($decrypted_data === false) {
+        if ($decrypted_data === false)
+        {
             $this->log_message("Error: Decryption failed.");
             return false;
         }
@@ -458,42 +459,4 @@ class EFS_Encryption
             'file_id' => null
         ];
     }
-
-    /**
-     * Logs messages to a file.
-     *
-     * @param string $message The message to log.
-    */
-
-    private function log_message($message)
-    {
-        global $wp_filesystem;
-
-        /* Initialize the WP_Filesystem */
-        if (!function_exists('WP_Filesystem')) 
-        {
-            require_once(ABSPATH . 'wp-admin/includes/file.php');
-        }
-
-        WP_Filesystem(); /* Set up the WP_Filesystem */
-
-        $log_file = WP_CONTENT_DIR . '/efs_encryption_log.txt';
-        $timestamp = gmdate('Y-m-d H:i:s'); /* Use gmdate() for timezone-independent time */
-        $log_entry = "[$timestamp] $message\n";
-
-        /* Check if file exists and read the existing content */
-        $existing_content = $wp_filesystem->get_contents($log_file);
-        if ($existing_content === false) 
-        {
-            $existing_content = '';
-        }
-
-        /* Append the new log entry */
-        $new_content = $existing_content . $log_entry;
-
-        /* Write the updated log content using WP_Filesystem */
-        $wp_filesystem->put_contents($log_file, $new_content, FS_CHMOD_FILE);
-    }
-
-
 }
