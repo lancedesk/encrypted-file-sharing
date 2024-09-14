@@ -25,11 +25,11 @@ class EFS_File_Handler
         $this->efs_init = new EFS_Init();
 
         /* Register AJAX actions */
-        add_action('wp_ajax_efs_handle_download', [$this, 'handle_download_request']);
-        add_action('wp_ajax_nopriv_efs_handle_download', [$this, 'handle_download_request']); /* Allow non-logged-in users */
+        add_action('wp_ajax_efs_handle_download', [$this, 'efs_handle_download_request']);
+        add_action('wp_ajax_nopriv_efs_handle_download', [$this, 'efs_handle_download_request']); /* Allow non-logged-in users */
 
         /* Hook after file is uploaded */
-        add_action('save_post', [$this, 'handle_file_upload_notifications']);
+        add_action('save_post', [$this, 'efs_efs_handle_file_upload_notifications']);
 
     }
 
@@ -37,45 +37,45 @@ class EFS_File_Handler
      * Initialize the S3 client via the S3 file handler.
     */
 
-    public function initialize_s3_client()
+    public function efs_initialize_s3_client()
     {
-        return $this->efs_s3_file_handler->initialize_s3_client();
+        return $this->efs_s3_file_handler->efs_initialize_s3_client();
     }
 
     /**
      * Fetch stored S3 buckets via S3 file handler.
     */
 
-    public function get_stored_s3_buckets()
+    public function efs_get_stored_s3_buckets()
     {
-        return $this->efs_s3_file_handler->get_stored_s3_buckets();
-    }
-
-    /**
-     * Upload file to a secure location via the local file handler.
-    */
-
-    private function handle_local_upload()
-    {
-        return $this->efs_local_file_handler->handle_local_upload();
+        return $this->efs_s3_file_handler->efs_get_stored_s3_buckets();
     }
 
     /**
      * Fetch S3 buckets for debugging purposes via S3 file handler.
     */
 
-    public function fetch_s3_buckets_debug()
+    public function efs_fetch_s3_buckets_debug()
     {
-        return $this->efs_s3_file_handler->fetch_s3_buckets_debug();
+        return $this->efs_s3_file_handler->efs_fetch_s3_buckets_debug();
+    }
+
+    /**
+     * Upload file to a secure location via the local file handler.
+    */
+
+    private function efs_handle_local_upload()
+    {
+        return $this->efs_local_file_handler->efs_handle_local_upload();
     }
 
     /**
      * Retrieve the encryption key for a file via the encryption class.
     */
 
-    public function get_encryption_key($user_id, $file_name)
+    public function efs_get_encryption_key($user_id, $file_name)
     {
-        return $this->efs_file_encryption->get_encryption_key($user_id, $file_name);
+        return $this->efs_file_encryption->efs_get_encryption_key($user_id, $file_name);
     }
 
     /**
@@ -83,9 +83,9 @@ class EFS_File_Handler
      *
     */
 
-    public function decrypt_file($encrypted_file_path, $encryption_key)
+    public function efs_decrypt_file($encrypted_file_path, $encryption_key)
     {
-        return $this->efs_file_encryption->decrypt_file($encrypted_file_path, $encryption_key);
+        return $this->efs_file_encryption->efs_decrypt_file($encrypted_file_path, $encryption_key);
     }
 
     /**
@@ -94,7 +94,7 @@ class EFS_File_Handler
      * @param int $post_id Post ID of the uploaded file.
     */
 
-    public function handle_file_upload_notifications($post_id)
+    public function efs_efs_handle_file_upload_notifications($post_id)
     {
         global $efs_user_selection;
         /* Define the log file path */
@@ -123,49 +123,13 @@ class EFS_File_Handler
             $this->efs_init->log_message($log_file, "Post Status: {$post->post_status}");
             $this->efs_init->log_message($log_file, "First Published Meta: $first_published");
 
-            if ($post->post_status === 'publish')
-            {
-                $this->efs_init->log_message($log_file, "Post is published.");
-            }
-            else
-            {
-                $this->efs_init->log_message($log_file, "Post is not published.");
-            }
-
-            if ($first_published === '')
-            {
-                $this->efs_init->log_message($log_file, "First published meta is empty.");
-            }
-            else
-            {
-                $this->efs_init->log_message($log_file, "First published meta is not empty.");
-            }
-
-            if ($is_encrypted === '1')
-            {
-                $this->efs_init->log_message($log_file, "Post is encrypted.");
-            }
-            else
-            {
-                $this->efs_init->log_message($log_file, "Post is not encrypted.");
-            }
-
-            if ($notify_users === '1')
-            {
-                $this->efs_init->log_message($log_file, "User notifications are enabled.");
-            }
-            else
-            {
-                $this->efs_init->log_message($log_file, "User notifications are disabled.");
-            }
-
             if ($post->post_status === 'publish' &&
                 $first_published === '' &&
                 $is_encrypted === '1' && $notify_users === '1'
             )
             {
                 /* Send the notification */
-                $this->efs_notification_handler->send_upload_notifications($post_id, $selected_users);
+                $this->efs_notification_handler->efs_send_upload_notifications($post_id, $selected_users);
                 
                 $this->efs_init->log_message($log_file, "File upload notifications sent for post ID: $post_id");
                 /* Mark this post as published for the first time */
@@ -189,20 +153,20 @@ class EFS_File_Handler
      * @return mixed Result of the upload operation, or false on failure.
     */
 
-    public function handle_file_upload($file)
+    public function efs_handle_file_upload($file)
     {
         $storage_option = get_option('efs_storage_option', 'local');
 
         switch ($storage_option) {
             case 'amazon':
-                return $this->efs_s3_file_handler->upload_to_amazon_s3($file);
+                return $this->efs_s3_file_handler->efs_upload_to_amazon_s3($file);
             case 'google':
-                return $this->upload_to_google_drive($file);
+                return $this->efs_upload_to_google_drive($file);
             case 'dropbox':
-                return $this->upload_to_dropbox($file);
+                return $this->efs_upload_to_dropbox($file);
             case 'local':
             default:
-                return $this->handle_local_upload();
+                return $this->efs_handle_local_upload();
         }
     }
 
@@ -213,7 +177,7 @@ class EFS_File_Handler
      * @return mixed Result of the upload operation, or false on failure.
     */
 
-    private function upload_to_google_drive($file)
+    private function efs_upload_to_google_drive($file)
     {
         /* Implement Google Drive upload logic */
     }
@@ -225,7 +189,7 @@ class EFS_File_Handler
      * @return mixed Result of the upload operation, or false on failure.
     */
 
-    private function upload_to_dropbox($file)
+    private function efs_upload_to_dropbox($file)
     {
         /* Implement Dropbox upload logic */
     }
@@ -234,7 +198,7 @@ class EFS_File_Handler
      * Handle the file download request via AJAX.
     */
 
-    public function handle_download_request()
+    public function efs_handle_download_request()
     {
         $log_file = WP_CONTENT_DIR . '/efs_decrypt_log.txt';
 
@@ -295,7 +259,7 @@ class EFS_File_Handler
         }
 
         /* Retrieve the encryption key from the database */
-        $encryption_key = $this->get_encryption_key($user_id, $file_name);  /* File name & id are used to store the key */
+        $encryption_key = $this->efs_get_encryption_key($user_id, $file_name);  /* File name & id are used to store the key */
 
         /* Check if the key was retrieved */
         if ($encryption_key === false)
@@ -307,7 +271,7 @@ class EFS_File_Handler
         $this->efs_init->log_message($log_file, 'Encryption key retrieved for file: ' . $file_name);
 
         /* Decrypt the file */
-        $decrypted_data = $this->decrypt_file($file_path, $encryption_key);
+        $decrypted_data = $this->efs_decrypt_file($file_path, $encryption_key);
 
         if ($decrypted_data === false)
         {
@@ -358,7 +322,7 @@ class EFS_File_Handler
      * @param string $file_url The URL of the file to delete.
     */
 
-    public function delete_local_file($file_url)
+    public function efs_delete_local_file($file_url)
     {
         $attachment_id = attachment_url_to_postid($file_url);
         if ($attachment_id) 
