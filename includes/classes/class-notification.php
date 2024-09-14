@@ -10,6 +10,36 @@ class EFS_Notification_Handler
     }
 
     /**
+     * Get template path, allowing for overrides in the theme.
+     *
+     * @param string $template_name The name of the template file.
+     * @param string $default_path Optional. Default path to look for templates.
+     *                             Defaults to the plugin's `templates` directory.
+     * @return string Path to the template file.
+    */
+
+    private function efs_get_template($template_name, $default_path = '')
+    {
+        /* Set the default plugin template path */
+        if (empty($default_path)) 
+        {
+            $default_path = plugin_dir_path(__FILE__) . 'templates/';
+        }
+
+        /* Look for the template in the theme */
+        $theme_template = locate_template($template_name);
+
+        /* If a theme override exists, return its path */
+        if ($theme_template) 
+        {
+            return $theme_template;
+        }
+
+        /* Otherwise, return the plugin's default template path */
+        return $default_path . $template_name;
+    }
+
+    /**
      * Send notifications based on file upload.
      *
      * @param int $post_id Post ID of the uploaded file.
