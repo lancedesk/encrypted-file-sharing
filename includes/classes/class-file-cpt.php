@@ -9,22 +9,22 @@ class EFS_File_CPT
     public function __construct()
     {
         /* Hook for initializing the custom post type */
-        add_action('init', [$this, 'register_file_cpt']);
+        add_action('init', [$this, 'efs_register_file_cpt']);
 
         /* Hook for adding meta boxes */
-        add_action('add_meta_boxes', [$this, 'add_file_meta_box']);
-        add_action('add_meta_boxes', [$this, 'add_expiry_date_meta_box']);
+        add_action('add_meta_boxes', [$this, 'efs_add_file_meta_box']);
+        add_action('add_meta_boxes', [$this, 'efs_add_expiry_date_meta_box']);
 
         /* Hook for saving meta box data */
-        add_action('save_post', [$this, 'save_file_meta_box_data']);
-        add_action('save_post', [$this, 'save_expiry_meta_box_data']);
+        add_action('save_post', [$this, 'efs_save_file_meta_box_data']);
+        add_action('save_post', [$this, 'efs_save_expiry_meta_box_data']);
     }
 
     /**
      * Register the custom post type for files.
     */
 
-    public function register_file_cpt()
+    public function efs_register_file_cpt()
     {
         $labels = array(
             'name'               => __('Files', 'encrypted-file-sharing'),
@@ -62,12 +62,12 @@ class EFS_File_CPT
      * Add meta box for file uploads.
     */
 
-    public function add_file_meta_box()
+    public function efs_add_file_meta_box()
     {
         add_meta_box(
             'efs_file_upload',
             __('File Upload', 'encrypted-file-sharing'),
-            [$this, 'render_file_meta_box'],
+            [$this, 'efs_render_file_meta_box'],
             'efs_file',
             'side',
             'high'
@@ -78,7 +78,7 @@ class EFS_File_CPT
      * Render the file upload meta box.
     */
 
-    public function render_file_meta_box($post)
+    public function efs_render_file_meta_box($post)
     {
         /* Nonce field for verification */
         wp_nonce_field('efs_file_meta_box', 'efs_file_meta_box_nonce');
@@ -112,7 +112,7 @@ class EFS_File_CPT
      * Save the file URL meta box data.
     */
 
-    public function save_file_meta_box_data($post_id)
+    public function efs_save_file_meta_box_data($post_id)
     {
         /* Check nonce and permissions */
         if (!isset($_POST['efs_file_meta_box_nonce']) || !wp_verify_nonce(wp_unslash(sanitize_key($_POST['efs_file_meta_box_nonce'])), 'efs_file_meta_box')) 
@@ -151,7 +151,7 @@ class EFS_File_CPT
             global $efs_local_file_handler;
 
             /* Handle the file upload and get the result */
-            $result = $efs_local_file_handler->get_upload_data();
+            $result = $efs_local_file_handler->efs_get_upload_data();
 
             if ($result && isset($result['encrypted_file'])) 
             {
@@ -166,7 +166,7 @@ class EFS_File_CPT
      * Add meta box for file expiry date.
     */
 
-    function add_expiry_date_meta_box()
+    function efs_add_expiry_date_meta_box()
     {
         /* Check if expiry is enabled in the admin settings */
         $efs_enable_expiry = trim(get_option('efs_enable_expiry', 0));
@@ -188,7 +188,7 @@ class EFS_File_CPT
                     add_meta_box(
                         'efs_expiry_date_meta_box', /* Meta box ID */
                         __('File Expiry Date', 'encrypted-file-sharing'), /* Title */
-                        [$this, 'render_expiry_date_meta_box'], /* Callback function */
+                        [$this, 'efs_render_expiry_date_meta_box'], /* Callback function */
                         'efs_file', /* Post type */
                         'side', /* Position: 'normal', 'side', or 'advanced' */
                         'high' /* Priority */
@@ -202,7 +202,7 @@ class EFS_File_CPT
      * Render the expiry date meta box.
     */
 
-    public function render_expiry_date_meta_box($post)
+    public function efs_render_expiry_date_meta_box($post)
     {
         /* An instance of the admin columns class */
         global $efs_admin_columns;
@@ -212,8 +212,8 @@ class EFS_File_CPT
 
         /* Retrieve expiration date and time from the custom table */
         $file_url = get_post_meta($post->ID, '_efs_file_url', true);
-        $file_name = $efs_admin_columns->extract_file_name($file_url);
-        $expiry_datetime = $efs_admin_columns->get_expiration_date($file_name);
+        $file_name = $efs_admin_columns->efs_extract_file_name($file_url);
+        $expiry_datetime = $efs_admin_columns->efs_get_expiration_date($file_name);
 
         /* Split expiry date and time */
         $expiry_date = $expiry_time = '';
@@ -239,7 +239,7 @@ class EFS_File_CPT
      * Save the expiry date meta box data.
     */
 
-    public function save_expiry_meta_box_data($post_id)
+    public function efs_save_expiry_meta_box_data($post_id)
     {
         /* An instance of the admin columns class */
         global $efs_admin_columns;
@@ -271,7 +271,7 @@ class EFS_File_CPT
 
         /* Retrieve file name or URL */
         $file_url = get_post_meta($post_id, '_efs_file_url', true);
-        $file_name = $efs_admin_columns->extract_file_name($file_url);
+        $file_name = $efs_admin_columns->efs_extract_file_name($file_url);
 
         /* Update expiry date in custom table */
         global $wpdb;
