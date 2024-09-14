@@ -36,7 +36,7 @@
                         <p>Downloaded by: <?php echo esc_html($user_display_name); ?> (<?php echo esc_html($user_email); ?>)</p>
                         <p>IP Address: <?php echo esc_html($user_ip); ?></p>
                         <p>For more details, please check the download logs below: </p>
-                        <p><a href="<?php echo esc_url($file_logs_link); ?>" style="background-color: #2980b9; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px;">Check Logs</a>.</p>
+                        <p><a href="<?php echo esc_url($file_logs_link); ?>" style="background-color: #2980b9; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px;">Check Logs</a></p>
                     </div>
 
                     <!-- Footer -->
