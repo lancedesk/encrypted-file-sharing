@@ -38,9 +38,10 @@
 
                     <!-- Footer -->
                     <div style="background-color: #ecf0f1; padding: 20px; text-align: center; font-size: 14px; color: #7f8c8d; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-                        <p>For any queries, please <a href="mailto:support@example.com" style="color: #2c3e50; text-decoration: none;">contact support</a>.</p>
-                        <p>&copy; <?php echo date('Y'); ?> Law Firm. All Rights Reserved.</p>
+                        <p>For any queries, please <a href="mailto:<?php echo esc_attr($website_email); ?>" style="color: #2c3e50; text-decoration: none;">contact support</a>.</p>
+                        <p>&copy; <a href="<?php echo esc_url($website_url); ?>"><?php echo date('Y'); ?> <?php echo esc_html($website_title); ?></a>. All Rights Reserved.</p>
                     </div>
+
                 </div>
             </td>
         </tr>
