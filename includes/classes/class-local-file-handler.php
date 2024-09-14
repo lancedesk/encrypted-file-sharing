@@ -48,7 +48,7 @@ class EFS_Local_File_Handler
         }
 
         /* Calculate the expiration date */
-        $expiration_date = $this->calculate_expiration_date();
+        $expiration_date = $this->efs_calculate_expiration_date();
 
         /* Log file path */
         $log_file = WP_CONTENT_DIR . '/efs_upload_log.txt';
@@ -142,13 +142,13 @@ class EFS_Local_File_Handler
                     $data_encryption_key = openssl_random_pseudo_bytes(32);
 
                     /* Encrypt the file using the EFS_Encryption class */
-                    $encrypted_file = $efs_file_encryption->encrypt_file($target_file, $data_encryption_key);
+                    $encrypted_file = $efs_file_encryption->efs_encrypt_file($target_file, $data_encryption_key);
                 
                     if ($encrypted_file)
                     {
                 
                         /* Store the file's metadata with the target file path */
-                        $file_metadata = $this->save_file_metadata($post_id, $creation_result['file_id']);
+                        $file_metadata = $this->efs_save_file_metadata($post_id, $creation_result['file_id']);
                 
                         /* Log the file metadata result */
                         if ($file_metadata['success'])
@@ -270,8 +270,9 @@ class EFS_Local_File_Handler
             $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'No data found for the specified post ID: ' . $post_id);
         }
 
-        $selected_users = $efs_user_selection->get_recipients_from_db($post_id)['results'];
-        $response = $efs_user_selection->get_recipients_from_db($post_id)['query'];
+        $result = $efs_user_selection->efs_get_recipients_from_db($post_id);
+        $selected_users = $result['results'];
+        $response = $result['query'];
 
         if (empty($selected_users))
         {
@@ -293,7 +294,7 @@ class EFS_Local_File_Handler
         if (!empty($selected_users) && is_array($selected_users))
         {
             /* Save the encryption key securely for all selected users in the database */
-            $efs_file_encryption->save_encrypted_key($upload_data['post_id'], $selected_users, $upload_data['file_id'], $upload_data['data_encryption_key'], $upload_data['expiration_date']);
+            $efs_file_encryption->efs_save_encrypted_key($upload_data['post_id'], $selected_users, $upload_data['file_id'], $upload_data['data_encryption_key'], $upload_data['expiration_date']);
             $efs_init->log_message(WP_CONTENT_DIR . '/efs_upload_log.txt', 'Encryption key saved for users: ' . implode(',', $selected_users));
         }
         else
@@ -423,7 +424,7 @@ class EFS_Local_File_Handler
      * @param int $file_id The ID of the file in the `efs_files` table.
     */
 
-    private function save_file_metadata($post_id, $file_id)
+    private function efs_save_file_metadata($post_id, $file_id)
     {
         global $wpdb;
         
@@ -479,7 +480,7 @@ class EFS_Local_File_Handler
      * @return string Expiration date in 'Y-m-d H:i:s' format.
     */
 
-    private function calculate_expiration_date()
+    private function efs_calculate_expiration_date()
     {
         /* Check if the admin has enabled expiry */
         $enable_expiry = get_option('efs_enable_expiry', 0); /* Default to 0 (disabled) if not set */
