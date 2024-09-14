@@ -2,9 +2,11 @@
 
 class EFS_Encryption
 {
+    private $logger;
+
     public function __construct()
     {
-        /* TODO: Implement encryption */
+        $this->logger = new EFS_Init();
     }
 
     /**
@@ -23,11 +25,11 @@ class EFS_Encryption
         $table_name = $wpdb->prefix . 'efs_encryption_keys';
 
         /* Log received parameters */
-        $this->log_message("Selected users: " . implode(', ', $selected_users));
-        $this->log_message("Post ID: $post_id");
-        $this->log_message("File ID: $file_id");
-        $this->log_message("Data Encryption Key received: $data_encryption_key");
-        $this->log_message("Expiration date: $expiration_date");
+        $this->logger->log_encryption_message("Selected users: " . implode(', ', $selected_users));
+        $this->logger->log_encryption_message("Post ID: $post_id");
+        $this->logger->log_encryption_message("File ID: $file_id");
+        $this->logger->log_encryption_message("Data Encryption Key received: $data_encryption_key");
+        $this->logger->log_encryption_message("Expiration date: $expiration_date");
 
         /* Loop through the selected users and insert encryption key for each */
         foreach ($selected_users as $user_id)
@@ -41,7 +43,7 @@ class EFS_Encryption
             if ($encrypted_kek === false)
             {
                 /* Log encryption failure */
-                $this->log_message("Error: Encryption of KEK failed for user ID: $user_id.");
+                $this->logger->log_encryption_message("Error: Encryption of KEK failed for user ID: $user_id.");
                 continue;
             }
 
@@ -54,7 +56,7 @@ class EFS_Encryption
             if ($encrypted_dek === false)
             {
                 /* Log encryption failure */
-                $this->log_message("Error: Encryption of DEK failed for user ID: $user_id.");
+                $this->logger->log_encryption_message("Error: Encryption of DEK failed for user ID: $user_id.");
                 continue;
             }
 
@@ -85,11 +87,11 @@ class EFS_Encryption
             if ($result === false)
             {
                 /* Log insertion failure */
-                $this->log_message("Error: Failed to insert data into database for user ID: $user_id.");
+                $this->logger->log_encryption_message("Error: Failed to insert data into database for user ID: $user_id.");
                 return false;  /* Return false immediately if database insertion fails */
             } else {
                 /* Log successful insertion */
-                $this->log_message("Successfully saved encrypted keys for user ID: $user_id.");
+                $this->logger->log_encryption_message("Successfully saved encrypted keys for user ID: $user_id.");
             }
         }
 
@@ -134,7 +136,7 @@ class EFS_Encryption
         if (!$file_id)
         {
             /* No file found with the specified name */
-            $this->log_message("No file found with file name $file_name.");
+            $this->logger->log_encryption_message("No file found with file name $file_name.");
             return false;
         }
 
@@ -155,7 +157,7 @@ class EFS_Encryption
         if (!$result)
         {
             /* No key found for the specified user and file */
-            $this->log_message("No key found for user ID $user_id and file name $file_name of id $file_id.");
+            $this->logger->log_encryption_message("No key found for user ID $user_id and file name $file_name of id $file_id.");
             return false;
         }
 
@@ -168,7 +170,7 @@ class EFS_Encryption
 
         if ($user_kek === false)
         {
-            $this->log_message("Failed to decrypt KEK for user ID $user_id and file name $file_name.");
+            $this->logger->log_encryption_message("Failed to decrypt KEK for user ID $user_id and file name $file_name.");
             return false;
         }
 
@@ -180,7 +182,7 @@ class EFS_Encryption
         
         /* Log IV and key lengths for debugging */
         if ($decrypted_dek === false) {
-            $this->log_message("Failed to decrypt DEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
+            $this->logger->log_encryption_message("Failed to decrypt DEK for user ID $user_id and file name $file_name. OpenSSL error: " . openssl_error_string());
             return false;
         }
 
@@ -310,7 +312,7 @@ class EFS_Encryption
 
         if ($encrypted_data === false) 
         {
-            $this->log_message("Error: Unable to read encrypted file.");
+            $this->logger->log_encryption_message("Error: Unable to read encrypted file.");
             return false;
         }
 
@@ -323,7 +325,7 @@ class EFS_Encryption
 
         if ($decrypted_data === false)
         {
-            $this->log_message("Error: Decryption failed.");
+            $this->logger->log_encryption_message("Error: Decryption failed.");
             return false;
         }
 
