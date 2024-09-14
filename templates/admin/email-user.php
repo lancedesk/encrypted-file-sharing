@@ -32,7 +32,8 @@
                     <div style="padding: 30px; color: #333333;">
                         <p>Hello <?php echo esc_html($user_display_name); ?>,</p>
                         <p>A new file titled <strong><?php echo esc_html($file_name); ?></strong> was uploaded for you on <strong><?php echo esc_html($upload_time); ?></strong>.</p>
-                        <p>Please <a href="<?php echo esc_url($download_link); ?>" style="background-color: #2980b9; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px;">log in to download your file</a>.</p>
+                        <p>You can login to our website and download the file using the link below:</p>
+                        <p><a href="<?php echo esc_url($download_link); ?>" style="background-color: #2980b9; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px;">Download File</a>.</p>
                     </div>
 
                     <!-- Footer -->
