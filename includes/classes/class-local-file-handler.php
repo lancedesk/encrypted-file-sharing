@@ -110,7 +110,7 @@ class EFS_Local_File_Handler
                 /* Optionally delete the original file after saving metadata */       
                 if ($delete_after_encryption)
                 {
-                    $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
+                    $efs_file_handler->efs_delete_local_file(wp_get_attachment_url($file_id));
                 }
                 
                 /* Send encrypted file URL as JSON response */
@@ -176,7 +176,7 @@ class EFS_Local_File_Handler
                             
                                 if ($delete_after_encryption)
                                 {
-                                    $efs_file_handler->delete_local_file(wp_get_attachment_url($file_id));
+                                    $efs_file_handler->efs_delete_local_file(wp_get_attachment_url($file_id));
                                 }
                                 
                                 /* Send encrypted file URL as JSON response */
