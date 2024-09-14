@@ -76,21 +76,19 @@ class EFS_Notification_Handler
                 {
                     $user_email = $user_info->user_email;
 
-                    /* Email subject and message */
-                    $subject = "New File Available for Download: " . $file_name;
-                    $message = "
-                    <h1>File Upload Notification</h1>
-                    <p>Hello " . esc_html($user_info->display_name) . ",</p>
-                    <p>A new file titled <strong>" . esc_html($file_name) . "</strong> was uploaded for you on <strong>" . esc_html($upload_time) . "</strong>.</p>
-                    <p>Please <a href='" . esc_url($download_link) . "'>log in</a> to download your file.</p>
-                    ";
+                    /* Load the email template */
+                    ob_start();
+                    $template_path = $this->efs_get_template('email-user.php');
+                    $user_display_name = $user_info->display_name;
+                    include($template_path);
+                    $message = ob_get_clean();
 
                     /* Send the email to the user */
                     $mail_status = wp_mail($user_email, $subject, $message, $headers);
 
                     /* Log debug info */
                     $this->logger->log_debug_info(
-                    "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
+                        "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
                     );
                 }
             }
