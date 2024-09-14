@@ -14,17 +14,17 @@ class EFS_Admin_Columns
         $this->file_display = new EFS_File_Display();
 
         /* Hook to add custom columns */
-        add_filter('manage_efs_file_posts_columns', array($this, 'add_custom_columns'));
+        add_filter('manage_efs_file_posts_columns', array($this, 'efs_add_custom_columns'));
 
         /* Hook to populate custom columns */
-        add_action('manage_efs_file_posts_custom_column', array($this, 'populate_custom_columns'), 10, 2);
+        add_action('manage_efs_file_posts_custom_column', array($this, 'efs_populate_custom_columns'), 10, 2);
     }
 
     /**
      * Add custom columns to the list table.
     */
 
-    public function add_custom_columns($columns)
+    public function efs_add_custom_columns($columns)
     {
         $columns['file_size'] = __('File Size', 'encrypted-file-sharing');
         $columns['recipient'] = __('Recipient', 'encrypted-file-sharing');
@@ -40,31 +40,32 @@ class EFS_Admin_Columns
      * Populate custom columns with data.
     */
 
-    public function populate_custom_columns($column, $post_id)
+    public function efs_populate_custom_columns($column, $post_id)
     {
-        switch ($column) {
+        switch ($column)
+        {
             case 'recipient':
-                echo wp_kses_post($this->get_recipients($post_id));
+                echo wp_kses_post($this->efs_get_recipients($post_id));
                 break;
 
             case 'downloaded':
-                echo esc_html($this->get_download_status($post_id));
+                echo esc_html($this->efs_get_download_status($post_id));
                 break;
 
             case 'download_date':
-                echo esc_html($this->get_formatted_date($post_id, '_efs_download_date'));
+                echo esc_html($this->efs_get_formatted_date($post_id, '_efs_download_date'));
                 break;
 
             case 'file_size':
-                echo esc_html($this->get_file_size($post_id));
+                echo esc_html($this->efs_get_file_size($post_id));
                 break;
 
             case 'expiry_date':
-                echo esc_html($this->get_expiration_date_display($post_id));
+                echo esc_html($this->efs_get_expiration_date_display($post_id));
                 break;
 
             case 'status':
-                echo esc_html($this->get_file_status($post_id));
+                echo esc_html($this->efs_get_file_status($post_id));
                 break;
         }
     }
@@ -76,7 +77,7 @@ class EFS_Admin_Columns
      * @return string HTML string of recipients.
     */
 
-    private function get_recipients($post_id)
+    private function efs_get_recipients($post_id)
     {
         global $wpdb;
 
@@ -97,11 +98,12 @@ class EFS_Admin_Columns
             
             /* Return the links as a comma-separated string */
             return implode(', ', $user_links);
-        } else {
+        }
+        else
+        {
             return esc_html__('None', 'encrypted-file-sharing');
         }
     }
-
 
     /**
      * Get the download status for a post.
@@ -110,7 +112,7 @@ class EFS_Admin_Columns
      * @return string Download status.
     */
 
-    private function get_download_status($post_id)
+    private function efs_get_download_status($post_id)
     {
         $status = get_post_meta($post_id, '_efs_download_status', true);
         return $status ? esc_html__('Downloaded', 'encrypted-file-sharing') : esc_html__('Pending', 'encrypted-file-sharing');
@@ -124,7 +126,7 @@ class EFS_Admin_Columns
      * @return string Formatted date or a message if not set.
     */
 
-    private function get_formatted_date($post_id, $meta_key)
+    private function efs_get_formatted_date($post_id, $meta_key)
     {
         $date = get_post_meta($post_id, $meta_key, true);
         return $date ? esc_html(gmdate('Y/m/d \a\t g:i a', strtotime($date))) : esc_html__('N/A', 'encrypted-file-sharing');
@@ -137,10 +139,11 @@ class EFS_Admin_Columns
      * @return string File size or a message if not available.
     */
 
-    private function get_file_size($post_id)
+    private function efs_get_file_size($post_id)
     {
         $file_url = get_post_meta($post_id, '_efs_file_url', true);
-        if ($file_url) {
+        if ($file_url)
+        {
             $upload_dir = wp_upload_dir();
             $relative_path = str_replace($upload_dir['baseurl'], '', $file_url);
             $file_path = $upload_dir['basedir'] . $relative_path;
@@ -152,16 +155,18 @@ class EFS_Admin_Columns
             if ($is_secure) 
             {
             /* Handle secure file path */
-                $file_size = file_exists($relative_path) ? $this->file_display->format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
+                $file_size = file_exists($relative_path) ? $this->file_display->efs_format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
             } 
             else
             {
                 /* Handle WordPress uploads file path */
-                $file_size = file_exists($file_path) ? $this->file_display->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
+                $file_size = file_exists($file_path) ? $this->file_display->efs_format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
             }
             
             return esc_html($file_size);
-        } else {
+        }
+        else
+        {
             return esc_html__('No file available', 'encrypted-file-sharing');
         }
     }
@@ -173,15 +178,18 @@ class EFS_Admin_Columns
      * @return string Formatted expiration date or a message if not set.
     */
 
-    public function get_expiration_date_display($post_id)
+    public function efs_get_expiration_date_display($post_id)
     {
         $file_url = get_post_meta($post_id, '_efs_file_url', true);
-        $file_name = $this->extract_file_name($file_url);
-        $expiry_date = $this->get_expiration_date($post_id);
+        $file_name = $this->efs_extract_file_name($file_url);
+        $expiry_date = $this->efs_get_expiration_date($post_id);
 
-        if ($expiry_date) {
+        if ($expiry_date)
+        {
             return esc_html(gmdate('Y/m/d \a\t g:i a', strtotime($expiry_date)));
-        } else {
+        }
+        else
+        {
             return esc_html__('No expiry set', 'encrypted-file-sharing');
         }
     }
@@ -193,11 +201,11 @@ class EFS_Admin_Columns
      * @return string Status message.
     */
 
-    private function get_file_status($post_id)
+    private function efs_get_file_status($post_id)
     {
         $file_url = get_post_meta($post_id, '_efs_file_url', true);
-        $file_name = $this->extract_file_name($file_url);
-        $expiry_date = $this->get_expiration_date($post_id);
+        $file_name = $this->efs_extract_file_name($file_url);
+        $expiry_date = $this->efs_get_expiration_date($post_id);
 
         if ($expiry_date)
         {
@@ -217,7 +225,7 @@ class EFS_Admin_Columns
      * @return string The extracted file name.
     */
 
-    public function extract_file_name($file_url)
+    public function efs_extract_file_name($file_url)
     {
         $file_path = wp_parse_url($file_url, PHP_URL_PATH);
         $file_name = basename($file_path);
@@ -231,7 +239,7 @@ class EFS_Admin_Columns
      * @return string Formatted expiration date or a message if not set.
     */
 
-    public function get_expiration_date($post_id)
+    public function efs_get_expiration_date($post_id)
     {
         global $wpdb;
         
