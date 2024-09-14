@@ -125,6 +125,7 @@ class EFS_Notification_Handler
         $download_time = current_time('mysql');
         $website_title = get_bloginfo('name');
         $website_url = get_bloginfo('url');
+        $file_logs_link = home_url("/wp-admin/edit.php?post_type=efs_file");
         /* Email subject and message */
         $subject = "File Downloaded: " . $file_name;
         
