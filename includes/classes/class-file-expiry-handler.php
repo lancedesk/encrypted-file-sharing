@@ -12,23 +12,23 @@ class EFS_File_Expiry_Handler
     public function __construct()
     {
         /* Schedule cron event on init. */
-        add_action('init', [$this, 'schedule_file_expiry_cron']);
+        add_action('init', [$this, 'efs_schedule_file_expiry_cron']);
 
         /* Hook into the cron event to check for expired files. */
-        add_action('efs_check_file_expiry_event', [$this, 'check_file_expiry']);
+        add_action('efs_check_file_expiry_event', [$this, 'efs_check_file_expiry']);
 
         /* Unschedule the event when the plugin is deactivated. */
-        register_deactivation_hook(__FILE__, [$this, 'unschedule_file_expiry_cron']);
+        register_deactivation_hook(__FILE__, [$this, 'efs_unschedule_file_expiry_cron']);
 
         /* Hook into save_post to save expiry information */
-        add_action('save_post', [$this, 'save_file_expiry']);
+        add_action('save_post', [$this, 'efs_save_file_expiry']);
     }
 
     /**
      * Schedule cron event if not already scheduled.
     */
 
-    public function schedule_file_expiry_cron()
+    public function efs_schedule_file_expiry_cron()
     {
         if (!wp_next_scheduled('efs_check_file_expiry_event')) 
         {
@@ -40,7 +40,7 @@ class EFS_File_Expiry_Handler
      * Unschedule the cron event when the plugin is deactivated.
     */
 
-    public function unschedule_file_expiry_cron()
+    public function efs_unschedule_file_expiry_cron()
     {
         $timestamp = wp_next_scheduled('efs_check_file_expiry_event');
         if ($timestamp) 
@@ -53,7 +53,7 @@ class EFS_File_Expiry_Handler
      * Function to check for expired files and handle them.
     */
 
-    public function check_file_expiry()
+    public function efs_check_file_expiry()
     {
         global $efs_file_handler;
 
@@ -82,7 +82,7 @@ class EFS_File_Expiry_Handler
                 if ($storage_option === 'local') 
                 {
                     $file_url = get_post_meta($post_id, '_efs_file_url', true);
-                    $efs_file_handler->delete_local_file($file_url);
+                    $efs_file_handler->efs_delete_local_file($file_url);
                 }
 
                 /* Change post status to 'expired' */
@@ -94,7 +94,7 @@ class EFS_File_Expiry_Handler
         }
     }
 
-    public function save_file_expiry($post_id)
+    public function efs_save_file_expiry($post_id)
     {
         /* Check if this is an auto-save routine. */
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
