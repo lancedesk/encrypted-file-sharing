@@ -5,7 +5,7 @@ class EFS_Admin_Settings_Page
     public function __construct()
     {
         /* Hook for adding admin menus */
-        add_action('admin_menu', [$this, 'add_settings_menu']);
+        add_action('admin_menu', [$this, 'efs_add_settings_menu']);
         /* add_action('admin_init', [$this, 'handle_form_submission']); */
     }
 
@@ -13,7 +13,7 @@ class EFS_Admin_Settings_Page
      * Add settings submenu under CPT menu.
     */
 
-    public function add_settings_menu()
+    public function efs_add_settings_menu()
     {
         add_submenu_page(
             'edit.php?post_type=efs_file', /* Parent slug (the slug of the CPT menu) */
@@ -21,7 +21,7 @@ class EFS_Admin_Settings_Page
             __('Settings', 'encrypted-file-sharing'), /* Menu title */
             'manage_options', /* Capability */
             'efs-settings', /* Menu slug */
-            [$this, 'settings_page_content'] /* Callback function */
+            [$this, 'efs_settings_page_content'] /* Callback function */
         );
     }
 
@@ -29,12 +29,12 @@ class EFS_Admin_Settings_Page
      * Display content of the settings page.
     */
 
-    public function settings_page_content()
+    public function efs_settings_page_content()
     {
         global $efs_file_handler; /* Use the global file handler instance */
 
         /* Fetch the list of S3 buckets */
-        $buckets = $efs_file_handler->get_stored_s3_buckets(); /* Use file_handler instance */
+        $buckets = $efs_file_handler->efs_get_stored_s3_buckets(); /* Use file_handler instance */
 
         /* Check if the private folder exists */
         $private_dir = realpath(ABSPATH . '../private_uploads/');
@@ -279,7 +279,7 @@ class EFS_Admin_Settings_Page
         if ($selected_storage === 'amazon') 
         {
             global $efs_s3_file_handler;
-            $result = $efs_s3_file_handler->initialize_s3_client();
+            $result = $efs_s3_file_handler->efs_initialize_s3_client();
 
             /* Check if S3 client initialization was successful */
             if (!$result) 
