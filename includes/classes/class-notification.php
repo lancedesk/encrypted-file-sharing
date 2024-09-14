@@ -47,7 +47,7 @@ class EFS_Notification_Handler
      *                              Each user ID should be an integer.
     */
 
-    public function send_upload_notifications($post_id, $selected_users)
+    public function efs_send_upload_notifications($post_id, $selected_users)
     {
         /* Capture the output of var_dump as a string */
         ob_start();
@@ -111,7 +111,7 @@ class EFS_Notification_Handler
      * @param WP_User $user The user who downloaded the file.
     */
 
-    public function send_download_notification_to_admin($file_id, $user)
+    public function efs_send_download_notification_to_admin($file_id, $user)
     {
         /* Get admin email from EFS settings page */
         $admin_email = get_option('efs_admin_email', get_option('admin_email'));
@@ -133,14 +133,13 @@ class EFS_Notification_Handler
 
         $headers = ['Content-Type: text/html; charset=UTF-8'];
 
-        /* Email subject and message */
-        $subject = "File Downloaded: " . $file_name;
-        $message = "
-            <h1>File Download Notification</h1>
-            <p>The file <strong>" . esc_html($file_name) . "</strong> was downloaded on <strong>" . esc_html($download_time) . "</strong>.</p>
-            <p>Downloaded by: " . esc_html($user->display_name) . " (" . esc_html($user->user_email) . ")</p>
-            <p>IP Address: " . esc_html($user_ip) . "</p>
-        ";
+        /* Load the admin notification template */
+        ob_start();
+        $template_path = $this->efs_get_template('email-admin.php');
+        $user_display_name = $user->display_name;
+        $user_email = $user->user_email;
+        include($template_path);
+        $message = ob_get_clean();
 
         /* Send the email to the admin */
         wp_mail($admin_email, $subject, $message, $headers);
