@@ -10,14 +10,14 @@ class EFS_File_Display
 	public function __construct()
     {
 		/* Register shortcode */
-		add_shortcode('efs_user_files', [$this, 'render_user_files_shortcode']);
+		add_shortcode('efs_user_files', [$this, 'efs_render_user_files_shortcode']);
 	}
 
 	/**
 	 * Render the user files shortcode.
 	*/
 
-	public function render_user_files_shortcode($atts)
+	public function efs_render_user_files_shortcode($atts)
     {
 		/* Start output buffering */
 		ob_start();
@@ -82,7 +82,7 @@ class EFS_File_Display
 								/* Retrieve file extension separately if needed */
 								$file_type = pathinfo($file_name, PATHINFO_EXTENSION);
 
-								$icon = $this->get_file_type_icon($file_type);
+								$icon = $this->efs_get_file_type_icon($file_type);
 
 								/* Convert file URL to file path */
 								$upload_dir = wp_upload_dir();
@@ -96,12 +96,12 @@ class EFS_File_Display
 								if ($is_secure)
                                 {
 									/* Handle secure file path */
-									$file_size = file_exists($relative_path) ? $this->format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
+									$file_size = file_exists($relative_path) ? $this->efs_format_file_size(filesize($relative_path)) : __('Unknown size', 'encrypted-file-sharing');
 								}
                                 else
                                 {
 									/* Handle WordPress uploads file path */
-									$file_size = file_exists($file_path) ? $this->format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
+									$file_size = file_exists($file_path) ? $this->efs_format_file_size(filesize($file_path)) : __('Unknown size', 'encrypted-file-sharing');
 								}
 
 								/* Get upload date and format it to show time */
@@ -129,7 +129,7 @@ class EFS_File_Display
                                     echo '</div>'; /* Close file-details div */
 
                                     /* Modal content */
-                                    $modal_content = $this->get_modal_content(get_the_ID(), $file_size);
+                                    $modal_content = $this->efs_get_modal_content(get_the_ID(), $file_size);
                                     /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $modal_content content are safely escaped */
                                     echo $modal_content;
                                     
@@ -170,14 +170,14 @@ class EFS_File_Display
      * @return string Modal content HTML.
     */
 
-    public function get_modal_content($file_id, $file_size)
+    public function efs_get_modal_content($file_id, $file_size)
     {
         global $efs_admin_columns;
 
         /* Get the file details */
         $excerpt = get_the_excerpt($file_id);
         $description = esc_html(get_post_field('post_content', $file_id));
-        $expiration = $efs_admin_columns->get_expiration_date_display($file_id);
+        $expiration = $efs_admin_columns->efs_get_expiration_date_display($file_id);
         $upload_date = get_the_date('F j, Y \a\t g:i A', $file_id);
         
         /* Build the modal content with a unique ID */
@@ -197,15 +197,22 @@ class EFS_File_Display
 	 * Format file size to a human-readable format.
 	*/
 
-	public function format_file_size($size)
+	public function efs_format_file_size($size)
 	{
-		if ($size >= 1073741824) {
+		if ($size >= 1073741824)
+        {
 			$size = number_format($size / 1073741824, 2) . ' GB';
-		} elseif ($size >= 1048576) {
+		}
+        elseif ($size >= 1048576)
+        {
 			$size = number_format($size / 1048576, 2) . ' MB';
-		} elseif ($size >= 1024) {
+		}
+        elseif ($size >= 1024)
+        {
 			$size = number_format($size / 1024, 2) . ' KB';
-		} else {
+		}
+        else
+        {
 			$size = $size . ' bytes';
 		}
 
@@ -219,7 +226,7 @@ class EFS_File_Display
      * @return string Icon HTML
     */
 
-    private function get_file_type_icon($file_type) 
+    private function efs_get_file_type_icon($file_type) 
     {
         /* Use dynamic base path to the icons folder */
         $base_path = plugin_dir_url(__FILE__) . '../../assets/images/';
