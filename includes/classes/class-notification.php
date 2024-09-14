@@ -2,6 +2,12 @@
 
 class EFS_Notification_Handler
 {
+    private $logger;
+
+    public function __construct()
+    {
+        $this->logger = new EFS_Init();
+    }
 
     /**
      * Send notifications based on file upload.
@@ -19,7 +25,7 @@ class EFS_Notification_Handler
         $selected_users_dump = ob_get_clean();
 
         /* Log the dump of selected users */
-        $this->log_debug_info("Selected users dump: " . $selected_users_dump);
+        $this->logger->log_debug_info("Selected users dump: " . $selected_users_dump);
 
         if (!empty($selected_users) && is_array($selected_users['results']))
         {
@@ -28,7 +34,7 @@ class EFS_Notification_Handler
             $download_link = wp_login_url() . '?redirect_to=' . urlencode(get_permalink($post_id));
             $headers = ['Content-Type: text/html; charset=UTF-8'];
 
-            $this->log_debug_info("Starting notification process for post ID: {$post_id}");
+            $this->logger->log_debug_info("Starting notification process for post ID: {$post_id}");
 
             foreach ($selected_users['results'] as $user_id_string)
             {
@@ -53,7 +59,7 @@ class EFS_Notification_Handler
                     $mail_status = wp_mail($user_email, $subject, $message, $headers);
 
                     /* Log debug info */
-                    $this->log_debug_info(
+                    $this->logger->log_debug_info(
                     "User notification sent: User email: {$user_email}, File: {$file_name}, Time: {$upload_time}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
                     );
                 }
@@ -61,12 +67,12 @@ class EFS_Notification_Handler
 
             if (empty($selected_users))
             {
-                $this->log_debug_info("No valid users found for notifications.");
+                $this->logger->log_debug_info("No valid users found for notifications.");
             }
         }
         else
         {
-            $this->log_debug_info("No users selected for notifications.");
+            $this->logger->log_debug_info("No users selected for notifications.");
         }
     }
 
@@ -112,10 +118,8 @@ class EFS_Notification_Handler
         wp_mail($admin_email, $subject, $message, $headers);
 
         /* Log debug info */
-        /*
-        $this->log_debug_info(
+        $this->logger->log_debug_info(
             "Admin notification sent: Admin email: {$admin_email}, File: {$file_name}, Time: {$download_time}, Downloaded by: {$user->user_email}, IP: {$user_ip}, Mail status: " . ($mail_status ? 'Success' : 'Failure')
         );
-        */
     }
 }
