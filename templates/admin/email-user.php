@@ -9,7 +9,40 @@
 */
 ?>
 
-<h1>File Upload Notification</h1>
-<p>Hello <?php echo esc_html($user_display_name); ?>,</p>
-<p>A new file titled <strong><?php echo esc_html($file_name); ?></strong> was uploaded for you on <strong><?php echo esc_html($upload_time); ?></strong>.</p>
-<p>Please <a href="<?php echo esc_url($download_link); ?>">log in</a> to download your file.</p>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Notification</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; line-height: 1.6;">
+    <table role="presentation" style="border-spacing: 0; width: 100%; margin: 0 auto;">
+        <tr>
+            <td>
+                <div style="background-color: #ffffff; max-width: 600px; margin: 20px auto; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                    <!-- Header -->
+                    <div style="background-color: #2c3e50; padding: 20px; color: #ffffff; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                        <h1 style="margin: 0;">File Upload Notification</h1>
+                    </div>
+                    
+                    <!-- Body -->
+                    <div style="padding: 30px; color: #333333;">
+                        <p>Hello <?php echo esc_html($user_display_name); ?>,</p>
+                        <p>A new file titled <strong><?php echo esc_html($file_name); ?></strong> was uploaded for you on <strong><?php echo esc_html($upload_time); ?></strong>.</p>
+                        <p>Please <a href="<?php echo esc_url($download_link); ?>" style="background-color: #2980b9; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px;">log in to download your file</a>.</p>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="background-color: #ecf0f1; padding: 20px; text-align: center; font-size: 14px; color: #7f8c8d; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                        <p>For any queries, please <a href="mailto:support@example.com" style="color: #2c3e50; text-decoration: none;">contact support</a>.</p>
+                        <p>&copy; <?php echo date('Y'); ?> Law Firm. All Rights Reserved.</p>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
