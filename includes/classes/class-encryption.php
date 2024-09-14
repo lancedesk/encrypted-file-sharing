@@ -17,7 +17,7 @@ class EFS_Encryption
      * @param string $expiration_date The expiration date of the encryption key.
     */
 
-    public function save_encrypted_key($post_id, $selected_users, $file_id, $data_encryption_key, $expiration_date)
+    public function efs_save_encrypted_key($post_id, $selected_users, $file_id, $data_encryption_key, $expiration_date)
     {
         global $wpdb;
         $table_name = $wpdb->prefix . 'efs_encryption_keys';
@@ -36,7 +36,7 @@ class EFS_Encryption
             $user_kek = openssl_random_pseudo_bytes(32); /* 256-bit key */
 
             /* Encrypt the KEK with the master key */
-            $encrypted_kek = $this->encrypt_with_master_key($user_kek);
+            $encrypted_kek = $this->efs_encrypt_with_master_key($user_kek);
 
             if ($encrypted_kek === false)
             {
@@ -105,7 +105,7 @@ class EFS_Encryption
      * @return string|false Returns the decrypted DEK if successful, false on failure.
     */
 
-    public function get_encryption_key($user_id, $file_name)
+    public function efs_get_encryption_key($user_id, $file_name)
     {
         global $wpdb;
 
@@ -164,7 +164,7 @@ class EFS_Encryption
         $encrypted_dek = $result->encryption_key;
 
         /* Decrypt the KEK with the master key */
-        $user_kek = $this->decrypt_with_master_key($encrypted_kek);
+        $user_kek = $this->efs_decrypt_with_master_key($encrypted_kek);
 
         if ($user_kek === false)
         {
@@ -198,7 +198,7 @@ class EFS_Encryption
      * @return string|false The path to the encrypted file on success, false on failure.
     */
 
-    public function encrypt_file($file_path, $data_encryption_key)
+    public function efs_encrypt_file($file_path, $data_encryption_key)
     {
         global $wp_filesystem;
     
@@ -248,7 +248,7 @@ class EFS_Encryption
      * @return string|false The master key as raw bytes, or false if retrieval fails.
     */
 
-    private function get_master_key()
+    private function efs_get_master_key()
     {
         global $wpdb;
 
@@ -293,7 +293,7 @@ class EFS_Encryption
      * @return string|false Returns the decrypted file content if successful, false on failure.
     */
 
-    public function decrypt_file($encrypted_file_path, $decrypted_dek)
+    public function efs_decrypt_file($encrypted_file_path, $decrypted_dek)
     {
         global $wp_filesystem;
 
@@ -336,9 +336,9 @@ class EFS_Encryption
      * @return string|false The encrypted KEK if successful, false on failure.
     */
 
-    private function encrypt_with_master_key($user_kek)
+    private function efs_encrypt_with_master_key($user_kek)
     {
-        $master_key = $this->get_master_key();
+        $master_key = $this->efs_get_master_key();
 
         if ($master_key === false)
         {
@@ -371,9 +371,9 @@ class EFS_Encryption
      * @return string|false The decrypted KEK if successful, false on failure.
     */
 
-    private function decrypt_with_master_key($encrypted_kek_with_iv)
+    private function efs_decrypt_with_master_key($encrypted_kek_with_iv)
     {
-        $master_key = $this->get_master_key();
+        $master_key = $this->efs_get_master_key();
 
         if ($master_key === false)
         {
