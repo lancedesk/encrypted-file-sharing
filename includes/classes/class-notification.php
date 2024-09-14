@@ -2,49 +2,6 @@
 
 class EFS_Notification_Handler
 {
-    /**
-     * Log debug info to a file in the wp-content folder.
-     *
-     * @param string $message The message to log.
-    */
-
-    private function log_debug_info($message)
-    {
-        /* Ensure WP_Filesystem is available */
-        if ( ! function_exists('get_filesystem_method') )
-        {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
-        }
-
-        global $wp_filesystem;
-
-        /* Initialize WP_Filesystem */
-        if ( empty( $wp_filesystem ) )
-        {
-            WP_Filesystem();
-        }
-
-        /* Define the log file path */
-        $log_file = WP_CONTENT_DIR . '/efs_notification_log.txt';
-
-        /* Get current time and prepare log message */
-        $current_time = current_time('mysql');
-        $log_message = '[' . $current_time . '] ' . $message . PHP_EOL;
-
-        /* Check if file exists */
-        if ( $wp_filesystem->exists( $log_file ) )
-        {
-            /* Append message if file exists */
-            $current_contents = $wp_filesystem->get_contents( $log_file );
-            $new_contents = $current_contents . $log_message;
-            $wp_filesystem->put_contents( $log_file, $new_contents, FS_CHMOD_FILE );
-        }
-        else
-        {
-            /* Create new file if it doesn't exist */
-            $wp_filesystem->put_contents( $log_file, $log_message, FS_CHMOD_FILE );
-        }
-    }
 
     /**
      * Send notifications based on file upload.
