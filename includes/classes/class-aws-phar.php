@@ -26,21 +26,21 @@ class EFS_Aws_Phar
         $log_file = WP_CONTENT_DIR . '/efs_phar_log.txt';
         $efs_init->log_message($log_file, 'Local Directory: ' . $this->local_directory);
 
-        /* Call the download_and_extract_phar method during construction */
+        /* Call the efs_download_and_extract_phar method during construction */
         try
         {
-            $this->download_and_extract_phar();
+            $this->efs_download_and_extract_phar();
         }
         catch (Exception $e)
         {
-            $this->handle_error('Failed to initialize EFS_Aws_Phar: ' . $e->getMessage());
+            $this->efs_handle_error('Failed to initialize EFS_Aws_Phar: ' . $e->getMessage());
         }
     }
 
     /**
      * Download and extract the PHAR file
      */
-    private function download_and_extract_phar()
+    private function efs_download_and_extract_phar()
     {
         global $wp_filesystem;
 
@@ -81,16 +81,16 @@ class EFS_Aws_Phar
             $wp_filesystem->delete($phar_file);
 
             /* Include the autoloader after extraction */
-            $this->include_autoloader();
+            $this->efs_include_autoloader();
         }
         catch (Exception $e)
         {
-            $this->handle_error('Error during PHAR file processing: ' . $e->getMessage());
+            $this->efs_handle_error('Error during PHAR file processing: ' . $e->getMessage());
         }
     }
 
     /* Include the autoloader */
-    private function include_autoloader()
+    private function efs_include_autoloader()
     {
         $autoloader = $this->local_directory . '/vendor/autoload.php';
 
@@ -105,7 +105,7 @@ class EFS_Aws_Phar
     }
 
     /* Handle errors */
-    private function handle_error($message)
+    private function efs_handle_error($message)
     {
         /* Log the error message */
         $efs_init = new EFS_Init();
