@@ -358,7 +358,7 @@ class EFS_Init
      * @param string $message The message to log.
     */
 
-    private function log_debug_info($message)
+    public function log_debug_info($message)
     {
         /* Ensure WP_Filesystem is available */
         if ( ! function_exists('get_filesystem_method') )
@@ -402,7 +402,7 @@ class EFS_Init
      * @param string $message The message to log.
     */
 
-    private function log_encryption_message($message)
+    public function log_encryption_message($message)
     {
         global $wp_filesystem;
 
