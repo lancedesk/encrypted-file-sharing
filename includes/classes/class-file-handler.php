@@ -101,7 +101,7 @@ class EFS_File_Handler
         $log_file = WP_CONTENT_DIR . '/efs_file_upload_notifications_log.txt';
 
         /* Get the selected users */
-        $selected_users = $efs_user_selection->get_recipients_from_db($post_id);
+        $selected_users = $efs_user_selection->efs_get_recipients_from_db($post_id);
 
         /* Ensure this only runs for the `efs_file` post type */
         if (get_post_type($post_id) === 'efs_file') 
@@ -297,7 +297,7 @@ class EFS_File_Handler
         if ($send_notifications)
         {
             $current_user = wp_get_current_user();
-            $this->efs_notification_handler->send_download_notification_to_admin($file_id, $current_user);
+            $this->efs_notification_handler->efs_send_download_notification_to_admin($file_id, $current_user);
             $this->efs_init->log_message($log_file, 'Admin notified of file download for file ID: ' . $file_id);
         }
 
