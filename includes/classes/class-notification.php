@@ -75,6 +75,8 @@ class EFS_Notification_Handler
                 if ($user_info)
                 {
                     $user_email = $user_info->user_email;
+                    /* Email subject and message */
+                    $subject = "New File Available for Download: " . $file_name;
 
                     /* Load the email template */
                     ob_start();
