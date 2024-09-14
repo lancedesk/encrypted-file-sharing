@@ -9,21 +9,21 @@ class EFS_User_Selection
     public function __construct()
     {
         /* Hook to add user selection meta box */
-        add_action('add_meta_boxes', [$this, 'add_user_selection_meta_box']);
+        add_action('add_meta_boxes', [$this, 'efs_add_user_selection_meta_box']);
         /* Hook to save user selection data */
-        add_action('save_post', [$this, 'save_user_selection_meta_box_data']);
+        add_action('save_post', [$this, 'efs_save_user_selection_meta_box_data']);
     }
 
     /**
      * Add meta box for user selection.
     */
 
-    public function add_user_selection_meta_box()
+    public function efs_add_user_selection_meta_box()
     {
         add_meta_box(
             'efs_user_selection',
             __('User Selection', 'encrypted-file-sharing'),
-            [$this, 'render_user_selection_meta_box'],
+            [$this, 'efs_render_user_selection_meta_box'],
             'efs_file',
             'side',
             'high'
@@ -34,13 +34,13 @@ class EFS_User_Selection
      * Render the user selection meta box.
     */
 
-    public function render_user_selection_meta_box($post)
+    public function efs_render_user_selection_meta_box($post)
     {
         /* Nonce field for verification */
         wp_nonce_field('efs_user_selection_meta_box', 'efs_user_selection_meta_box_nonce');
 
         /* Get recipients from the database */
-        $selected_users = $this->get_recipients_from_db($post->ID)['results'];
+        $selected_users = $this->efs_get_recipients_from_db($post->ID)['results'];
 
         /* Get all users for selection */
         $all_users = get_users(['fields' => ['ID', 'display_name', 'user_email']]);
@@ -48,9 +48,12 @@ class EFS_User_Selection
         echo '<p>';
         echo '<label for="efs_user_selection">' . esc_html__('Select Users:', 'encrypted-file-sharing') . '</label>';
         echo '<select id="efs_user_selection" name="efs_user_selection[]" multiple="multiple" style="width:100%;">';
-        foreach ($all_users as $user) {
+        
+        foreach ($all_users as $user)
+        {
             echo '<option value="' . esc_attr($user->ID) . '" ' . (in_array($user->ID, (array) $selected_users) ? 'selected="selected"' : '') . '>' . esc_html($user->display_name) . ' - ' . esc_html($user->user_email) . '</option>';
         }
+
         echo '</select>';
         echo '</p>';
     }
@@ -59,12 +62,12 @@ class EFS_User_Selection
      * Save the user selection meta box data.
     */
 
-    public function save_user_selection_meta_box_data($post_id)
+    public function efs_save_user_selection_meta_box_data($post_id)
     {
         $log_file = WP_CONTENT_DIR . '/efs_save_user_selection_log.txt';
 
         /* Log start of function execution */
-        $this->log_message($log_file, 'Started save_user_selection_meta_box_data for post ID: ' . $post_id);
+        $this->log_message($log_file, 'Started efs_save_user_selection_meta_box_data for post ID: ' . $post_id);
 
         /* Check if nonce is set */
         if (!isset($_POST['efs_user_selection_meta_box_nonce']))
@@ -107,7 +110,7 @@ class EFS_User_Selection
             $this->log_message($log_file, 'Selected users: ' . implode(', ', $selected_users));
 
             /* Save selected recipients to the database */
-            $result = $this->save_recipients_to_db($post_id, $selected_users);
+            $result = $this->efs_save_recipients_to_db($post_id, $selected_users);
 
             if ($result === false)
             {
@@ -137,7 +140,7 @@ class EFS_User_Selection
             $this->log_message($log_file, 'No users selected for post ID: ' . $post_id);
 
             /* If no users selected, delete from the database */
-            $this->save_recipients_to_db($post_id, []);
+            $this->efs_save_recipients_to_db($post_id, []);
 
             /* Remove the saved flag if no users are selected */
             delete_post_meta($post_id, '_efs_user_selection_saved');
@@ -145,7 +148,7 @@ class EFS_User_Selection
         }
 
         /* Log end of function execution */
-        $this->log_message($log_file, 'Finished save_user_selection_meta_box_data for post ID: ' . $post_id);
+        $this->log_message($log_file, 'Finished efs_save_user_selection_meta_box_data for post ID: ' . $post_id);
     }
 
     /**
@@ -157,7 +160,7 @@ class EFS_User_Selection
      * @return void
     */
 
-    public function save_recipients_to_db($post_id, $recipients)
+    public function efs_save_recipients_to_db($post_id, $recipients)
     {
         global $wpdb;
 
@@ -208,7 +211,7 @@ class EFS_User_Selection
      * @return array Array of recipient IDs.
     */
 
-    public function get_recipients_from_db($post_id)
+    public function efs_get_recipients_from_db($post_id)
     {
         global $wpdb;
 
