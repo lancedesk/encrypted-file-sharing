@@ -1,12 +1,12 @@
 <?php
 /**
-     * Template for the email notification after file upload.
-     * Variables passed from the notification class:
-     * - $file_name: The name of the uploaded file.
-     * - $upload_time: The time when the file was uploaded.
-     * - $user_display_name: The display name of the user being notified.
-     * - $download_link: Link to download the file.
-     */
+* Template for the email notification after file upload.
+* Variables passed from the notification class:
+* - $file_name: The name of the uploaded file.
+* - $upload_time: The time when the file was uploaded.
+* - $user_display_name: The display name of the user being notified.
+* - $download_link: Link to download the file.
+*/
 ?>
 
 <h1>File Upload Notification</h1>
