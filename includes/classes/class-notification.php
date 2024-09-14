@@ -23,7 +23,7 @@ class EFS_Notification_Handler
         /* Set the default plugin template path */
         if (empty($default_path)) 
         {
-            $default_path = plugin_dir_path(__FILE__) . 'templates/';
+            $default_path = plugin_dir_path(dirname(__FILE__, 2)) . 'templates/admin/';
         }
 
         /* Look for the template in the theme */
