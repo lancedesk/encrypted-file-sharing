@@ -395,4 +395,40 @@ class EFS_Init
             $wp_filesystem->put_contents( $log_file, $log_message, FS_CHMOD_FILE );
         }
     }
+
+    /**
+     * Logs messages to a file.
+     *
+     * @param string $message The message to log.
+    */
+
+    private function log_encryption_message($message)
+    {
+        global $wp_filesystem;
+
+        /* Initialize the WP_Filesystem */
+        if (!function_exists('WP_Filesystem')) 
+        {
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+        }
+
+        WP_Filesystem(); /* Set up the WP_Filesystem */
+
+        $log_file = WP_CONTENT_DIR . '/efs_encryption_log.txt';
+        $timestamp = gmdate('Y-m-d H:i:s'); /* Use gmdate() for timezone-independent time */
+        $log_entry = "[$timestamp] $message\n";
+
+        /* Check if file exists and read the existing content */
+        $existing_content = $wp_filesystem->get_contents($log_file);
+        if ($existing_content === false) 
+        {
+            $existing_content = '';
+        }
+
+        /* Append the new log entry */
+        $new_content = $existing_content . $log_entry;
+
+        /* Write the updated log content using WP_Filesystem */
+        $wp_filesystem->put_contents($log_file, $new_content, FS_CHMOD_FILE);
+    }
 }
