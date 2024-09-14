@@ -112,28 +112,6 @@ class EFS_Init
     }
 
     /**
-     * Create the custom table for storing the master key.
-    */
-
-    public function efs_create_master_key_table()
-    {
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'efs_master_key';
-
-        /* SQL to create the table */
-        $charset_collate = $wpdb->get_charset_collate();
-        $sql = "CREATE TABLE $table_name (
-            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            master_key BLOB NOT NULL,
-            PRIMARY KEY (id)
-        ) $charset_collate;";
-
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
-
-    /**
      * Create the database table for storing encrypted file metadata.
     */
 
@@ -157,6 +135,28 @@ class EFS_Init
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql); /* Ensures the table is created or updated if it already exists */
+    }
+
+    /**
+     * Create the custom table for storing the master key.
+    */
+
+    public function efs_create_master_key_table()
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'efs_master_key';
+
+        /* SQL to create the table */
+        $charset_collate = $wpdb->get_charset_collate();
+        $sql = "CREATE TABLE $table_name (
+            id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            master_key BLOB NOT NULL,
+            PRIMARY KEY (id)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
     }
 
     /**
@@ -341,6 +341,50 @@ class EFS_Init
         if ( $wp_filesystem->exists( $log_file ) )
         {
             /* Append if file exists */
+            $current_contents = $wp_filesystem->get_contents( $log_file );
+            $new_contents = $current_contents . $log_message;
+            $wp_filesystem->put_contents( $log_file, $new_contents, FS_CHMOD_FILE );
+        }
+        else
+        {
+            /* Create new file if it doesn't exist */
+            $wp_filesystem->put_contents( $log_file, $log_message, FS_CHMOD_FILE );
+        }
+    }
+
+    /**
+     * Log debug info to a file in the wp-content folder.
+     *
+     * @param string $message The message to log.
+    */
+
+    private function log_debug_info($message)
+    {
+        /* Ensure WP_Filesystem is available */
+        if ( ! function_exists('get_filesystem_method') )
+        {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        global $wp_filesystem;
+
+        /* Initialize WP_Filesystem */
+        if ( empty( $wp_filesystem ) )
+        {
+            WP_Filesystem();
+        }
+
+        /* Define the log file path */
+        $log_file = WP_CONTENT_DIR . '/efs_notification_log.txt';
+
+        /* Get current time and prepare log message */
+        $current_time = current_time('mysql');
+        $log_message = '[' . $current_time . '] ' . $message . PHP_EOL;
+
+        /* Check if file exists */
+        if ( $wp_filesystem->exists( $log_file ) )
+        {
+            /* Append message if file exists */
             $current_contents = $wp_filesystem->get_contents( $log_file );
             $new_contents = $current_contents . $log_message;
             $wp_filesystem->put_contents( $log_file, $new_contents, FS_CHMOD_FILE );
