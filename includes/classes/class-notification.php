@@ -62,6 +62,9 @@ class EFS_Notification_Handler
             $file_name = get_the_title($post_id);
             $upload_time = current_time('mysql');
             $download_link = wp_login_url() . '?redirect_to=' . urlencode(get_permalink($post_id));
+            $website_email = get_option('admin_email');
+            $website_title = get_bloginfo('name');
+            $website_url = get_bloginfo('url');
             $headers = ['Content-Type: text/html; charset=UTF-8'];
 
             $this->logger->log_debug_info("Starting notification process for post ID: {$post_id}");
