@@ -123,6 +123,10 @@ class EFS_Notification_Handler
 
         $file_name = get_the_title($file_id);
         $download_time = current_time('mysql');
+        $website_title = get_bloginfo('name');
+        $website_url = get_bloginfo('url');
+        /* Email subject and message */
+        $subject = "File Downloaded: " . $file_name;
         
         /* Check if $_SERVER['REMOTE_ADDR'] is set */
         if (isset($_SERVER['REMOTE_ADDR']))
