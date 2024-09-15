@@ -103,8 +103,9 @@ class EFS_Init
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             expiration_date DATETIME NULL, -- Allow NULL values
             download_date DATETIME DEFAULT NULL,
+            version INT NOT NULL,  -- Track re-encryption attempts or versions
             PRIMARY KEY (id),
-            UNIQUE (user_id, file_id)  -- Ensure each user gets unique key/expiry for a file
+            UNIQUE (user_id, file_id, version)  -- Uniqueness based on version, user id & file id
         ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
