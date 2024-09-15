@@ -69,7 +69,10 @@ class EFS_Encryption
                 )
             );
 
-            /* Save the encrypted DEK and KEK */
+            /* If no previous version exists, start from 1 */
+            $new_version = is_null($current_version) ? 1 : $current_version + 1;
+
+            /* Save the encrypted DEK and KEK with the new version */
             /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Reason for direct query: Custom table insertion required */
             $result = $wpdb->insert(
                 $table_name,
@@ -80,7 +83,8 @@ class EFS_Encryption
                     'encryption_key' => $encrypted_dek, /* Store encrypted DEK */
                     'user_kek' => $encrypted_kek, /* Save encrypted KEK */
                     'expiration_date' => $expiration_date !== null ? $expiration_date : null, /* Null if no expiration */
-                    'created_at' => current_time('mysql')
+                    'created_at' => current_time('mysql'),
+                    'version' => $new_version /* Incremented version */
                 ],
                 [
                     '%d', /* post_id */
@@ -89,7 +93,8 @@ class EFS_Encryption
                     '%s', /* encrypted_dek */
                     '%s', /* user_kek */
                     '%s', /* expiration_date %s for DATETIME */
-                    '%s'  /* created_at */
+                    '%s', /* created_at */
+                    '%d'  /* version */
                 ]
             );
 
