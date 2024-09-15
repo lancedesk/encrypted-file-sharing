@@ -152,7 +152,7 @@ class EFS_Notification_Handler
         $message = ob_get_clean();
 
         /* Send the email to the admin */
-        wp_mail($admin_email, $subject, $message, $headers);
+        $mail_status = wp_mail($admin_email, $subject, $message, $headers);
 
         /* Log debug info */
         $this->logger->log_debug_info(
