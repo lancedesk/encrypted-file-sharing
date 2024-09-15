@@ -60,6 +60,15 @@ class EFS_Encryption
                 continue;
             }
 
+            /* Fetch the current highest version for this user and file */
+            $current_version = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT MAX(version) FROM $table_name WHERE user_id = %d AND file_id = %d",
+                    $user_id,
+                    $file_id
+                )
+            );
+
             /* Save the encrypted DEK and KEK */
             /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Reason for direct query: Custom table insertion required */
             $result = $wpdb->insert(
