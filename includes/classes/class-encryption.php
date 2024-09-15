@@ -154,7 +154,7 @@ class EFS_Encryption
             return false;
         }
 
-        /* Query to get the encrypted DEK and KEK for the specific user and file */
+        /* Query to get the latest version of the encrypted DEK and KEK for the specific user and file */
         /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Reason: Custom table query required */
         $result = $wpdb->get_row(
             $wpdb->prepare(
@@ -163,6 +163,8 @@ class EFS_Encryption
                 FROM {$wpdb->prefix}efs_encryption_keys ek
                 WHERE user_id = %d
                 AND file_id = %d
+                ORDER BY version DESC
+                LIMIT 1
                 ",
                 $user_id, $file_id
             )
