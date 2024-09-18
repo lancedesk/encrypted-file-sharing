@@ -126,6 +126,10 @@ class EFS_Admin_Settings_Page
             $efs_delete_files = isset($_POST['efs_delete_files']) ? 1 : 0;
             update_option('efs_delete_files', $efs_delete_files);
 
+            /* Handle debug mode checkbox */
+            $efs_debug_mode = isset($_POST['efs_debug_mode']) ? 1 : 0;
+            update_option('efs_debug_mode', $efs_debug_mode);
+
         }
 
         /* Retrieve current options */
@@ -136,6 +140,7 @@ class EFS_Admin_Settings_Page
         $expiry_period = get_option('efs_expiry_period', 7); /* Default to 7 days */
         $expiry_unit = get_option('efs_expiry_unit', 'days'); /* Default to days */
         $file_privacy = get_option('efs_file_privacy', 0); /* Default to public */
+        $efs_delete_files = get_option('efs_delete_files', 0); /* Default to 0 */
         
         /* Retrieve current AWS options */
         $aws_region = get_option('efs_aws_region', '');
@@ -266,6 +271,13 @@ class EFS_Admin_Settings_Page
         echo '<label for="efs_delete_files">';
         echo '<input type="checkbox" id="efs_delete_files" name="efs_delete_files" value="1"' . checked(1, get_option('efs_delete_files', 0), false) . '>';
         echo esc_html__('Delete files from media library after encryption', 'encrypted-file-sharing');
+        echo '</label>';
+
+        /* Checkbox for enabling/disabling debug mode */
+        echo '<h2>' . esc_html__('Enable Debug Logging', 'encrypted-file-sharing') . '</h2>';
+        echo '<label for="efs_debug_mode">';
+        echo '<input type="checkbox" id="efs_debug_mode" name="efs_debug_mode" value="1"' . checked(1, get_option('efs_debug_mode', 0), false) . '>';
+        echo esc_html__('Enable logging of encryption messages for debugging', 'encrypted-file-sharing');
         echo '</label>';
 
         submit_button(esc_html__('Save Settings', 'encrypted-file-sharing'), 'primary', 'save_settings_button');
