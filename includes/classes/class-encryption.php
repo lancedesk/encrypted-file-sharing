@@ -63,7 +63,7 @@ class EFS_Encryption
             /* Fetch the current highest version for this user and file */
             $current_version = $wpdb->get_var(
                 $wpdb->prepare(
-                    "SELECT MAX(version) FROM $table_name WHERE user_id = %d AND file_id = %d",
+                    "SELECT MAX(version) FROM {$wpdb->prefix}efs_encryption_keys WHERE user_id = %d AND file_id = %d",
                     $user_id,
                     $file_id
                 )
