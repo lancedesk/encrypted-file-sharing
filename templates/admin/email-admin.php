@@ -41,7 +41,7 @@
 
                     <!-- Footer -->
                     <div style="background-color: #ecf0f1; padding: 20px; text-align: center; font-size: 14px; color: #7f8c8d; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-                        <p>&copy; <?php echo date('Y'); ?> <a href="<?php echo esc_url($website_url); ?>"><?php echo esc_html($website_title); ?></a>. All Rights Reserved.</p>
+                        <p>&copy; <?php echo gmdate('Y'); ?> <a href="<?php echo esc_url($website_url); ?>"><?php echo esc_html($website_title); ?></a>. All Rights Reserved.</p>
                     </div>
 
                 </div>
