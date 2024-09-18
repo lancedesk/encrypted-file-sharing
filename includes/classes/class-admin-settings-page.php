@@ -297,6 +297,7 @@ class EFS_Admin_Settings_Page
         if ($folder_exists)
         {
             echo '<div class="notice notice-success is-dismissible">';
+            /* Translators: %s is the path to the private folder. */
             echo '<p>' . sprintf(esc_html__('The private folder is located at: %s', 'encrypted-file-sharing'), esc_html($private_dir)) . '</p>';
             echo '</div>';
         } 
