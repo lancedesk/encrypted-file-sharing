@@ -321,7 +321,7 @@ class EFS_Local_File_Handler
         /* First, check if the file already exists by file_name */
         $existing_file = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT id FROM $table_name WHERE file_name = %s",
+                "SELECT id FROM {$wpdb->prefix}efs_files WHERE file_name = %s",
                 $file_name
             )
         );
