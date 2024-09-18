@@ -28,13 +28,13 @@ function efs_enqueue_admin_scripts($hook_suffix)
     $post_type = get_post_type();
 
     /* Ensure we are editing an efs_file post type or on the EFS settings page */
-    if (($hook_suffix === 'post-new.php' ||
-         $hook_suffix === 'post.php' ||
-         $hook_suffix === 'edit.php' ||
-         /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Conditionally enqueue scripts, not for sensitive actions*/
-         (isset($_GET['page']) && $_GET['page'] === 'efs-settings')) &&
-         /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Conditionally enqueue scripts, not for sensitive actions*/
-         ($post_type === 'efs_file' || (isset($_GET['page']) && $_GET['page'] === 'efs-settings'))
+    if (($hook_suffix === 'post-new.php' || 
+        $hook_suffix === 'post.php' || 
+        $hook_suffix === 'edit.php' ||
+        /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Conditionally enqueue scripts, not for sensitive actions*/
+        (isset($_GET['page']) && $_GET['page'] === 'efs-settings')) &&
+        /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Conditionally enqueue scripts, not for sensitive actions*/
+        ($post_type === 'efs_file' || (isset($_GET['page']) && $_GET['page'] === 'efs-settings'))
         )
     {
         /* Enqueue admin CSS */
@@ -68,6 +68,7 @@ add_action('admin_enqueue_scripts', 'efs_enqueue_s3_handler_script');
 function efs_enqueue_s3_handler_script($hook_suffix)
 {
     /* Check if we are on the correct admin page */
+    /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Conditionally enqueue scripts, not for sensitive actions*/
     if (isset($_GET['post_type']) && $_GET['post_type'] === 'efs_file' && isset($_GET['page']) && $_GET['page'] === 'efs-settings')
     {
         
