@@ -334,6 +334,7 @@ class EFS_Local_File_Handler
         }
 
         /* Insert the file record into the database */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $inserted = $wpdb->insert(
             $table_name,
             array(
