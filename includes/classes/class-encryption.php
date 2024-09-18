@@ -434,10 +434,6 @@ class EFS_Encryption
     {
         global $wpdb;
 
-        /* Table names */
-        $files_table = $wpdb->prefix . 'efs_files';
-        $encrypted_files_table = $wpdb->prefix . 'efs_encrypted_files';
-
         /* Search for the file by name in the files table */
         $file = $wpdb->get_row(
             $wpdb->prepare(
