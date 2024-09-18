@@ -28,10 +28,12 @@ function efs_enqueue_admin_scripts($hook_suffix)
     $post_type = get_post_type();
 
     /* Ensure we are editing an efs_file post type or on the EFS settings page */
-    if (($hook_suffix === 'post-new.php' || 
-         $hook_suffix === 'post.php' || 
+    if (($hook_suffix === 'post-new.php' ||
+         $hook_suffix === 'post.php' ||
          $hook_suffix === 'edit.php' ||
-         (isset($_GET['page']) && $_GET['page'] === 'efs-settings')) && 
+         /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Conditionally enqueue scripts, not for sensitive actions*/
+         (isset($_GET['page']) && $_GET['page'] === 'efs-settings')) &&
+         /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Conditionally enqueue scripts, not for sensitive actions*/
          ($post_type === 'efs_file' || (isset($_GET['page']) && $_GET['page'] === 'efs-settings'))
         )
     {
