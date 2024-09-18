@@ -73,7 +73,7 @@ class EFS_Init
             id INT NOT NULL AUTO_INCREMENT,
             file_id INT NOT NULL,  -- Reference to the file in `efs_files`
             post_id INT NOT NULL,
-            upload_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            upload_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
         ) $charset_collate;";
 
@@ -100,9 +100,9 @@ class EFS_Init
             file_id INT NOT NULL,  -- Reference to the file in `efs_file_metadata`
             encryption_key BLOB NOT NULL,
             user_kek BLOB NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            expiration_date DATETIME NULL, -- Allow NULL values
-            download_date DATETIME DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            expiration_date TIMESTAMP NULL, -- Allow NULL values
+            download_date TIMESTAMP DEFAULT NULL,
             version INT NOT NULL,  -- Track re-encryption attempts or versions
             PRIMARY KEY (id),
             UNIQUE (user_id, file_id, version)  -- Uniqueness based on version, user id & file id
@@ -129,7 +129,7 @@ class EFS_Init
             file_id INT(11) NOT NULL,
             post_id INT(11) NOT NULL,
             data_encryption_key BLOB NOT NULL,
-            expiration_date DATETIME NULL, -- Allow NULL values
+            expiration_date TIMESTAMP NULL, -- Allow NULL values
             encrypted_file VARCHAR(255) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) $charset_collate;";
