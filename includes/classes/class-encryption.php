@@ -441,7 +441,7 @@ class EFS_Encryption
         /* Search for the file by name in the files table */
         $file = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT id FROM $files_table WHERE file_name = %s",
+                "SELECT id FROM {$wpdb->prefix}efs_encrypted_files WHERE file_name = %s",
                 $file_name
             )
         );
