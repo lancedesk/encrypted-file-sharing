@@ -211,8 +211,6 @@ class EFS_File_CPT
         wp_nonce_field('efs_expiry_meta_box', 'efs_expiry_meta_box_nonce');
 
         /* Retrieve expiration date and time from the custom table */
-        $file_url = get_post_meta($post->ID, '_efs_file_url', true);
-        $file_name = $efs_admin_columns->efs_extract_file_name($file_url);
         $expiry_datetime = $efs_admin_columns->efs_get_expiration_date($post->ID);
 
         /* Split expiry date and time */
