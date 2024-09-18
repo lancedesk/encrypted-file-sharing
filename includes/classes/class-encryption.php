@@ -137,6 +137,7 @@ class EFS_Encryption
         }
 
         /* Query to get the file ID from the efs_files table */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $file_id = $wpdb->get_var(
             $wpdb->prepare(
                 "
