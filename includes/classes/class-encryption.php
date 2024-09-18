@@ -437,6 +437,7 @@ class EFS_Encryption
         global $wpdb;
 
         /* Search for the file by name in the files table */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $file = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT id FROM {$wpdb->prefix}efs_files WHERE file_name = %s",
