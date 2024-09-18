@@ -319,6 +319,7 @@ class EFS_Local_File_Handler
         $table_name = $wpdb->prefix . 'efs_files';
 
         /* First, check if the file already exists by file_name */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $existing_file = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT id FROM {$wpdb->prefix}efs_files WHERE file_name = %s",
