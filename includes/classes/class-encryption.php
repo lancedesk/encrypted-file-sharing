@@ -449,6 +449,7 @@ class EFS_Encryption
         if ($file !== null)
         {
             /* Use the file ID to search in the encrypted files table */
+            /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
             $encrypted_file = $wpdb->get_row(
                 $wpdb->prepare(
                     "SELECT data_encryption_key, encrypted_file FROM {$wpdb->prefix}efs_encrypted_files WHERE file_id = %d",
