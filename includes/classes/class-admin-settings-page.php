@@ -154,10 +154,9 @@ class EFS_Admin_Settings_Page
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('EFS Settings', 'encrypted-file-sharing') . '</h1>';
 
-        /* AWS Settings Form */
+        /* Combine all settings into one form */
         echo '<form method="post" action="">';
         wp_nonce_field('efs_settings_save', 'efs_settings_nonce'); /* Add nonce field */
-        wp_nonce_field('efs_settings_save', 'efs_settings_nonce');
         echo '<h2>' . esc_html__('Amazon S3 Settings', 'encrypted-file-sharing') . '</h2>';
         
         /* AWS Region */
@@ -194,13 +193,7 @@ class EFS_Admin_Settings_Page
         echo '</div>';
         echo '<button id="efs_fetch_buckets" type="button">' . esc_html__('Fetch Buckets', 'encrypted-file-sharing') . '</button>';
 
-        submit_button(esc_html__('Save AWS Settings', 'encrypted-file-sharing'), 'primary', 'save_aws_settings_button');
-        echo '</form>';
-
         /* Storage Option Settings */
-        echo '<form method="post" action="">';
-        wp_nonce_field('efs_settings_save', 'efs_settings_nonce'); /* Add nonce field */
-        echo '<input type="hidden" name="efs_form_type" value="storage_option">';
         echo '<h2>' . esc_html__('Select Storage Option', 'encrypted-file-sharing') . '</h2>';
         echo '<select name="efs_storage_option">';
         echo '<option value="local"' . selected($selected_storage, 'local', false) . '>' . esc_html__('Local Media', 'encrypted-file-sharing') . '</option>';
@@ -208,12 +201,8 @@ class EFS_Admin_Settings_Page
         echo '<option value="google"' . selected($selected_storage, 'google', false) . '>' . esc_html__('Google Drive', 'encrypted-file-sharing') . '</option>';
         echo '<option value="dropbox"' . selected($selected_storage, 'dropbox', false) . '>' . esc_html__('Dropbox', 'encrypted-file-sharing') . '</option>';
         echo '</select>';
-        submit_button(esc_html__('Save Storage Settings', 'encrypted-file-sharing'), 'primary', 'save_storage_settings_button');
-        echo '</form>';
 
         /* Admin Email Settings */
-        echo '<form method="post" action="">';
-        wp_nonce_field('efs_settings_save', 'efs_settings_nonce'); /* Add nonce field */
         echo '<h2>' . esc_html__('Select Admin to Receive Notifications', 'encrypted-file-sharing') . '</h2>';
         echo '<select name="efs_admin_email">';
 
