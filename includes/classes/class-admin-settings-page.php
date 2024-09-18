@@ -50,15 +50,9 @@ class EFS_Admin_Settings_Page
                 wp_die(esc_html__('Nonce verification failed.', 'encrypted-file-sharing'));
             }
 
-            /* Handle the storage option form */
-            $form_type = isset($_POST['efs_form_type']) ? sanitize_text_field(wp_unslash(sanitize_key($_POST['efs_form_type']))) : '';
-
-            if ($form_type === 'storage_option') 
+            if (isset($_POST['efs_storage_option'])) 
             {
-                if (isset($_POST['efs_storage_option'])) 
-                {
-                    update_option('efs_storage_option', sanitize_text_field(wp_unslash($_POST['efs_storage_option'])));
-                }
+                update_option('efs_storage_option', sanitize_text_field(wp_unslash($_POST['efs_storage_option'])));
             }
 
             /* Save AWS region */
