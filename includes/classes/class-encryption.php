@@ -61,6 +61,7 @@ class EFS_Encryption
             }
 
             /* Fetch the current highest version for this user and file */
+            /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
             $current_version = $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT MAX(version) FROM {$wpdb->prefix}efs_encryption_keys WHERE user_id = %d AND file_id = %d",
