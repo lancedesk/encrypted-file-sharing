@@ -102,7 +102,7 @@ class EFS_Init
             user_kek BLOB NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             expiration_date TIMESTAMP NULL, -- Allow NULL values
-            download_date TIMESTAMP DEFAULT NULL,
+            download_date TIMESTAMP NULL DEFAULT NULL,
             version INT NOT NULL,  -- Track re-encryption attempts or versions
             PRIMARY KEY (id),
             UNIQUE (user_id, file_id, version)  -- Uniqueness based on version, user id & file id
