@@ -83,6 +83,10 @@ new EFS_File_CPT();
 
 /* EFS activation hooks */
 register_activation_hook(__FILE__, ['EFS_Init', 'efs_activate']);
+
+/* EFS uninstall hook */
+register_uninstall_hook(__FILE__, ['EFS_Init', 'efs_uninstall']);
+
 /* 
 register_activation_hook(__FILE__, [$efs_aws_phar, 'download_and_extract_phar']);
 register_activation_hook(__FILE__, 'efs_install_dependencies');
