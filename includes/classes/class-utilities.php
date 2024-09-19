@@ -75,6 +75,3 @@ class EFS_Utilities
     }
 
 }
-
-/* Instantiate the class to trigger the action */
-$efs_post_manager = new EFS_Utilities();
