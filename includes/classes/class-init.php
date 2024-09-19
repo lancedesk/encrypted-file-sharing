@@ -456,9 +456,20 @@ class EFS_Init
     /* Static uninstall method for register_uninstall_hook() */
     public static function efs_uninstall()
     {
-        global $wpdb;
+        global $wpdb, $wp_filesystem;
 
+        /* Get uninstall option */
         $uninstall_data = get_option('efs_uninstall_data', 0);
+
+        $private_dir = ABSPATH . '../private_uploads/';
+
+        /* Load the WP_Filesystem API */
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+
+        if (empty($wp_filesystem)) 
+        {
+            WP_Filesystem();
+        }
 
         if ($uninstall_data) 
         {
@@ -485,6 +496,13 @@ class EFS_Init
             foreach ($posts as $post) 
             {
                 wp_delete_post($post->ID, true);
+            }
+
+            /* Delete the private folder */
+            if ($wp_filesystem->is_dir($private_dir)) 
+            {
+                /* Recursive delete of folder and contents */
+                $wp_filesystem->delete($private_dir, true); /* true - recursive delete */
             }
         }
 
