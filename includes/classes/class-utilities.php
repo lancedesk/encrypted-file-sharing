@@ -35,39 +35,42 @@ class EFS_Utilities
             return;
         }
 
+        /* Step 1: Retrieve file metadata based on the post_id */
+        $efs_file_metadata_table = $wpdb->prefix . 'efs_file_metadata';
+
+        $file_metadata = $wpdb->get_row(
+            $wpdb->prepare("SELECT file_id FROM $efs_file_metadata_table WHERE post_id = %d",
+            $post_id
+            )
+        );
+
+        if (!$file_metadata) 
+        {
+            return;  /* No metadata found, exit */
+        }
+
+        /* Step 2: Get file_id from from file metadata */
+        $file_id = $file_metadata->file_id;
+
         /* Table names */
         $efs_files_table = $wpdb->prefix . 'efs_files';
-        $efs_file_metadata_table = $wpdb->prefix . 'efs_file_metadata';
         $efs_encryption_keys_table = $wpdb->prefix . 'efs_encryption_keys';
         $efs_encrypted_files_table = $wpdb->prefix . 'efs_encrypted_files';
         $efs_recipients_table = $wpdb->prefix . 'efs_recipients';
 
-        /* Step 1: Get the file_id from efs_file_metadata table using post_id */
-        $file_id = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT file_id FROM $efs_file_metadata_table WHERE post_id = %d", 
-                $post_id
-            )
-        );
-
-        /* If no file is found, return early */
-        if (!$file_id) {
-            return;
-        }
-
-        /* Step 2: Delete related rows in efs_encrypted_files using file_id */
+        /* Step 3: Delete related rows in efs_encrypted_files using file_id */
         $wpdb->delete($efs_encrypted_files_table, array('file_id' => $file_id), array('%d'));
 
-        /* Step 3: Delete related rows in efs_recipients using post_id */
+        /* Step 4: Delete related rows in efs_recipients using post_id */
         $wpdb->delete($efs_recipients_table, array('post_id' => $post_id), array('%d'));
 
-        /* Step 4: Delete related rows in efs_encryption_keys using file_id */
+        /* Step 5: Delete related rows in efs_encryption_keys using file_id */
         $wpdb->delete($efs_encryption_keys_table, array('file_id' => $file_id), array('%d'));
 
-        /* Step 5: Delete related rows in efs_file_metadata using post_id */
+        /* Step 6: Delete related rows in efs_file_metadata using post_id */
         $wpdb->delete($efs_file_metadata_table, array('post_id' => $post_id), array('%d'));
 
-        /* Step 6: Finally, delete the row in efs_files using file_id */
+        /* Step 7: Finally, delete the row in efs_files using file_id */
         $wpdb->delete($efs_files_table, array('id' => $file_id), array('%d'));
     }
 
