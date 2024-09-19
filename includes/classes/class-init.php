@@ -7,13 +7,12 @@ class EFS_Init
         /* Empty constructor */
     }
 
-    /* Static uninstall method for register_uninstall_hook() */
     public static function efs_uninstall()
     {
         /* Instantiate the class to call non-static methods */
         $instance = new self();
-
-        /* Call the uninstall method */
+         
+        /* Call the uninstall method to remove tables, etc. */
         $instance->efs_uninstall_handler();
     }
 
@@ -464,12 +463,12 @@ class EFS_Init
     }
 
     /* Static uninstall method for register_uninstall_hook() */
-    private function efs_uninstall_handler()
+    public function efs_uninstall_handler()
     {
         global $wpdb, $wp_filesystem;
         $log_file = WP_CONTENT_DIR . '/efs_uninstall_log.txt';
 
-        $this->log_message($upload_dir, 'Uninstalling Encrypted File Sharing plugin.');
+        $this->log_message($log_file, 'Uninstalling Encrypted File Sharing plugin.');
 
         /* Get uninstall option */
         $uninstall_data = get_option('efs_uninstall_data', 0);
@@ -500,6 +499,7 @@ class EFS_Init
             /* Delete each table */
             foreach ($table_names as $table_name) 
             {
+                /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Custom table query, caching not applicable */
                 $wpdb->query("DROP TABLE IF EXISTS $table_name");
             }
 
