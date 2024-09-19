@@ -50,6 +50,7 @@ class EFS_Init
             id INT NOT NULL AUTO_INCREMENT,
             file_name VARCHAR(255) NOT NULL,
             encrypted_file_path VARCHAR(255) NOT NULL,
+            upload_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY file_name (file_name)
         ) $charset_collate;";
