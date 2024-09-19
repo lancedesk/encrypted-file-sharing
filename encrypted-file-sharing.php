@@ -51,6 +51,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/classes/class-notification.ph
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-handler.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-admin-users.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-encryption.php';
+require_once plugin_dir_path(__FILE__) . 'includes/classes/class-utilities.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-2fa-auth.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-file-cpt.php';
 require_once plugin_dir_path(__FILE__) . 'includes/classes/class-aws-phar.php';
@@ -72,6 +73,7 @@ $efs_file_handler =  new EFS_File_Handler(
     $efs_file_encryption
 );
 
+$efs_post_manager = new EFS_Utilities();
 $efs_aws_phar = new EFS_AWS_Phar();
 new EFS_File_Expiry_Handler();
 new EFS_Admin_Settings_Page();
