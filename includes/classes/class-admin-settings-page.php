@@ -266,6 +266,12 @@ class EFS_Admin_Settings_Page
         echo esc_html__('Enable logging of encryption messages for debugging', 'encrypted-file-sharing');
         echo '</label>';
 
+        /* Checkbox for uninstall behavior */
+        echo '<h2>' . esc_html__('Uninstall Behavior', 'encrypted-file-sharing') . '</h2>';
+        echo '<label for="efs_uninstall_data">';
+        echo '<input type="checkbox" id="efs_uninstall_data" name="efs_uninstall_data" value="1" ' . checked(1, get_option('efs_uninstall_data', 0), false) . '>';
+        echo esc_html__('Delete all data (database tables and posts) upon plugin uninstall', 'encrypted-file-sharing') . '</label>';
+
         submit_button(esc_html__('Save Settings', 'encrypted-file-sharing'), 'primary', 'save_settings_button');
         echo '</form>';
 
