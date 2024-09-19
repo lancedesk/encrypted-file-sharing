@@ -19,9 +19,6 @@ class EFS_File_Expiry_Handler
 
         /* Unschedule the event when the plugin is deactivated. */
         register_deactivation_hook(__FILE__, [$this, 'efs_unschedule_file_expiry_cron']);
-
-        /* Hook into save_post to save expiry information */
-        add_action('save_post', [$this, 'efs_save_file_expiry']);
     }
 
     /**
