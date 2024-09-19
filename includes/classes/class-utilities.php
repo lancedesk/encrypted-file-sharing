@@ -8,7 +8,6 @@ class EFS_Utilities
 
     public function __construct()
     {
-        $efs_logger = new EFS_init();
         /* Hook the delete function to before_delete_post action. */
         add_action('before_delete_post', [$this, 'efs_delete_post_data']);
     }
@@ -21,7 +20,7 @@ class EFS_Utilities
 
     public function efs_delete_post_data($post_id)
     {
-        global $wpdb;
+        global $wpdb, $efs_init;
 
         /* Define the log file path */
         $log_file = WP_CONTENT_DIR . '/efs_post_data_deletion_log.txt';
@@ -56,7 +55,7 @@ class EFS_Utilities
 
         /* Step 2: Get file_id from from file metadata */
         $file_id = $file_metadata->file_id;
-        $efs_logger->log_message($log_file, "Deleting data for file ID: $file_id");
+        $efs_init->log_message($log_file, "Deleting data for file ID: $file_id");
 
         /* Table names */
         $efs_files_table = $wpdb->prefix . 'efs_files';
@@ -67,27 +66,27 @@ class EFS_Utilities
         /* Step 3: Delete related rows in efs_encrypted_files using file_id */
         /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_encrypted_files_table, array('file_id' => $file_id), array('%d'));
-        $efs_logger->log_message($log_file, "Deleted rows from efs_encrypted_files for file ID: $file_id");
+        $efs_init->log_message($log_file, "Deleted rows from efs_encrypted_files for file ID: $file_id");
 
         /* Step 4: Delete related rows in efs_recipients using post_id */
         /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_recipients_table, array('post_id' => $post_id), array('%d'));
-        $efs_logger->log_message($log_file, "Deleted rows from efs_recipients for post ID: $post_id");
+        $efs_init->log_message($log_file, "Deleted rows from efs_recipients for post ID: $post_id");
 
         /* Step 5: Delete related rows in efs_encryption_keys using file_id */
         /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_encryption_keys_table, array('file_id' => $file_id), array('%d'));
-        $efs_logger->log_message($log_file, "Deleted rows from efs_encryption_keys for file ID: $file_id");
+        $efs_init->log_message($log_file, "Deleted rows from efs_encryption_keys for file ID: $file_id");
 
         /* Step 6: Delete related rows in efs_file_metadata using post_id */
         /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_file_metadata_table, array('post_id' => $post_id), array('%d'));
-        $efs_logger->log_message($log_file, "Deleted rows from efs_file_metadata for post ID: $post_id");
+        $efs_init->log_message($log_file, "Deleted rows from efs_file_metadata for post ID: $post_id");
 
         /* Step 7: Finally, delete the row in efs_files using file_id */
         /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_files_table, array('id' => $file_id), array('%d'));
-        $efs_logger->log_message($log_file, "Deleted row from efs_files for file ID: $file_id");
+        $efs_init->log_message($log_file, "Deleted row from efs_files for file ID: $file_id");
     }
 
 }
