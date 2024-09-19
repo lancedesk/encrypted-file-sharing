@@ -124,6 +124,9 @@ class EFS_Admin_Settings_Page
             $efs_debug_mode = isset($_POST['efs_debug_mode']) ? 1 : 0;
             update_option('efs_debug_mode', $efs_debug_mode);
 
+            /* Handle uninstall data checkbox */
+            $efs_uninstall_data = isset($_POST['efs_uninstall_data']) ? 1 : 0;
+            update_option('efs_uninstall_data', $efs_uninstall_data);
         }
 
         /* Retrieve current options */
