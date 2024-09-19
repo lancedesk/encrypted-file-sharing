@@ -40,7 +40,7 @@ class EFS_Utilities
 
         /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $file_metadata = $wpdb->get_row(
-            $wpdb->prepare("SELECT file_id FROM $efs_file_metadata_table WHERE post_id = %d",
+            $wpdb->prepare("SELECT file_id FROM {$wpdb->prefix}efs_file_metadata WHERE post_id = %d",
             $post_id
             )
         );
