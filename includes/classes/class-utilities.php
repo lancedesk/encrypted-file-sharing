@@ -28,6 +28,13 @@ class EFS_Utilities
             return;
         }
 
+        /* Check if the post type is 'efs_file' */
+        $post_type = get_post_type($post_id);
+        if ($post_type !== 'efs_file') 
+        {
+            return;
+        }
+
         /* Table names */
         $efs_files_table = $wpdb->prefix . 'efs_files';
         $efs_file_metadata_table = $wpdb->prefix . 'efs_file_metadata';
