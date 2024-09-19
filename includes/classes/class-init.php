@@ -467,6 +467,9 @@ class EFS_Init
     private function efs_uninstall_handler()
     {
         global $wpdb, $wp_filesystem;
+        $log_file = WP_CONTENT_DIR . '/efs_uninstall_log.txt';
+
+        $this->log_message($upload_dir, 'Uninstalling Encrypted File Sharing plugin.');
 
         /* Get uninstall option */
         $uninstall_data = get_option('efs_uninstall_data', 0);
