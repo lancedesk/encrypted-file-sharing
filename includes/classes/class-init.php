@@ -7,6 +7,16 @@ class EFS_Init
         /* Empty constructor */
     }
 
+    /* Static uninstall method for register_uninstall_hook() */
+    public static function efs_uninstall()
+    {
+        /* Instantiate the class to call non-static methods */
+        $instance = new self();
+
+        /* Call the uninstall method */
+        $instance->efs_uninstall_handler();
+    }
+
     /* Static activation method for register_activation_hook() */
     public static function efs_activate()
     {
@@ -454,7 +464,7 @@ class EFS_Init
     }
 
     /* Static uninstall method for register_uninstall_hook() */
-    public static function efs_uninstall()
+    private function efs_uninstall_handler()
     {
         global $wpdb, $wp_filesystem;
 
