@@ -499,7 +499,7 @@ class EFS_Init
             /* Delete each table */
             foreach ($table_names as $table_name) 
             {
-                /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Custom table query, caching not applicable */
+                /* phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Custom table query, caching not applicable */
                 $wpdb->query("DROP TABLE IF EXISTS $table_name");
             }
 
