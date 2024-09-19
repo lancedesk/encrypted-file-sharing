@@ -457,15 +457,28 @@ class EFS_Init
     public static function efs_uninstall()
     {
         global $wpdb;
-        
+
         $uninstall_data = get_option('efs_uninstall_data', 0);
-        
+
         if ($uninstall_data) 
         {
-            /* Delete custom database table */
-            $table_name = $wpdb->prefix . 'efs_files';
-            $wpdb->query("DROP TABLE IF EXISTS $table_name");
-            
+            /* Define table names */
+            $table_names = array(
+                $wpdb->prefix . 'efs_files',
+                $wpdb->prefix . 'efs_file_metadata',
+                $wpdb->prefix . 'efs_encryption_keys',
+                $wpdb->prefix . 'efs_encrypted_files',
+                $wpdb->prefix . 'efs_master_key',
+                $wpdb->prefix . 'efs_recipients',
+                $wpdb->prefix . 'efs_admin_users',
+            );
+
+            /* Delete each table */
+            foreach ($table_names as $table_name) 
+            {
+                $wpdb->query("DROP TABLE IF EXISTS $table_name");
+            }
+
             /* Delete all posts of type 'efs_file' */
             $post_type = 'efs_file';
             $posts = get_posts(array('post_type' => $post_type, 'numberposts' => -1));
@@ -474,8 +487,9 @@ class EFS_Init
                 wp_delete_post($post->ID, true);
             }
         }
-        
+
         /* Remove the options stored in the database */
         delete_option('efs_uninstall_data');
     }
+
 }
