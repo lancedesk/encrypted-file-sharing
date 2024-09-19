@@ -52,41 +52,45 @@ class EFS_File_Expiry_Handler
 
     public function efs_check_file_expiry()
     {
-        global $efs_file_handler;
+        global $efs_file_handler, $efs_admin_columns, $wpdb;
 
         /* Check if file expiry is enabled */
         $enable_expiry = get_option('efs_enable_expiry', 0);
 
         if ($enable_expiry) 
         {
-            /* Get expired files based on meta_key `_efs_file_expiry_date` */
+            /* Get all published files */
             $args = [
-                'post_type'    => 'efs_file',
-                'meta_key'     => '_efs_file_expiry_date',
-                'meta_value'   => gmdate('Y-m-d'),
-                'meta_compare' => '<=',
-                'post_status'  => 'publish',
-                'fields'       => 'ids',
+                'post_type'   => 'efs_file',
+                'post_status' => 'publish',
+                'fields'      => 'ids',
             ];
 
-            $expired_posts = get_posts($args);
+            $file_posts = get_posts($args);
 
-            foreach ($expired_posts as $post_id) 
+            /* Loop through the files and check expiry from custom table */
+            foreach ($file_posts as $post_id) 
             {
-                /* Delete the local file if stored locally */
-                $storage_option = get_option('efs_storage_option', 'local');
+                $expiration_date = $efs_admin_columns->efs_get_expiration_date($post_id);
 
-                if ($storage_option === 'local') 
+                /* Compare expiration date if it exists */
+                if ($expiration_date && strtotime($expiration_date) <= strtotime(gmdate('Y-m-d'))) 
                 {
-                    $file_url = get_post_meta($post_id, '_efs_file_url', true);
-                    $efs_file_handler->efs_delete_local_file($file_url);
-                }
+                    /* Delete the local file if stored locally */
+                    $storage_option = get_option('efs_storage_option', 'local');
 
-                /* Change post status to 'expired' */
-                wp_update_post([
-                    'ID'          => $post_id,
-                    'post_status' => 'expired', /* Set to 'expired' */
-                ]);
+                    if ($storage_option === 'local') 
+                    {
+                        $file_url = get_post_meta($post_id, '_efs_file_url', true);
+                        $efs_file_handler->efs_delete_local_file($file_url);
+                    }
+
+                    /* Change post status to 'expired' */
+                    wp_update_post([
+                        'ID'          => $post_id,
+                        'post_status' => 'expired',
+                    ]);
+                }
             }
         }
     }
