@@ -38,6 +38,7 @@ class EFS_Utilities
         /* Step 1: Retrieve file metadata based on the post_id */
         $efs_file_metadata_table = $wpdb->prefix . 'efs_file_metadata';
 
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $file_metadata = $wpdb->get_row(
             $wpdb->prepare("SELECT file_id FROM $efs_file_metadata_table WHERE post_id = %d",
             $post_id
@@ -59,18 +60,23 @@ class EFS_Utilities
         $efs_recipients_table = $wpdb->prefix . 'efs_recipients';
 
         /* Step 3: Delete related rows in efs_encrypted_files using file_id */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_encrypted_files_table, array('file_id' => $file_id), array('%d'));
 
         /* Step 4: Delete related rows in efs_recipients using post_id */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_recipients_table, array('post_id' => $post_id), array('%d'));
 
         /* Step 5: Delete related rows in efs_encryption_keys using file_id */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_encryption_keys_table, array('file_id' => $file_id), array('%d'));
 
         /* Step 6: Delete related rows in efs_file_metadata using post_id */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_file_metadata_table, array('post_id' => $post_id), array('%d'));
 
         /* Step 7: Finally, delete the row in efs_files using file_id */
+        /* phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom table query, caching not applicable */
         $wpdb->delete($efs_files_table, array('id' => $file_id), array('%d'));
     }
 
