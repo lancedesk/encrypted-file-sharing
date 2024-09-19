@@ -452,4 +452,30 @@ class EFS_Init
             $wp_filesystem->put_contents($log_file, $new_content, FS_CHMOD_FILE);
         }
     }
+
+    /* Static uninstall method for register_uninstall_hook() */
+    public static function efs_uninstall()
+    {
+        global $wpdb;
+        
+        $uninstall_data = get_option('efs_uninstall_data', 0);
+        
+        if ($uninstall_data) 
+        {
+            /* Delete custom database table */
+            $table_name = $wpdb->prefix . 'efs_files';
+            $wpdb->query("DROP TABLE IF EXISTS $table_name");
+            
+            /* Delete all posts of type 'efs_file' */
+            $post_type = 'efs_file';
+            $posts = get_posts(array('post_type' => $post_type, 'numberposts' => -1));
+            foreach ($posts as $post) 
+            {
+                wp_delete_post($post->ID, true);
+            }
+        }
+        
+        /* Remove the options stored in the database */
+        delete_option('efs_uninstall_data');
+    }
 }
